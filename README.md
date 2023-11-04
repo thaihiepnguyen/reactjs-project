@@ -10,6 +10,13 @@
     npm run start:dev
 ```
 
+### 2. How to run GUI
+```
+    cd /gui-reactjs-project
+    npm install
+    npm run dev
+```
+
 ### 3. How to DEV
 ```mermaid
 sequenceDiagram
