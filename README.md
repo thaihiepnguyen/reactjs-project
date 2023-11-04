@@ -1,5 +1,6 @@
 ## REACTJS PROJECT 
 
+- node version: nodejs v16.20.0
 - api-port: 3001
 - gui-port: 3000
 
