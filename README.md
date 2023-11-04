@@ -9,3 +9,16 @@
     npm install
     npm run start:dev
 ```
+
+### 3. How to DEV
+```mermaid
+sequenceDiagram
+    participant Main branch
+    participant Dev branch
+    participant Task demo
+    Note over Dev branch: Triển khai các task như này theo như thầy nói nhé!!!!
+    Main branch->>Dev branch: được tạo ra từ main
+    Dev branch->>Task demo: Được tạo ra từ dev
+    Task demo->> Dev branch: Sau khi hoàn thành, merge vào dev
+    Dev branch->> Main branch: Sau khi được verify, merge vào main
+```
