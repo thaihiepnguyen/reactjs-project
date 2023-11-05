@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import * as fs from 'fs'
 const PORT = 3001;
 
-
 async function dynamicImport(type): Promise<any> {
   const PREFIX = '/src/modules';
   const __dirname = fs.realpathSync('.');
@@ -22,7 +21,9 @@ async function dynamicImport(type): Promise<any> {
 
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule.forRoot(await dynamicImport('module')));
+  const app = await NestFactory.create(
+    AppModule.forRoot(await dynamicImport('module'))
+  );
   await app.listen(PORT || 3001);
   console.log('App is running on port: ', PORT || 3001);
 }

@@ -7,7 +7,7 @@ USE `QLHSSV_DB`;
 CREATE TABLE `QLHSSV_DB`.`users`
 (
     id         INT(11) NOT NULL AUTO_INCREMENT,
-    is_valid   TINYINT(1) NOT NULL DEFAULT '0',
+    is_valid   TINYINT(1) NOT NULL DEFAULT '1',
     is_active  TINYINT(1) NOT NULL DEFAULT '0',
     fullname   VARCHAR(255) NULL,
     password   VARCHAR(255) NULL,

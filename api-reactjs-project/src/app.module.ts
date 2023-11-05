@@ -1,8 +1,9 @@
-import {DynamicModule, Module} from '@nestjs/common';
+import {DynamicModule, MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import entities from "./typeorm";
+import {AuthMiddleware} from "./middlewares/auth.middleware";
 @Module({})
-export class AppModule {
+export class AppModule implements NestModule {
   static forRoot(modules): DynamicModule {
     return {
       module: AppModule,
@@ -19,5 +20,13 @@ export class AppModule {
         ...modules
       ]
     }
+  }
+  configure(consumer: MiddlewareConsumer): any {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(
+        'user/profile',
+        '/home',
+        '/auth/create')
   }
 }
