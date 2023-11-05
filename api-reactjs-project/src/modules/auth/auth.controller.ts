@@ -1,7 +1,6 @@
-import {Body, Controller, Post, UsePipes, ValidationPipe} from "@nestjs/common";
+import {Body, Controller, Get, Post, UsePipes, ValidationPipe} from "@nestjs/common";
 import {AuthService} from "./auth.service";
 import {CreateUserDto} from "./auth.dto";
-import {TBaseDto} from "../../typeorm/app.dto";
 
 
 @Controller('auth')
@@ -12,7 +11,7 @@ export class AuthController {
   ) {}
 
   @Post('create')
-  async create(@Body() createUserDto: CreateUserDto): Promise<void> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<any> {
     return await this.authService.create(createUserDto);
   }
 }
