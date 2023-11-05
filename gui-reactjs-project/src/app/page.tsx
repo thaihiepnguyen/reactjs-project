@@ -5,6 +5,7 @@ import Link from "next/link";
 import { routes } from "./routers/routes";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { increment } from "@/redux/reducers/counter";
+import API from "@/services/apiConfig"
 
 export default function Home() {
   const dispatch = useAppDispatch();
@@ -13,6 +14,7 @@ export default function Home() {
   const onClick = () => {
     dispatch(increment(1))
   }
+  
   return (
     <Box>
       <Stack direction={"column"} spacing={2}>
