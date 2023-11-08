@@ -8,3 +8,10 @@ export class RegisterDto {
   @IsEmail()
   email: string;
 }
+
+export class LoginDto {
+  @IsNotEmpty()
+  password: string;
+  @IsEmail()
+  email: string;
+}

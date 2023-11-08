@@ -1,6 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as fs from 'fs'
+import {ValidationPipe} from "@nestjs/common";
+import * as cookieParser from "cookie-parser";
+import {AuthGuard} from "./modules/auth/auth.guard";
 const PORT = 3001;
 
 async function dynamicImport(type): Promise<any> {
@@ -24,6 +27,10 @@ async function bootstrap() {
   const app = await NestFactory.create(
     AppModule.forRoot(await dynamicImport('module'))
   );
+  app.useGlobalGuards(new AuthGuard());
+  app.useGlobalPipes(new ValidationPipe())
+  app.use(cookieParser());
+
   await app.listen(PORT || 3001);
   console.log('App is running on port: ', PORT || 3001);
 }
