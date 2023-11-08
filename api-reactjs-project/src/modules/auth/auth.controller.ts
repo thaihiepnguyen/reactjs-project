@@ -1,12 +1,15 @@
-import {Body, Controller, Get, Post, UsePipes, ValidationPipe} from "@nestjs/common";
+import {Body, Controller, ForbiddenException, Get, Post, Res} from "@nestjs/common";
 import {AuthService} from "./auth.service";
-import {RegisterDto} from "./auth.dto";
+import {LoginDto, RegisterDto} from "./auth.dto";
 import {UserService} from "../user/user.service";
+import { Response } from "express";
 import * as bcrypt from "bcrypt";
+import {Cookies} from "../../app.decorator";
+import {MetaDataAuth} from "./auth.decorator";
+import * as argon from 'argon2';
 
 
 @Controller('auth')
-@UsePipes(new ValidationPipe({ transform: true }))
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -14,7 +17,6 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  @UsePipes(new ValidationPipe({ transform: true }))
   async register(@Body() registerDto: RegisterDto): Promise<any> {
     const {fullname, email, password} = registerDto;
     const user = await this.userService.findUserByEmail(email);
@@ -30,6 +32,66 @@ export class AuthController {
     await this.userService.createUser(fullname, email, encryptedPassword);
     return {
       message: 'User created successfully'
+    }
+  }
+
+
+  @Post('login')
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response): Promise<any> {
+    const {email, password} = loginDto;
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) {
+      return {
+        message: 'User not found'
+      }
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return {
+        message: 'Incorrect password'
+      }
+    }
+
+    const payload = {
+      id: user.id,
+      fullname: user.fullname,
+      email: user.email,
+    }
+
+    const token = await this.authService.generateToken(payload);
+    response.cookie('token', token);
+    response.cookie('userId', user.id)
+    response.cookie('userName', user.fullname)
+    return {
+      message: 'success'
+    }
+  }
+
+  @Get('refresh-token')
+  async refreshToken(
+    @MetaDataAuth('userId') userId: number,
+    @Cookies('token') token: any,
+    @Res({ passthrough: true }) response: Response
+  ): Promise<any> {
+    const {refreshToken} = token;
+
+    const user = await this.userService.findUserById(userId);
+
+    const isMatched = await argon.verify(user.refreshToken, refreshToken);
+    if (!isMatched) throw new ForbiddenException('Access Denied');
+
+    const payload = {
+      id: user.id,
+      fullname: user.fullname,
+      email: user.email,
+    }
+
+    const newToken = await this.authService.generateToken(payload);
+    response.cookie('token', newToken);
+
+    return {
+      message: 'success'
     }
   }
 }

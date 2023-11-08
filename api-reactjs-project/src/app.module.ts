@@ -1,7 +1,7 @@
 import {DynamicModule, MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import entities from "./typeorm";
-import {AuthMiddleware} from "./middlewares/auth.middleware";
+import {AuthMiddleware} from "./modules/auth/auth.middleware";
 @Module({})
 export class AppModule implements NestModule {
   static forRoot(modules): DynamicModule {
@@ -10,11 +10,11 @@ export class AppModule implements NestModule {
       imports: [
         TypeOrmModule.forRoot({
           type: 'mysql',
-          host: 'localhost',
+          host: 'bndfldpprlg9bq5dbymj-mysql.services.clever-cloud.com',
           port: 3306,
-          username: 'root', // your username
-          password: 'reallyStrongPwd123', // your password
-          database: 'QLHSSV_DB', // name of database
+          username: 'untyigrruhzut6nf', // your username
+          password: 'EzHurQYOCo1zhSnSrd5b', // your password
+          database: 'bndfldpprlg9bq5dbymj', // name of database
           entities,
         }),
         ...modules
@@ -26,7 +26,6 @@ export class AppModule implements NestModule {
       .apply(AuthMiddleware)
       .forRoutes(
         'user/profile',
-        '/home',
-        '/auth/create')
+        '/home')
   }
 }

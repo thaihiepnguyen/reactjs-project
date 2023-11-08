@@ -14,6 +14,7 @@ CREATE TABLE `QLHSSV_DB`.`users`
     email      VARCHAR(255) NULL,
     avatar_url     TEXT NULL,
     role_id    INT(11) NOT NULL DEFAULT '1',
+    refresh_token TEXT NULL,
     created_at TIMESTAMP  DEFAULT CURRENT_TIMESTAMP NOT NULL ,
     updated_at TIMESTAMP  DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
@@ -31,3 +32,6 @@ CREATE TABLE `QLHSSV_DB`.`roles`
 INSERT INTO `QLHSSV_DB`.`roles` (name) VALUES ('student');
 INSERT INTO `QLHSSV_DB`.`roles` (name) VALUES ('teacher');
 INSERT INTO `QLHSSV_DB`.`roles` (name) VALUES ('admin');
+
+
+SELECT * FROM users;
