@@ -26,6 +26,6 @@ export class AppModule implements NestModule {
       .apply(AuthMiddleware)
       .forRoutes(
         'user/profile',
-        '/home')
+        '/auth/login-social')
   }
 }

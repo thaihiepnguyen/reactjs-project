@@ -63,8 +63,11 @@ export class AuthController {
     response.cookie('token', token);
     response.cookie('userId', user.id)
     response.cookie('userName', user.fullname)
+    delete user.password;
     return {
-      message: 'success'
+      message: 'success',
+      token: token,
+      user: user,
     }
   }
 
@@ -92,6 +95,28 @@ export class AuthController {
 
     return {
       message: 'success'
+    }
+  }
+
+  @Post('login-social')
+  async loginSocial(@Body() loginSocialDto: any, @Res({ passthrough: true }) response: Response): Promise<any> {
+    const {name: fullname, email, image:avatar} = loginSocialDto.user;
+    const user = await this.userService.createOrUpdateUser(fullname, email, avatar );
+
+    const payload = {
+      id: user.id,
+      fullname: user.fullname,
+      email: user.email,
+    }
+
+    const token = await this.authService.generateToken(payload);
+    response.cookie('token', token);
+    response.cookie('userId', user.id)
+    response.cookie('userName', user.fullname)
+    return {
+      message: 'success',
+      token: token,
+      user: user,
     }
   }
 }
