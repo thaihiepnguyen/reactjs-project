@@ -2,7 +2,7 @@ import { routes } from "@/app/routers/routes";
 import { EAPI } from "@/models/general";
 import axios from "axios";
 import {redirect} from "next/navigation"
-import { cookies } from 'next/headers'
+
 
 const api = axios.create({
   baseURL: `${process.env.API_URL}`,
@@ -11,9 +11,6 @@ const api = axios.create({
 
 //User login token
 api.interceptors.request.use((config) => {
-  const cookieStore = cookies();
-  const token = cookieStore.get(EAPI.token);
-
   return config;
 });
 
