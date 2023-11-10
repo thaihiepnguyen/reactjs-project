@@ -4,6 +4,7 @@ import * as fs from 'fs'
 import {ValidationPipe} from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import {AuthGuard} from "./modules/auth/auth.guard";
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 const PORT = 3001;
 
 async function dynamicImport(type): Promise<any> {
@@ -27,6 +28,15 @@ async function bootstrap() {
   const app = await NestFactory.create(
     AppModule.forRoot(await dynamicImport('module'))
   );
+
+  const corsOptions: CorsOptions = {
+    origin: 'http://localhost:3000',  // Replace with the actual origin of your frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  };
+
+  app.enableCors(corsOptions);
+  
   app.useGlobalGuards(new AuthGuard());
   app.useGlobalPipes(new ValidationPipe())
   app.use(cookieParser());
