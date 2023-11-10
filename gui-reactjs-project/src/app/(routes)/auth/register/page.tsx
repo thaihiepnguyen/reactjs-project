@@ -1,10 +1,11 @@
 "use client";
-// SignUpForm.jsx
 
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material';
-// import './SignUpFormStyles.scss';
 import { Helmet } from 'react-helmet';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
 
 function RegisterForm() {
   const [fullname, setFullName] = useState('');
@@ -13,21 +14,21 @@ function RegisterForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleFullNameChange = (event) => {
+  const handleFullNameChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setFullName(event.target.value);
   };
 
-  const handleEmailChange = (event) => {
+  const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setEmail(event.target.value);
   };
 
-  const handlePasswordChange = (event) => {
+  const handlePasswordChange = (event: { target: { value: any; }; }) => {
     const newPassword = event.target.value;
     setPassword(newPassword);
     validatePassword(newPassword);
   };
 
-  const handleUserTypeChange = (event) => {
+  const handleUserTypeChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setUserType(event.target.value);
   };
 
@@ -45,7 +46,7 @@ function RegisterForm() {
   //   }
   // };
 
-  const validatePassword = (value) => {
+  const validatePassword = (value: string) => {
     // Password validation logic
     const regex = /^(?=.*\d)(?=.*[A-Z]).{8,}$/;
     if (!regex.test(value)) {
@@ -55,10 +56,41 @@ function RegisterForm() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 
     // Additional form submission logic, e.g., sending data to the server
+    try {
+      const response = await axios.post('http://localhost:3001/auth/register', {
+        fullname,
+        email,
+        password, 
+      });
+
+      // Handle the response as needed
+      if (response.data.message === 'User already exists') {
+        console.log('Run here');
+        // Show SweetAlert2 dialog for user already exists
+        Swal.fire({
+          title: 'Error',
+          text: 'User already exists. Please choose a different email.',
+          icon: 'error',
+        });
+      } else {
+
+        // Handle other cases or success
+        Swal.fire({
+          title: "Register sucessfully!",
+          text: "Congratulations!",
+          icon: "success"
+        });
+      }
+      // console.log('Server response:', response.data);
+    } catch (error) {
+      // Handle error
+      console.error('Error submitting form:', error);
+    }
+    
     console.log('Form submitted:', { fullname, email, password, userType });
   };
 

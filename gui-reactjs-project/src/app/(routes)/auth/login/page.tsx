@@ -30,6 +30,7 @@ function SignUpForm() {
     event.preventDefault();
 
     // Additional form submission logic
+    
   };
   return (
     <Container maxWidth="sm">
