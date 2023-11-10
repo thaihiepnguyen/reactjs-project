@@ -5,6 +5,7 @@ import {InjectConnection, InjectRepository} from "@nestjs/typeorm";
 import {Connection} from "mysql2";
 import {JwtService} from "@nestjs/jwt";
 import * as argon from 'argon2';
+import {MailerService} from "@nestjs-modules/mailer";
 
 
 @Injectable()
@@ -14,7 +15,8 @@ export class AuthService {
     private readonly userRepository: Repository<Users>,
     @InjectConnection()
     private readonly connection: Connection,
-    private jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService
   ) {}
 
   public async generateToken(payload: any)
@@ -34,5 +36,35 @@ export class AuthService {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  public async sendMail(toEmail, token): Promise<any> {
+    const html = `<p>Click the following link to verify your email: <a href="http://localhost:3001/auth/verify-email?token=${token.accessToken}">Verify Email</a></p>`;
+    return await this.mailerService.sendMail({
+      to: toEmail,
+      from: 'thaihiep232002@gmail.com',
+      subject: 'Verify Your Email',
+      html: html,
+    });
+  }
+
+  public async verifyEmail(token: string): Promise<any> {
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(token);
+      if (!payload) {
+        return {
+          message: 'Invalid token',
+          status: 400
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      await this.userRepository.update(
+        {email: payload.email},
+        {isActive: true}
+      );
+    }
   }
 }

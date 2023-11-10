@@ -7,7 +7,6 @@ import {JwtService} from "@nestjs/jwt";
 export class AuthMiddleware implements NestMiddleware {
   constructor(private jwtService: JwtService) {}
   use(req: Request, res: Response, next: NextFunction) {
-    console.log(req.cookies)
     if (!req.cookies.token) {
       return res.status(401).json({
         statusCode: 401,

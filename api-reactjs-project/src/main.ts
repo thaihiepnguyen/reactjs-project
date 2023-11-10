@@ -5,7 +5,9 @@ import {ValidationPipe} from "@nestjs/common";
 import * as cookieParser from "cookie-parser";
 import {AuthGuard} from "./modules/auth/auth.guard";
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
-const PORT = 3001;
+import { config } from 'dotenv';
+import * as process from "process";
+config();
 
 async function dynamicImport(type): Promise<any> {
   const PREFIX = '/src/modules';
@@ -30,7 +32,7 @@ async function bootstrap() {
   );
 
   const corsOptions: CorsOptions = {
-    origin: 'http://localhost:3000',  // Replace with the actual origin of your frontend
+    origin: process.env.CLIENT_URL,  // Replace with the actual origin of your frontend
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };
@@ -41,7 +43,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe())
   app.use(cookieParser());
 
-  await app.listen(PORT || 3001);
-  console.log('App is running on port: ', PORT || 3001);
+  await app.listen(process.env.PORT || 3001);
+  console.log('App is running on port: ', process.env.PORT || 3001);
 }
 bootstrap();

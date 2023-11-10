@@ -1,5 +1,5 @@
 export class TBaseDto<T> {
-  data: T;
+  data?: T;
   message?: string;
   status?: number;
 }

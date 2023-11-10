@@ -2,6 +2,9 @@ import {DynamicModule, MiddlewareConsumer, Module, NestModule} from '@nestjs/com
 import {TypeOrmModule} from "@nestjs/typeorm";
 import entities from "./typeorm";
 import {AuthMiddleware} from "./modules/auth/auth.middleware";
+import {MailerModule} from "@nestjs-modules/mailer";
+import {ConfigModule} from "@nestjs/config";
+import * as process from "process";
 @Module({})
 export class AppModule implements NestModule {
   static forRoot(modules): DynamicModule {
@@ -10,12 +13,24 @@ export class AppModule implements NestModule {
       imports: [
         TypeOrmModule.forRoot({
           type: 'mysql',
-          host: 'bndfldpprlg9bq5dbymj-mysql.services.clever-cloud.com',
-          port: 3306,
-          username: 'untyigrruhzut6nf', // your username
-          password: 'EzHurQYOCo1zhSnSrd5b', // your password
-          database: 'bndfldpprlg9bq5dbymj', // name of database
+          host: process.env.MYSQL_ADDON_HOST,
+          port: +process.env.MYSQL_ADDON_PORT,
+          username: process.env.MYSQL_ADDON_USER,
+          password: process.env.MYSQL_ADDON_PASSWORD,
+          database: process.env.MYSQL_ADDON_DB,
           entities,
+        }),
+        MailerModule.forRoot({
+          transport: {
+            host: process.env.HOST_NODEMAILER,
+            auth: {
+              user: process.env.USER_NODEMAILER,
+              pass: process.env.PASS_NODEMAILER
+            }
+          }
+        }),
+        ConfigModule.forRoot({
+          isGlobal: true,
         }),
         ...modules
       ]
