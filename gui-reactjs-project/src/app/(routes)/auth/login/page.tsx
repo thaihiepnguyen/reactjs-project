@@ -5,18 +5,27 @@ import React, { useState } from 'react';
 import { TextField, Button, Container, Typography } from '@mui/material';
 import classes from "./styles.module.scss"
 import { signIn } from "next-auth/react";
+import Link from 'next/link';
+import { routes } from "@/app/routers/routes";
+import { Helmet } from "react-helmet";
+import axios from "axios";
 
-function SignUpForm() {
+function LoginForm() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handlePasswordChange = (event) => {
+  const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setEmail(event.target.value);
+  }
+   
+  const handlePasswordChange = (event: { target: { value: any; }; }) => {
     const newPassword = event.target.value;
     setPassword(newPassword);
     validatePassword(newPassword);
   };
 
-  const validatePassword = (value) => {
+  const validatePassword = (value: string) => {
     // Password validation logic
     const regex = /^(?=.*\d)(?=.*[A-Z]).{8,}$/;
     if (!regex.test(value)) {
@@ -26,16 +35,31 @@ function SignUpForm() {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 
     // Additional form submission logic
+    // try {
+    //   const response = await axios.post('http://localhost:3001/auth/login', {
+    //     email 
+    //   });
+
+    //   // Handle the response as needed
+    //   if (response.data) {
+    //     console.log('Exist account: ', response.data);
+    //   }
+    // } catch (error) {
+    //   // Handle error
+    //   console.error('Error submitting form:', error);
+    // }
     
+    console.log('Form submitted:', {email, password});
   };
+  
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" align="center" gutterBottom>
-        Sign Up
+        Login
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
@@ -45,6 +69,7 @@ function SignUpForm() {
           margin="normal"
           fullWidth
           required
+          onChange={handleEmailChange}
         />
         <TextField
           type="password"
@@ -63,7 +88,7 @@ function SignUpForm() {
           fullWidth
           disabled={Boolean(error)} 
         >
-          Sign Up
+          Login
         </Button>
       </form>
     </Container>
@@ -76,9 +101,12 @@ export default function Login() {
 
   return (
     <>
+      <Helmet>
+        <title>Login</title>
+      </Helmet>
       <span>Login page</span>
       <span>Counter: {value}</span>
-      <SignUpForm />
+      <LoginForm />
       <Container maxWidth="sm">
         <Button 
             className={classes.loginGoogleBtn}
@@ -90,6 +118,12 @@ export default function Login() {
             >
             Login with google
         </Button>
+        <Typography className={classes.switchText}variant="body2" align="center" gutterBottom>
+          Don't have an account?{' '}
+          <Link href={routes.register} >
+            Register
+          </Link>
+        </Typography>
       </Container>
     </>
   )
