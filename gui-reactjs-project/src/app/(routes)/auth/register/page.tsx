@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Radio, RadioGroup, FormControlLabel, FormControl } from '@mui/material';
+import { TextField, Button, Container, Typography, Radio, RadioGroup, FormControlLabel, FormControl, InputAdornment, IconButton } from '@mui/material';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-
+import classes from './styles.module.scss';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 function RegisterForm() {
   const [fullname, setFullName] = useState('');
@@ -13,6 +14,7 @@ function RegisterForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleFullNameChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setFullName(event.target.value);
@@ -27,6 +29,11 @@ function RegisterForm() {
     setPassword(newPassword);
     validatePassword(newPassword);
   };
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
 
   const handleUserTypeChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setUserType(event.target.value);
@@ -120,7 +127,7 @@ function RegisterForm() {
           onChange={handleEmailChange}
         />
         <TextField
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           label="Password"
           variant="outlined"
           margin="normal"
@@ -128,6 +135,15 @@ function RegisterForm() {
           required
           value={password}
           onChange={handlePasswordChange}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleTogglePasswordVisibility} edge="end">
+                  {showPassword ? <Visibility /> : <VisibilityOff />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         {error && <Typography variant="body2" color="error">{error}</Typography>}
         
@@ -162,7 +178,9 @@ export default function Register() {
         <title>Register</title>
       </Helmet>
       {/* <span>Register Page</span> */}
-      <RegisterForm />
+      <Container className={classes.box} maxWidth="sm">
+        <RegisterForm />
+      </Container>
     </>
   );
 }
