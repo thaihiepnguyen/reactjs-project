@@ -1,15 +1,19 @@
 'use client'
 
-import { useAppSelector } from "@/redux/hook";
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, InputAdornment, IconButton } from '@mui/material';
 import classes from "./styles.module.scss"
 import { signIn } from "next-auth/react";
 import Link from 'next/link';
 import { routes } from "@/app/routers/routes";
+<<<<<<< Updated upstream
 import { Helmet } from "react-helmet";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+=======
+>>>>>>> Stashed changes
 import axios from "axios";
+import {EAPI} from "@/models/general";
+import Cookies from 'universal-cookie/es6';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -45,19 +49,25 @@ function LoginForm() {
     event.preventDefault();
 
     // Additional form submission logic
-    // try {
-    //   const response = await axios.post('http://localhost:3001/auth/login', {
-    //     email 
-    //   });
+    try {
+      const response = await axios.post('http://localhost:3001/auth/login', {
+        email,
+        password
+      });
 
-    //   // Handle the response as needed
-    //   if (response.data) {
-    //     console.log('Exist account: ', response.data);
-    //   }
-    // } catch (error) {
-    //   // Handle error
-    //   console.error('Error submitting form:', error);
-    // }
+      // Handle the response as needed
+      if (response.data) {
+        const cookies = new Cookies();
+        cookies.set('token', JSON.stringify(response.data.data.token));
+        cookies.set('userId', response.data.data.user.id);
+        cookies.set('userName', response.data.data.user.fullname);
+
+        console.log('Exist account: ', response.data);
+      }
+    } catch (error) {
+      // Handle error
+      console.error('Error submitting form:', error);
+    }
     
     console.log('Form submitted:', {email, password});
   };
@@ -118,10 +128,11 @@ function LoginForm() {
 
 
 export default function Login() {
-  const {value} = useAppSelector(state => state.counterReducer)
+  // const {value} = useAppSelector(state => state.counterReducer)
 
   return (
     <>
+<<<<<<< Updated upstream
       <Helmet>
         <title>Login</title>
       </Helmet>
@@ -147,6 +158,31 @@ export default function Login() {
             </Link>
           </Typography>
         </Container>
+=======
+      {/*<Helmet>*/}
+      {/*  <title>Login</title>*/}
+      {/*</Helmet>*/}
+      {/*<span>Login page</span>*/}
+      {/*<span>Counter: {value}</span>*/}
+      <LoginForm />
+      <Container maxWidth="sm">
+        <Button 
+            className={classes.loginGoogleBtn}
+            type="submit"
+            variant="contained"
+            // color="white"
+            fullWidth
+            onClick={()=>signIn('google')}
+            >
+            Login with google
+        </Button>
+        <Typography className={classes.switchText}variant="body2" align="center" gutterBottom>
+          Don't have an account?{' '}
+          <Link href={routes.register} >
+            Register
+          </Link>
+        </Typography>
+>>>>>>> Stashed changes
       </Container>
     </>
   )

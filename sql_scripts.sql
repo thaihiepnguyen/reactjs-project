@@ -32,6 +32,3 @@ CREATE TABLE `QLHSSV_DB`.`roles`
 INSERT INTO `QLHSSV_DB`.`roles` (name) VALUES ('student');
 INSERT INTO `QLHSSV_DB`.`roles` (name) VALUES ('teacher');
 INSERT INTO `QLHSSV_DB`.`roles` (name) VALUES ('admin');
-
-
-SELECT * FROM users;

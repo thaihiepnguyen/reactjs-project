@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/redux/provider";
 import AuthProvider from "./components/AuthProvider";
+import Index from "@/app/components/Navbar/Navbar";
 
 
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={montserrat.className}>
         <AuthProvider>
           <Providers>
+            <Index></Index>
             {children}
           </Providers>
         </AuthProvider>

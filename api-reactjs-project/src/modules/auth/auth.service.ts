@@ -47,12 +47,6 @@ export class AuthService {
   public async sendMail(toEmail, token): Promise<any> {
     const serverUrl = process.env.SERVER_URL || 'http://localhost:3001';
     const html = `<p>Click the following link to verify your email: <a href="${serverUrl}/auth/verify-email?token=${token.accessToken}">Verify Email</a></p>`;
-    console.log({
-      to: toEmail,
-      from: process.env.USER_NODEMAILER,
-      subject: 'Verify Your Email',
-      html: html,
-    })
     return await this.mailerService.sendMail({
       to: toEmail,
       from: process.env.USER_NODEMAILER,
@@ -61,24 +55,23 @@ export class AuthService {
     });
   }
 
-  public async verifyEmail(token: string): Promise<any> {
+  public async verifyEmail(token: string): Promise<Boolean> {
     let payload: any;
     try {
       payload = this.jwtService.verify(token);
       if (!payload) {
-        return {
-          message: 'Invalid token',
-          status: 400
-        }
+        return false;
       }
     } catch (e) {
       console.log(e);
+      return false;
     } finally {
       await this.userRepository.update(
         {email: payload.email},
         {isActive: true}
       );
     }
+    return true;
   }
 
   public async register(registerDto: RegisterDto)

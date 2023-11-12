@@ -1,0 +1,28 @@
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #fff;
+  border-bottom: 1px solid #e6e6e6;
+  height: 60px;
+  line-height: 60px;
+  padding: 0 20px;
+  width: 100%;
+  margin-bottom: 30px;
+  .home {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .loginContainer {
+    align-self: center;
+    height: 40px;
+    width: 200px;
+    display: flex;
+    justify-content: space-around;
+  }
+}

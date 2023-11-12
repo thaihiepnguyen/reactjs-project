@@ -52,8 +52,9 @@ export class UserService {
   async findUserById(id: number): Promise<Users | undefined> {
     return await this.userRepository.findOne(
       {
-        where: {id}
-      }
+        where: {id},
+        select: ['id', 'fullname', 'email', 'avatarUrl']
+      },
     );
   }
 }

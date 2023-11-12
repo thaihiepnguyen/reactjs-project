@@ -7,14 +7,21 @@ import {JwtService} from "@nestjs/jwt";
 export class AuthMiddleware implements NestMiddleware {
   constructor(private jwtService: JwtService) {}
   use(req: Request, res: Response, next: NextFunction) {
-    if (!req.cookies.token) {
+    const authorizationHeader = req.headers.authorization;
+    if (!authorizationHeader) {
       return res.status(401).json({
         statusCode: 401,
         message: 'Unauthorized'
       })
     }
+    const [, accessToken] = authorizationHeader.split(' ');
 
-    const { accessToken } = req.cookies.token;
+    if (!accessToken) {
+      return res.status(401).json({
+        statusCode: 401,
+        message: 'Unauthorized'
+      })
+    }
 
     let isTokenValid = true;
     try {

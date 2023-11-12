@@ -25,10 +25,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response
   ): Promise<TBaseDto<any>> {
     const { message, data, statusCode } = await this.authService.login(loginDto);
-    const { token, user } = data;
-    response.cookie('token', token);
-    response.cookie('userId', user.id);
-    response.cookie('userName', user.fullname);
+    const { user } = data;
     delete user.password;
     return {
       message,
@@ -45,40 +42,21 @@ export class AuthController {
   ): Promise<TBaseDto<any>> {
     const {refreshToken} = token;
 
-    const { message, data, statusCode } = await this.authService.refreshToken(userId, refreshToken);
-    const { newToken, user } = data;
-
-    response.cookie('token', newToken);
-    response.cookie('userId', user.id)
-    response.cookie('userName', user.fullname)
-
-    return {
-      message,
-      statusCode,
-    }
+    return await this.authService.refreshToken(userId, refreshToken);
   }
 
   @Post('login-social')
   async loginSocial(@Body() loginSocialDto: any, @Res({ passthrough: true }) response: Response)
     : Promise<TBaseDto<any>> {
-    const { message, data, statusCode } = await this.authService.loginSocial(loginSocialDto);
-
-    const { token, user } = data;
-    response.cookie('token', token);
-    response.cookie('userId', user.id)
-    response.cookie('userName', user.fullname)
-    return {
-      message,
-      data,
-      statusCode,
-    }
+    return await this.authService.loginSocial(loginSocialDto);
   }
 
   @Get('verify-email')
   async verifyEmail(
     @Query('token') token: string
   ): Promise<TBaseDto<any>> {
-    await this.authService.verifyEmail(token);
+    const isValid = await this.authService.verifyEmail(token);
+    if (!isValid) throw new Error('Invalid token');
     return {
       message: 'success',
       statusCode: 200,
