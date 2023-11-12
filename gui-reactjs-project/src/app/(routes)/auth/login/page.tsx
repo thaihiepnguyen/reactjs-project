@@ -6,13 +6,9 @@ import classes from "./styles.module.scss"
 import { signIn } from "next-auth/react";
 import Link from 'next/link';
 import { routes } from "@/app/routers/routes";
-<<<<<<< Updated upstream
 import { Helmet } from "react-helmet";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-=======
->>>>>>> Stashed changes
 import axios from "axios";
-import {EAPI} from "@/models/general";
 import Cookies from 'universal-cookie/es6';
 
 function LoginForm() {
@@ -132,7 +128,6 @@ export default function Login() {
 
   return (
     <>
-<<<<<<< Updated upstream
       <Helmet>
         <title>Login</title>
       </Helmet>
@@ -158,31 +153,6 @@ export default function Login() {
             </Link>
           </Typography>
         </Container>
-=======
-      {/*<Helmet>*/}
-      {/*  <title>Login</title>*/}
-      {/*</Helmet>*/}
-      {/*<span>Login page</span>*/}
-      {/*<span>Counter: {value}</span>*/}
-      <LoginForm />
-      <Container maxWidth="sm">
-        <Button 
-            className={classes.loginGoogleBtn}
-            type="submit"
-            variant="contained"
-            // color="white"
-            fullWidth
-            onClick={()=>signIn('google')}
-            >
-            Login with google
-        </Button>
-        <Typography className={classes.switchText}variant="body2" align="center" gutterBottom>
-          Don't have an account?{' '}
-          <Link href={routes.register} >
-            Register
-          </Link>
-        </Typography>
->>>>>>> Stashed changes
       </Container>
     </>
   )
