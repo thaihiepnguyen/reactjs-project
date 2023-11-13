@@ -10,6 +10,8 @@ import { Helmet } from "react-helmet";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from "axios";
 import Cookies from 'universal-cookie/es6';
+import {useAppDispatch} from "@/redux/hook";
+import {setUser} from "@/redux/reducers/user";
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -32,7 +34,6 @@ function LoginForm() {
   };
 
   const validatePassword = (value: string) => {
-    // Password validation logic
     const regex = /^(?=.*\d)(?=.*[A-Z]).{8,}$/;
     if (!regex.test(value)) {
       setError('Password must be at least 8 characters, contain one number, and one uppercase letter.');
@@ -44,28 +45,21 @@ function LoginForm() {
   const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 
-    // Additional form submission logic
     try {
       const response = await axios.post('http://localhost:3001/auth/login', {
         email,
         password
       });
 
-      // Handle the response as needed
       if (response.data) {
         const cookies = new Cookies();
         cookies.set('token', JSON.stringify(response.data.data.token));
         cookies.set('userId', response.data.data.user.id);
         cookies.set('userName', response.data.data.user.fullname);
-
-        console.log('Exist account: ', response.data);
       }
     } catch (error) {
-      // Handle error
       console.error('Error submitting form:', error);
     }
-    
-    console.log('Form submitted:', {email, password});
   };
   
   return (

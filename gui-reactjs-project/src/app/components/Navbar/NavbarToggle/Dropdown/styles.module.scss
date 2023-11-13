@@ -1,0 +1,28 @@
+
+.menusContainer {
+  position: fixed;
+  z-index: 99999;
+  padding: 25px 15px;
+  width: 250px;
+  border-radius: 5px;
+  background-color: white;
+  border: 1px solid lightgray;
+  box-shadow: 3px 3px 3px lightgray;
+  right: 10px;
+}
+.menusItem {
+  list-style-type: none;
+  margin-left: 15px;
+}
+.menusItemContainer {
+  text-decoration: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px 10px;
+}
+
+.menusItemContainer:hover {
+  background-color: whitesmoke;
+  border-radius: 5px;
+}
