@@ -1,30 +1,43 @@
 "use client";
 
-import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Radio, RadioGroup, FormControlLabel, FormControl, InputAdornment, IconButton } from '@mui/material';
-import { Helmet } from 'react-helmet';
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import classes from './styles.module.scss';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import React, { useState } from "react";
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import { Helmet } from "react-helmet";
+import axios from "axios";
+import Swal from "sweetalert2";
+import classes from "./styles.module.scss";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { routes } from "@/app/routers/routes";
+import Link from "next/link";
 
 function RegisterForm() {
-  const [fullname, setFullName] = useState('');
-  const [userType, setUserType] = useState('student'); // Default to 'student'
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [fullname, setFullName] = useState("");
+  const [userType, setUserType] = useState("student"); // Default to 'student'
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleFullNameChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+  const handleFullNameChange = (event: { target: { value: React.SetStateAction<string> } }) => {
     setFullName(event.target.value);
   };
 
-  const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+  const handleEmailChange = (event: { target: { value: React.SetStateAction<string> } }) => {
     setEmail(event.target.value);
   };
 
-  const handlePasswordChange = (event: { target: { value: any; }; }) => {
+  const handlePasswordChange = (event: { target: { value: any } }) => {
     const newPassword = event.target.value;
     setPassword(newPassword);
     validatePassword(newPassword);
@@ -34,8 +47,7 @@ function RegisterForm() {
     setShowPassword(!showPassword);
   };
 
-
-  const handleUserTypeChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+  const handleUserTypeChange = (event: { target: { value: React.SetStateAction<string> } }) => {
     setUserType(event.target.value);
   };
 
@@ -57,48 +69,47 @@ function RegisterForm() {
     // Password validation logic
     const regex = /^(?=.*\d)(?=.*[A-Z]).{8,}$/;
     if (!regex.test(value)) {
-      setError('Password must be at least 8 characters, contain at least 1 number, 1 uppercase letter.');
+      setError("Password must be at least 8 characters, contain at least 1 number, 1 uppercase letter.");
     } else {
-      setError('');
+      setError("");
     }
   };
 
-  const handleSubmit = async (event: { preventDefault: () => void; }) => {
+  const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
 
     // Additional form submission logic, e.g., sending data to the server
     try {
-      const response = await axios.post('http://localhost:3001/auth/register', {
+      const response = await axios.post("http://localhost:3001/auth/register", {
         fullname,
         email,
-        password, 
+        password,
       });
 
       // Handle the response as needed
-      if (response.data.message === 'User already exists') {
-        console.log('Run here');
+      if (response.data.message === "User already exists") {
+        console.log("Run here");
         // Show SweetAlert2 dialog for user already exists
         Swal.fire({
-          title: 'Error',
-          text: 'User already exists. Please choose a different email.',
-          icon: 'error',
+          title: "Error",
+          text: "User already exists. Please choose a different email.",
+          icon: "error",
         });
       } else {
-
         // Handle other cases or success
         Swal.fire({
           title: "Register sucessfully!",
           text: "Congratulations!",
-          icon: "success"
+          icon: "success",
         });
       }
       // console.log('Server response:', response.data);
     } catch (error) {
       // Handle error
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
     }
-    
-    console.log('Form submitted:', { fullname, email, password, userType });
+
+    console.log("Form submitted:", { fullname, email, password, userType });
   };
 
   return (
@@ -107,27 +118,10 @@ function RegisterForm() {
         Register
       </Typography>
       <form onSubmit={handleSubmit}>
+        <TextField label="Full Name" variant="outlined" margin="normal" fullWidth required value={fullname} onChange={handleFullNameChange} />
+        <TextField type="email" label="Email" variant="outlined" margin="normal" fullWidth required value={email} onChange={handleEmailChange} />
         <TextField
-          label="Full Name"
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          required
-          value={fullname}
-          onChange={handleFullNameChange}
-        />
-        <TextField
-          type="email"
-          label="Email"
-          variant="outlined"
-          margin="normal"
-          fullWidth
-          required
-          value={email}
-          onChange={handleEmailChange}
-        />
-        <TextField
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           label="Password"
           variant="outlined"
           margin="normal"
@@ -145,8 +139,12 @@ function RegisterForm() {
             ),
           }}
         />
-        {error && <Typography variant="body2" color="error">{error}</Typography>}
-        
+        {error && (
+          <Typography variant="body2" color="error">
+            {error}
+          </Typography>
+        )}
+
         <FormControl component="fieldset" margin="normal" fullWidth>
           <Typography variant="subtitle1" gutterBottom>
             You are:
@@ -156,17 +154,13 @@ function RegisterForm() {
             <FormControlLabel value="teacher" control={<Radio />} label="Teacher" />
           </RadioGroup>
         </FormControl>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          className="submit-button"
-          fullWidth
-          disabled={Boolean(error)}
-        >
+        <Button type="submit" variant="contained" color="primary" className="submit-button" fullWidth disabled={Boolean(error)}>
           Register
         </Button>
       </form>
+      <Typography className={classes.switchText} sx={{mt: 2}} variant="body2" align="center" gutterBottom>
+        Already have an account? <Link href={routes.login}>Login</Link>
+      </Typography>
     </Container>
   );
 }
