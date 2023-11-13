@@ -1,0 +1,72 @@
+.root {
+  width: 100%;
+}
+
+.iconEye {
+  svg {
+    width: 17px;
+    height: 16px;
+  }
+}
+
+.iconErrorOutline {
+  width: 20px;
+  height: 20px;
+  color: #af1c10;
+}
+
+.inputTextfield {
+  &[class~=Mui-disabled] {
+    background: #f4f4f4;
+    ::placeholder {
+      color: #d2d2d2;
+    }
+    .iconErrorOutline {
+      display: none;
+    }
+  }
+  ::placeholder {
+    color: #8d8d8d;
+    font-weight: 400;
+    font-size: 16px; 
+    opacity: 1;
+  }
+  
+  :focus {
+    caret-color: #3b87db;
+  }
+
+  input {
+    padding: 8px 16px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px !important;
+    line-height: 24px;
+    letter-spacing: 0.015em;
+    color: #1c1c1c;
+  }
+
+  fieldset {
+    border-width: 1px !important;
+    border-color: #a4a4a4;
+  }
+}
+.inputInvalid {  
+  fieldset {
+    border: 1px solid #af1c10;
+  }
+}
+.optional {
+  color: var(--cimigo-green-dark);
+}
+.textInfor {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  color: #7c9911;
+  margin: 0;
+}
+
+.titleRequired {
+  color: #af1c10;
+}
