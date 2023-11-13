@@ -13,4 +13,15 @@ export class UserDto {
   is_active: number;
   @IsOptional()
   role_id: number;
+  @IsOptional()
+  phone: string;
+}
+
+export class UpdateProfileUserDto {
+  @IsNotEmpty()
+  fullname: string;
+  @IsEmail()
+  email: string;
+  @IsOptional()
+  phone: string;
 }

@@ -5,6 +5,9 @@ import {AuthMiddleware} from "./modules/auth/auth.middleware";
 import {MailerModule} from "@nestjs-modules/mailer";
 import {ConfigModule} from "@nestjs/config";
 import * as process from "process";
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
 @Module({})
 export class AppModule implements NestModule {
   static forRoot(modules): DynamicModule {
@@ -31,6 +34,10 @@ export class AppModule implements NestModule {
         }),
         ConfigModule.forRoot({
           isGlobal: true,
+        }),
+        ServeStaticModule.forRoot({
+          rootPath: join(__dirname, '..', 'uploads'),
+          serveRoot: '/uploads/'
         }),
         ...modules
       ]

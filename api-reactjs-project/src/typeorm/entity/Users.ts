@@ -48,4 +48,9 @@ export class Users extends EntityBase{
     name: "refresh_token",
   })
   refreshToken: string;
+
+  @Column("text", {
+    name: "phone"
+  })
+  phone: string;
 }
