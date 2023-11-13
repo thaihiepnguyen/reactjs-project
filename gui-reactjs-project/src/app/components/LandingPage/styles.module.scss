@@ -1,0 +1,233 @@
+
+.main__info::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 500px;
+  z-index: -1;
+  background-color: #274b70;
+  background-position: center;
+  clip-path: polygon(0 25%, 100% 0%, 100% 75%, 0% 100%);
+}
+
+.main {
+  display: flex;
+  width: 100%;
+  position: relative;
+  margin-top: 100px;
+  flex-direction: column;
+}
+
+.main__info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 120px;
+  padding: 0 100px;
+}
+
+.main__description {
+  width: 60%;
+}
+
+.main__image {
+  width: 25%;
+  height: auto;
+}
+
+.main__image img {
+  width: 176px;
+  height: 367px;
+  margin: 0 60px;
+  filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.6));
+}
+
+.main__description h2 {
+  color: #f9f9f9;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.main__description p {
+  color: #f9f9f9;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.main__description .btn_blue {
+  padding: 10px;
+  background: rgba(18, 212, 255, 0.78);
+  border-radius: 45px;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.main__pictures {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-bottom: 50px;
+}
+
+.main__pictures img {
+  width: 50%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  /* height: 100vh; */
+  flex-direction: column;
+}
+
+.footer__title {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 900;
+  margin: 50px;
+  max-width: 838px;
+}
+
+.footer__images {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 50px;
+  flex-wrap: wrap;
+}
+
+.footer__image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  height: 200px;
+  width: 190px;
+  margin: 15px;
+}
+
+.footer__image img {
+  width: 80px;
+}
+
+.footer__image h3 {
+  margin: 15px;
+  font-weight: bold;
+}
+
+.footer__image p {
+  font-size: 18px;
+}
+
+.footer__image p span {
+  color: #2fdf84;
+  font-weight: bold;
+}
+
+.footer__logo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 50px;
+}
+
+.footer__logo_title {
+  font-size: 36px;
+  color: #656565;
+  font-weight: 900;
+  text-align: center;
+}
+
+.footer__logo_title::after {
+  content: "";
+  width: 239px;
+  height: 25px;
+  display: block;
+  background-color: #2fdf84;
+  margin: 0 auto;
+}
+
+.footer__logo p {
+  color: #ababab;
+  margin: 5px;
+  font-size: 14px;
+}
+
+.header__info {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 100px;
+}
+
+.header__info_description {
+  max-width: 50%;
+}
+
+.header__info_description h1 {
+  font-size: 62px;
+  font-weight: 900;
+  color: #2e2e2e;
+  margin-bottom: 10px;
+}
+
+.header__info_description p {
+  color: #4e4e4e;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.header__info .btn {
+  padding: 5px 10px;
+  margin-right: 15px;
+  background: none;
+  border: none;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.header__info .btn_black {
+  color: #fff;
+  background-color: #2e2e2e;
+  border-radius: 15px;
+  padding: 5px 15px;
+}
+
+.header__info_image {
+  width: 35%;
+  height: auto;
+}
+
+.header__info_image img {
+  width: 176px;
+  height: 367px;
+  margin: 0 60px;
+}
+
+.header__companies {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  height: 100%;
+  margin: 50px;
+  padding: 0 100px;
+}
+
+.header__companies_img {
+  width: 100px;
+  height: 100px;
+  margin: 15px 25px;
+  object-fit: contain;
+}
