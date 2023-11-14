@@ -18,15 +18,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={montserrat.className}>
-        <AuthProvider>
-          <Providers>
+        <Providers>
+          <AuthProvider>
             <StyledComponentsRegistry>
               <CircularProgress />
               <Navbar></Navbar>
               {children}
             </StyledComponentsRegistry>
-          </Providers>
-        </AuthProvider>
+          </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

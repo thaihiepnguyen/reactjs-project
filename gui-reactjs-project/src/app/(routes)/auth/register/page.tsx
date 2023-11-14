@@ -19,8 +19,11 @@ import classes from "./styles.module.scss";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { routes } from "@/app/routers/routes";
 import Link from "next/link";
+import axiosInstance from "@/app/routers/axios";
+import { useRouter } from "next/navigation";
 
 function RegisterForm() {
+  const router = useRouter();
   const [fullname, setFullName] = useState("");
   const [userType, setUserType] = useState("student"); // Default to 'student'
   const [email, setEmail] = useState("");
@@ -79,7 +82,7 @@ function RegisterForm() {
 
     // Additional form submission logic, e.g., sending data to the server
     try {
-      const response = await axios.post(`${process.env.API_URL}/auth/register`, {
+      const response = await axiosInstance.post(`/auth/register`, {
         fullname,
         email,
         password,
@@ -100,7 +103,10 @@ function RegisterForm() {
           title: "Register sucessfully!",
           text: "Congratulations!",
           icon: "success",
-        });
+        })
+        .then(()=>{
+          router.push(routes.login);
+        })
       }
       // console.log('Server response:', response.data);
     } catch (error) {

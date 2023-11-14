@@ -9,8 +9,13 @@ import { routes } from "@/app/routers/routes";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
+import { useRouter } from 'next/navigation'
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { setUser } from "@/redux/reducers/user";
 
 function LoginForm() {
+  const router = useRouter()
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -52,17 +57,24 @@ function LoginForm() {
 
       // Handle the response as needed
       if (response.data) {
+        dispatch(setUser(response.data.data.user))
         Swal.fire({
           title: "Login sucessfully!",
           text: "Congratulations!",
           icon: "success",
-        });
-        window.location.reload();
-        console.log('Exist account: ', response.data);
+        })
+        .then(()=>{
+          router.replace('/home');
+        })
       }
     } catch (error) {
       // Handle error
-      console.error('Error submitting form:', error);
+      console.log(error)
+      Swal.fire({
+        title: "Oops!",
+        text: error?.response?.data?.message,
+        icon: "error",
+      });
     }
     
     console.log('Form submitted:', {email, password});
@@ -137,7 +149,7 @@ export default function Login() {
           {/* Left side - Information */}
           <Container className={classes.infoContainer}>
               <Typography className={classes.title__left__section} variant="h2" align="left" gutterBottom>
-                Join us to day
+                Join us today
               </Typography>
               <Typography variant="body1" fontStyle="italic">
               Discover accessible, diverse education at your fingertips. 
@@ -157,7 +169,7 @@ export default function Login() {
                 variant="contained"
                 // color="white"
                 fullWidth
-                onClick={()=>signIn('google')}
+                onClick={()=>signIn('google', {callbackUrl: '/home'})}
                 >
                 <img alt="Google icon" className={classes.google_icon} src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
                 Login with google

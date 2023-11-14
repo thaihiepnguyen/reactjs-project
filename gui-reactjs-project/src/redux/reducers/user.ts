@@ -15,6 +15,9 @@ const user = createSlice({
   reducers: {
     setUser: (state, action: PayloadAction<User>) => {
      state.user = action.payload;
+     if(state.user?.avatarUrl && !state.user.avatarUrl.includes('http')){
+      state.user.avatarUrl = `${process.env.API_URL}\\${state.user.avatarUrl}`
+     }
     },
   },
 });

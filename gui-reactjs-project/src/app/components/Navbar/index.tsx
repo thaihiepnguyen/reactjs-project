@@ -5,7 +5,6 @@ import Link from "next/link";
 import { routes } from "@/app/routers/routes";
 import classes from "./styles.module.scss";
 import { HomeOutlined } from "@mui/icons-material";
-import Cookies from "universal-cookie/es6";
 import { useEffect, useState } from "react";
 import axiosInstance from "@/app/routers/axios";
 import axios from "axios";
@@ -15,28 +14,43 @@ import UserService from "@/services/user";
 import { setLoading } from "@/redux/reducers/loading";
 import NavbarToggle from "@/app/components/Navbar/NavbarToggle";
 import OutsideClickHandler from "react-outside-click-handler/esm/OutsideClickHandler";
+import { useSession } from "next-auth/react"
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
   const {user} = useAppSelector(state => state.userReducer);
   const [isClick, setClick] = useState(false);
+  const { data: session, status } = useSession()
 
   useEffect(() => {
-    if (!user) {
+    if (!session) {
       dispatch(setLoading(true));
-      UserService.getMe()
-        .then(data => {
-          dispatch(setUser(data)
-          );
-        })
-        .catch((e) => {
-          dispatch(setUser(null));
-        })
-        .finally(() => {
-          dispatch(setLoading(false));
-        });
+    UserService.getMe()
+      .then((data) => {
+        dispatch(
+          setUser(data)
+        );
+      })
+      .catch((e) => {
+        dispatch(setUser(null));
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
+    } else {
+      axiosInstance.post('/auth/login-social', {
+        user: session.user
+      })
+      .then((res)=>{
+        dispatch(
+          setUser(res.data.data.user)
+        );
+      })
+      .catch(err => {
+        console.log(err)
+      })
     }
-  }, []);
+  }, [session]);
 
   return (
     <nav className={classes.nav}>

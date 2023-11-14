@@ -65,12 +65,7 @@ const EditProfile = () => {
         UserService.getMe()
           .then((data) => {
             dispatch(
-              setUser({
-                fullname: data.fullname,
-                avatar: data.avatarUrl,
-                phone: data.phone,
-                email: data.email,
-              })
+              setUser(data)
             );
           })
           .catch((e) => {
@@ -86,14 +81,15 @@ const EditProfile = () => {
         });
       });
   };
-
   useEffect(() => {
-    reset({
-      fullname: user?.fullname,
-      phone: user?.phone,
-      email: user?.email,
-      avatar: `${process.env.API_URL}\\${user?.avatar}`,
-    });
+    if(user) {
+      reset({
+        fullname: user?.fullname,
+        phone: user?.phone,
+        email: user?.email,
+        avatar: `${user?.avatarUrl}`,
+      });
+    }
   }, [user]);
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={classes.form}>
