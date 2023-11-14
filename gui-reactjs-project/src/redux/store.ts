@@ -2,6 +2,7 @@ import {configureStore} from '@reduxjs/toolkit'
 import counterReducer from "./reducers/counter"
 import userReducer from "./reducers/user"
 import loadingReducer from "./reducers/loading"
+import logger from "redux-logger"
 
 export const store = configureStore({
   reducer: {
@@ -9,6 +10,7 @@ export const store = configureStore({
     userReducer,
     loadingReducer
   },
+  middleware: [logger],
   devTools: process.env.NODE_ENV != 'production'
 })
 

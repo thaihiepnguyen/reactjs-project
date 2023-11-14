@@ -18,31 +18,25 @@ export default function Navbar() {
   const cookies = new Cookies();
   const userId = cookies.get("userId");
   const dispatch = useAppDispatch();
-
   useEffect(() => {
-    if (userId) {
-      dispatch(setLoading(true));
-      UserService.getMe()
-        .then((data) => {
-          dispatch(
-            setUser({
-              fullname: data.fullname,
-              avatar: data.avatarUrl,
-              phone: data.phone,
-              email: data.email,
-            })
-          );
-        })
-        .catch((e) => {
-          dispatch(setUser(null));
-        })
-        .finally(() => {
-          dispatch(setLoading(false));
-        });
-    } else {
-      dispatch(setUser(null));
-      dispatch(setLoading(false));
-    }
+    dispatch(setLoading(true));
+    UserService.getMe()
+      .then((data) => {
+        dispatch(
+          setUser({
+            fullname: data.fullname,
+            avatar: data.avatarUrl,
+            phone: data.phone,
+            email: data.email,
+          })
+        );
+      })
+      .catch((e) => {
+        dispatch(setUser(null));
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
   }, []);
 
   return (
