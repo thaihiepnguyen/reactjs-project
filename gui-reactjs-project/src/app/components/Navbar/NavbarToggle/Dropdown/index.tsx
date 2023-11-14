@@ -1,23 +1,27 @@
 import classes from './styles.module.scss';
-import Cookies from "universal-cookie/es6";
+
 import {AccountCircle, ExitToApp, Help, NightsStay, Settings, ShoppingBasket} from "@mui/icons-material";
 import Link from "next/link";
 import {routes} from "@/app/routers/routes";
+import { getCookies, setCookie, deleteCookie, getCookie } from 'cookies-next';
+import { redirect } from "next/navigation";
+import { useAppDispatch } from "@/redux/hook";
+import { setUser } from "@/redux/reducers/user";
 
 
 const menusIcon = [
   <AccountCircle/>,
 ];
 export const Dropdown = () => {
+  const dispatch = useAppDispatch();
   const menus = [
     {name: 'User Profile', link: `/user/profile`},
   ];
   const Logout = () => {
-    const cookies = new Cookies();
-    cookies.remove('token');
-    cookies.remove('userId');
-    cookies.remove('userName');
-    window.location.reload();
+    deleteCookie('token');
+    deleteCookie('userId');
+    deleteCookie('userName');
+    dispatch(setUser(null));
   }
   return (
     <ul className={classes.menusContainer}>
@@ -35,7 +39,7 @@ export const Dropdown = () => {
       }
       <div className={classes.menusItemContainer}>
         <ExitToApp/>
-        <li className={classes.menusItem} onClick={Logout}>Đăng xuất</li>
+        <Link href={"/"} className={classes.menusItem} onClick={Logout}>Logout</Link>
       </div>
     </ul>
   );

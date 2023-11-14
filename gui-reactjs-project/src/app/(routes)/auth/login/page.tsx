@@ -7,8 +7,8 @@ import { signIn } from "next-auth/react";
 import Link from 'next/link';
 import { routes } from "@/app/routers/routes";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import axios from "axios";
-import Cookies from 'universal-cookie/es6';
+import axiosInstance from "@/app/routers/axios";
+import Swal from "sweetalert2";
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -45,17 +45,18 @@ function LoginForm() {
 
     // Additional form submission logic
     try {
-      const response = await axios.post(`${process.env.API_URL}/auth/login`, {
+      const response = await axiosInstance.post(`/auth/login`, {
         email,
         password
       });
 
       // Handle the response as needed
       if (response.data) {
-        const cookies = new Cookies();
-        cookies.set('token', JSON.stringify(response.data.data.token));
-        cookies.set('userId', response.data.data.user.id);
-        cookies.set('userName', response.data.data.user.fullname);
+        Swal.fire({
+          title: "Login sucessfully!",
+          text: "Congratulations!",
+          icon: "success",
+        });
         window.location.reload();
         console.log('Exist account: ', response.data);
       }

@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-import Cookies from "universal-cookie/es6";
+import { getCookies, setCookie, deleteCookie, getCookie } from 'cookies-next';
 
 const axiosInstance = axios.create({
   baseURL: `${process.env.API_URL}`,
@@ -9,10 +9,16 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const cookies = new Cookies();
-    const token = cookies.get('token');
-    const userId = cookies.get('userId');
-    const userName = cookies.get('userName');
+
+    let tokenStr =  getCookie('token')?.toString();
+    let token = {
+      accessToken: ""
+    };
+    if (tokenStr) {
+      token = JSON.parse(tokenStr);
+    }
+    const userId = getCookie('userId');
+    const userName = getCookie('userName');
 
     if (token) {
       config.headers['Authorization'] = `Bearer ${token.accessToken}`;
@@ -27,6 +33,20 @@ axiosInstance.interceptors.request.use(
     }
 
     return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+axiosInstance.interceptors.response.use(
+  (response) => {
+    if(response?.data?.data?.token) {
+      setCookie('token', JSON.stringify(response.data.data.token))
+      setCookie('userId', response.data.data.user.id)
+      setCookie('userName', response.data.data.user.fullname)
+    }
+    return response;
   },
   (error) => {
     return Promise.reject(error);
