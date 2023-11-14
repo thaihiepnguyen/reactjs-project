@@ -1,4 +1,4 @@
-import {Body, Controller, Post, Res, UploadedFile, UseInterceptors} from "@nestjs/common";
+import {Body, Controller, HttpException, Post, Res, UploadedFile, UseInterceptors} from "@nestjs/common";
 import {Get} from "@nestjs/common";
 import {MetaDataAuth} from "../auth/auth.decorator";
 import {UserService} from "./user.service";
@@ -7,6 +7,7 @@ import { TBaseDto } from "src/app.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
+import {unlink} from "fs";
 
 @Controller('user')
 export class UserController {
@@ -29,7 +30,22 @@ export class UserController {
       }
     })
   }))
-  async register(@UploadedFile() file: Express.Multer.File, @Body() updateDto: UpdateProfileUserDto, @Res({ passthrough: true }) response: Response) {
-    console.log(file);
+  async register(@UploadedFile() file: Express.Multer.File, @MetaDataAuth('userId') userId: number, @Body() updateDto: UpdateProfileUserDto, @Res({ passthrough: true }) response: Response) {
+    if (file) {
+      updateDto.avatarUrl = file.path;
+    }
+    const user = await this.userService.updateUser(userId, updateDto);
+    if(!user && file) {
+      await unlink(file.path, () => {});
+      throw new HttpException('User not found', 404);
+    } else {
+      return {
+        message: 'success',
+        data: {
+          user: user,
+        },
+        statusCode: 200
+      };
+    }
   }
 }

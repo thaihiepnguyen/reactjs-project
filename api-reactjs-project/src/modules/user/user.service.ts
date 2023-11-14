@@ -3,6 +3,8 @@ import {InjectConnection, InjectRepository} from "@nestjs/typeorm";
 import {Roles, Users} from "../../typeorm";
 import {InsertResult, QueryResult, Repository} from "typeorm";
 import {Connection} from "mysql2/index";
+import { UpdateProfileUserDto } from "./user.dto";
+import { unlink } from "fs";
 
 @Injectable()
 export class UserService {
@@ -56,5 +58,31 @@ export class UserService {
         select: ['id', 'fullname', 'email', 'avatarUrl']
       },
     );
+  }
+  async updateUser(id:number, data: UpdateProfileUserDto) {
+    id = id ? id : 0;
+    let user = await this.userRepository.findOne({
+      where: {
+        id: id,
+        email: data.email
+      }
+    })
+
+    if(user) {
+      if (data.avatarUrl && user.avatarUrl) {
+        unlink(user.avatarUrl, () => {});
+      }
+      await this.userRepository.update(user.id, {
+        avatarUrl: data.avatarUrl,
+        fullname: data.fullname,
+        phone: data.phone
+      })
+      return await this.userRepository.findOne({
+        where: {
+          id: user.id,
+        }
+      })
+    }
+    return null;
   }
 }

@@ -24,4 +24,6 @@ export class UpdateProfileUserDto {
   email: string;
   @IsOptional()
   phone: string;
+  @IsOptional()
+  avatarUrl: string;
 }
