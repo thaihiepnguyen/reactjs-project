@@ -39,6 +39,9 @@ export default function Navbar() {
         .finally(() => {
           dispatch(setLoading(false));
         });
+    } else {
+      dispatch(setUser(null));
+      dispatch(setLoading(false));
     }
   }, []);
 
