@@ -32,7 +32,7 @@ async function bootstrap() {
   );
 
   const corsOptions: CorsOptions = {
-    origin: process.env.CLIENT_URL,  // Replace with the actual origin of your frontend
+    origin: [process.env.CLIENT_URL, 'http://127.0.0.1:3000'],  // Replace with the actual origin of your frontend
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };
