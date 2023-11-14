@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, InputAdornment, IconButton } from '@mui/material';
+import { TextField, Button, Container, Typography, InputAdornment, IconButton, Grid } from '@mui/material';
 import classes from "./styles.module.scss"
 import { signIn } from "next-auth/react";
 import Link from 'next/link';
@@ -131,27 +131,43 @@ export default function Login() {
     <>
       {/* <span>Login page</span>
       <span>Counter: {value}</span> */}
-      <Container className={classes.box} maxWidth="sm">
-        <LoginForm />
-        <Container maxWidth="sm">
-          <Button 
-              className={classes.loginGoogleBtn}
-              type="submit"
-              sx={{backgroundColor: "#fff", mt: 2}}
-              variant="contained"
-              // color="white"
-              fullWidth
-              onClick={()=>signIn('google')}
-              >
-              <img alt="Google icon" className={classes.google_icon} src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
-              Login with google
-          </Button>
-          <Typography className={classes.switchText}variant="body2" align="center" gutterBottom>
-            Don't have an account?{' '}
-            <Link href={routes.register} >
-              Register
-            </Link>
-          </Typography>
+      <Container className={classes.container} maxWidth="lg">
+        <Container className={classes.left__section} maxWidth="sm">
+          {/* Left side - Information */}
+          <Container className={classes.infoContainer}>
+              <Typography className={classes.title__left__section} variant="h2" align="left" gutterBottom>
+                Join us to day
+              </Typography>
+              <Typography variant="body1" fontStyle="italic">
+              Discover accessible, diverse education at your fingertips. 
+              Our platform offers engaging courses, expert guidance, and flexible learning, 
+              empowering you to excel on your educational journey, anytime, anywhere, ...
+              </Typography>
+            </Container>
+        </Container>
+
+        <Container className={classes.box} maxWidth="sm">
+          <LoginForm />
+          <Container maxWidth="sm">
+            <Button 
+                className={classes.loginGoogleBtn}
+                type="submit"
+                sx={{backgroundColor: "#fff", mt: 2}}
+                variant="contained"
+                // color="white"
+                fullWidth
+                onClick={()=>signIn('google')}
+                >
+                <img alt="Google icon" className={classes.google_icon} src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+                Login with google
+            </Button>
+            <Typography className={classes.switchText}variant="body2" align="center" gutterBottom>
+              Don't have an account?{' '}
+              <Link href={routes.register} >
+                Register
+              </Link>
+            </Typography>
+          </Container>
         </Container>
       </Container>
     </>

@@ -30,3 +30,19 @@
   margin-right: 8px;
 }
 
+.container {
+  display: flex;
+}
+
+.title__left__section {
+  font-size: 62px;
+  font-weight: 920;
+  color: #2e2e2e;
+  margin-bottom: 10px;
+}
+
+.left__section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
