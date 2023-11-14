@@ -3,7 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/redux/provider";
 import AuthProvider from "./components/AuthProvider";
-import Index from "@/app/components/Navbar/Navbar";
+import Index from "@/app/components/Navbar";
 import CircularProgress from "@/app/components/CircularProgress";
 import StyledComponentsRegistry from "@/lib/registry";
 
