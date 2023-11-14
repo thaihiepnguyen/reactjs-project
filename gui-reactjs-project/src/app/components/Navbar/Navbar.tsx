@@ -38,8 +38,8 @@ export default function Navbar() {
         </Link>
       </div>
       <div className={classes.loginContainer}>
-        <Button variant="outlined" href={routes.register}>Register</Button>
-        <Button variant="outlined" href={routes.login}>Login</Button>
+          <Button variant="outlined"><Link className={classes.link} href={routes.register}>Register</Link></Button>
+          <Button variant="outlined" ><Link className={classes.link} href={routes.login}>Login</Link></Button>
       </div>
     </nav>
   )
