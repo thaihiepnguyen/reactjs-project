@@ -15,8 +15,6 @@ import UserService from "@/services/user";
 import { setLoading } from "@/redux/reducers/loading";
 
 export default function Navbar() {
-  const cookies = new Cookies();
-  const userId = cookies.get("userId");
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(setLoading(true));
