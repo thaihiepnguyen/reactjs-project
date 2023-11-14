@@ -6,7 +6,6 @@ import classes from "./styles.module.scss"
 import { signIn } from "next-auth/react";
 import Link from 'next/link';
 import { routes } from "@/app/routers/routes";
-import { Helmet } from "react-helmet";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from "axios";
 import Cookies from 'universal-cookie/es6';
@@ -79,6 +78,7 @@ function LoginForm() {
           label="Email"
           variant="outlined"
           margin="normal"
+          autoComplete="email"
           fullWidth
           required
           onChange={handleEmailChange}
@@ -88,6 +88,7 @@ function LoginForm() {
           label="Password"
           variant="outlined"
           margin="normal"
+          autoComplete="current-password"
           fullWidth
           required
           value={password}
@@ -107,7 +108,7 @@ function LoginForm() {
             Forgot Password?
           </Link>
         </Typography>
-        {error && <Typography variant="body2" color="error">{error}</Typography>}
+        {error && <Typography variant="body2" sx={{my: 2}} color="error">{error}</Typography>}
         <Button
           type="submit"
           variant="contained"
@@ -128,9 +129,6 @@ export default function Login() {
 
   return (
     <>
-      <Helmet>
-        <title>Login</title>
-      </Helmet>
       {/* <span>Login page</span>
       <span>Counter: {value}</span> */}
       <Container className={classes.box} maxWidth="sm">
@@ -139,11 +137,13 @@ export default function Login() {
           <Button 
               className={classes.loginGoogleBtn}
               type="submit"
+              sx={{backgroundColor: "#fff", mt: 2}}
               variant="contained"
               // color="white"
               fullWidth
               onClick={()=>signIn('google')}
               >
+              <img alt="Google icon" className={classes.google_icon} src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
               Login with google
           </Button>
           <Typography className={classes.switchText}variant="body2" align="center" gutterBottom>

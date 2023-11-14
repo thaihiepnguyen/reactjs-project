@@ -13,7 +13,6 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import { Helmet } from "react-helmet";
 import axios from "axios";
 import Swal from "sweetalert2";
 import classes from "./styles.module.scss";
@@ -119,10 +118,11 @@ function RegisterForm() {
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField label="Full Name" variant="outlined" margin="normal" fullWidth required value={fullname} onChange={handleFullNameChange} />
-        <TextField type="email" label="Email" variant="outlined" margin="normal" fullWidth required value={email} onChange={handleEmailChange} />
+        <TextField type="email" label="Email" variant="outlined" margin="normal" autoComplete="email" fullWidth required value={email} onChange={handleEmailChange} />
         <TextField
           type={showPassword ? "text" : "password"}
           label="Password"
+          autoComplete="current-password"
           variant="outlined"
           margin="normal"
           fullWidth
@@ -168,9 +168,6 @@ function RegisterForm() {
 export default function Register() {
   return (
     <>
-      <Helmet>
-        <title>Register</title>
-      </Helmet>
       {/* <span>Register Page</span> */}
       <Container className={classes.box} maxWidth="sm">
         <RegisterForm />

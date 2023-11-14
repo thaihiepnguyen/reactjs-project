@@ -1,11 +1,13 @@
 import {configureStore} from '@reduxjs/toolkit'
 import counterReducer from "./reducers/counter"
 import userReducer from "./reducers/user"
+import loadingReducer from "./reducers/loading"
 
 export const store = configureStore({
   reducer: {
     counterReducer,
-    userReducer
+    userReducer,
+    loadingReducer
   },
   devTools: process.env.NODE_ENV != 'production'
 })
