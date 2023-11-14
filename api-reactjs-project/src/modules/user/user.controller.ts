@@ -30,7 +30,9 @@ export class UserController {
       }
     })
   }))
-  async updateProfile(@UploadedFile() file: Express.Multer.File, @MetaDataAuth('userId') userId: number, @Body() updateDto: UpdateProfileUserDto, @Res({ passthrough: true }) response: Response) {
+  async updateProfile(@UploadedFile() file: Express.Multer.File, @MetaDataAuth('userId') userId: number, @Body() updateDto: UpdateProfileUserDto
+                      // , @Res({ passthrough: true }) response: Response
+  ) {
     if (file) {
       updateDto.avatarUrl = file.path;
     }
