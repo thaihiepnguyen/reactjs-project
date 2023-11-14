@@ -44,8 +44,8 @@ export default function Navbar() {
       </div>
       {
        !email ? <div className={classes.loginContainer}>
-        <Button variant="outlined" href={routes.register}>Register</Button>
-        <Button variant="outlined" href={routes.login}>Login</Button>
+        <Button variant="outlined"><Link className={classes.link} href={routes.register}>Register</Link></Button>
+        <Button variant="outlined"><Link className={classes.link} href={routes.login}>Login</Link></Button>
        </div> : <NavbarToggle userName={fullname}/>
       }
     </div>

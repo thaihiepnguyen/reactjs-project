@@ -26,4 +26,17 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+
+axiosInstance.interceptors.response.use((response) => {
+  const cookies = new Cookies();
+  const token = cookies.set('token', 123123);
+  console.log(response);
+  return response;
+}, (error) => {
+  if(error?.response?.status === 401 || error?.response?.status  === 403 ){
+    //refresh token
+  }
+  return Promise.reject(error);
+})
+ 
 export default axiosInstance;

@@ -12,6 +12,8 @@ import axios from "axios";
 import Cookies from 'universal-cookie/es6';
 import {useAppDispatch} from "@/redux/hook";
 import {setUser} from "@/redux/reducers/user";
+import axiosInstance from "@/app/routers/axios";
+import Swal from "sweetalert2";
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -46,16 +48,21 @@ function LoginForm() {
     event.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3001/auth/login', {
+      const response = await axiosInstance.post('http://localhost:3001/auth/login', {
         email,
         password
       });
 
       if (response.data) {
-        const cookies = new Cookies();
-        cookies.set('token', JSON.stringify(response.data.data.token));
-        cookies.set('userId', response.data.data.user.id);
-        cookies.set('userName', response.data.data.user.fullname);
+        // const cookies = new Cookies();
+        // cookies.set('token', JSON.stringify(response.data.data.token));
+        // cookies.set('userId', response.data.data.user.id);
+        // cookies.set('userName', response.data.data.user.fullname);
+        Swal.fire({
+          title: "Login sucessfully!",
+          text: "Congratulations!",
+          icon: "success",
+        });
       }
     } catch (error) {
       console.error('Error submitting form:', error);
