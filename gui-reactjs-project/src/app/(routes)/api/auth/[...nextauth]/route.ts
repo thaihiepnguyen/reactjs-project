@@ -1,6 +1,7 @@
+import axiosInstance from "@/app/routers/axios";
 import { routes } from "@/app/routers/routes";
 import { EAPI } from "@/models/general";
-import api from "@/services/apiConfig";
+
 import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
 import { cookies } from 'next/headers'
@@ -14,7 +15,7 @@ const handler = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) { //{ user, account, profile, email, credentials }
-        await api.post('/auth/login-social', {
+        await axiosInstance.post('/auth/login-social', {
           provider: account?.provider,
           user: user,
           account: account,

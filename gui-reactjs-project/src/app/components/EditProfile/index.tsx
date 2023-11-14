@@ -8,6 +8,11 @@ import { Controller, useForm } from "react-hook-form";
 import UploadImage from "../UploadImage";
 import Heading3 from "../text/Heading3";
 import Inputs from "../input/InputTextfield";
+import UserService from "@/services/user";
+import Swal from "sweetalert2";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { setUser } from "@/redux/reducers/user";
+import ParagraphSmall from "../text/ParagraphSmall";
 
 export const VALIDATION = {
   phone: /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
@@ -21,6 +26,8 @@ export interface UserFormData {
 }
 
 const EditProfile = () => {
+  const { user } = useAppSelector((state) => state.userReducer);
+  const dispatch = useAppDispatch();
   const schema = useMemo(() => {
     return yup.object().shape({
       avatar: yup.mixed(),
@@ -43,9 +50,51 @@ const EditProfile = () => {
   });
 
   const onSubmit = (data: UserFormData) => {
-    console.log(data);
+    const form = new FormData();
+    form.append("fullname", data.fullname);
+    form.append("avatar", data.avatar);
+    form.append("phone", data.phone);
+    form.append("email", data.email);
+    UserService.UpdateProfile(form)
+      .then((res) => {
+        Swal.fire({
+          title: "Update profile sucessfully!",
+          text: "Congratulations!",
+          icon: "success",
+        });
+        UserService.getMe()
+          .then((data) => {
+            dispatch(
+              setUser({
+                fullname: data.fullname,
+                avatar: data.avatarUrl,
+                phone: data.phone,
+                email: data.email,
+              })
+            );
+          })
+          .catch((e) => {
+            dispatch(setUser(null));
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        Swal.fire({
+          title: err,
+          text: "Oops!",
+          icon: "error",
+        });
+      });
   };
 
+  useEffect(() => {
+    reset({
+      fullname: user?.fullname,
+      phone: user?.phone,
+      email: user?.email,
+      avatar: `${process.env.API_URL}\\${user?.avatar}`,
+    });
+  }, [user]);
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={classes.form}>
       <Grid className={classes.rowInfo}>
@@ -68,8 +117,11 @@ const EditProfile = () => {
         </div>
         <div className={classes.personalInfo}>
           <Heading3 $colorName="--eerie-black" className={classes.name}>
-            Lê Đăng Khoa
+            {user?.fullname}
           </Heading3>
+          <ParagraphSmall>
+            {user?.email}
+          </ParagraphSmall>
         </div>
       </Grid>
       <Grid container columnSpacing={1} rowSpacing={3} className={classes.customMargin}>
@@ -91,6 +143,7 @@ const EditProfile = () => {
             placeholder="Enter your email"
             inputRef={register("email")}
             errorMessage={errors.email?.message}
+            disabled
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -103,7 +156,7 @@ const EditProfile = () => {
             errorMessage={errors.phone?.message}
           />
         </Grid>
-        <Button type='submit' variant="contained" children={"Save change"} className={classes.btnSave}/> 
+        <Button sx={{mt: 4, ml: 1}} type="submit" variant="contained" children={"Save change"} className={classes.btnSave} />
       </Grid>
     </form>
   );

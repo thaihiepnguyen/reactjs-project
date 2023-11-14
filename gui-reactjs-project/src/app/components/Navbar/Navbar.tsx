@@ -9,22 +9,30 @@ import Cookies from "universal-cookie/es6";
 import {useEffect, useState} from "react";
 import axiosInstance from "@/app/routers/axios";
 import axios from "axios";
+import { useAppDispatch } from "@/redux/hook";
+import { setUser } from "@/redux/reducers/user";
+import UserService from "@/services/user";
 
 export default function Navbar() {
   const cookies = new Cookies();
   const userId = cookies.get('userId');
-  const [user, setUser] = useState(null);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (userId) {
-      axiosInstance.get(`${process.env.API_URL}/user/profile`, {
-        withCredentials: true
-      }).then((response) => {
-        console.log(response.data);
-      }).catch((error) => {
-        console.log(error);
-      })
-    }
+      UserService.getMe()
+        .then(data => {
+          dispatch(setUser({
+            fullname: data.fullname,
+            avatar: data.avatarUrl,
+            phone: data.phone,
+            email: data.email,
+          }))
+        })
+        .catch(e => {
+          dispatch(setUser(null))
+        })
+      }
   }, [])
 
 

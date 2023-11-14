@@ -55,7 +55,6 @@ export class UserService {
     return await this.userRepository.findOne(
       {
         where: {id},
-        select: ['id', 'fullname', 'email', 'avatarUrl']
       },
     );
   }

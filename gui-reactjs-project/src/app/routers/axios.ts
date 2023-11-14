@@ -2,7 +2,10 @@
 import axios from 'axios';
 import Cookies from "universal-cookie/es6";
 
-const axiosInstance = axios.create();
+const axiosInstance = axios.create({
+  baseURL: `${process.env.API_URL}`,
+  withCredentials: true,
+});
 
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -20,7 +23,7 @@ axiosInstance.interceptors.request.use(
     }
 
     if (userName) {
-      config.headers['X-User-Name'] = userName;
+      config.headers['X-User-Name'] = encodeURI(userName);
     }
 
     return config;
