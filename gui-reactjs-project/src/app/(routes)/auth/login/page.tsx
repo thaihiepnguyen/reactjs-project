@@ -45,7 +45,7 @@ function LoginForm() {
 
     // Additional form submission logic
     try {
-      const response = await axios.post('http://localhost:3001/auth/login', {
+      const response = await axios.post(`${process.env.API_URL}/auth/login`, {
         email,
         password
       });
@@ -56,7 +56,7 @@ function LoginForm() {
         cookies.set('token', JSON.stringify(response.data.data.token));
         cookies.set('userId', response.data.data.user.id);
         cookies.set('userName', response.data.data.user.fullname);
-
+        window.location.reload();
         console.log('Exist account: ', response.data);
       }
     } catch (error) {

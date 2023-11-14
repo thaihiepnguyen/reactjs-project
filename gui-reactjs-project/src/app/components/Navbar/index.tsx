@@ -16,11 +16,7 @@ import { setLoading } from "@/redux/reducers/loading";
 import NavbarToggle from "@/app/components/Navbar/NavbarToggle";
 import OutsideClickHandler from "react-outside-click-handler/esm/OutsideClickHandler";
 
-<<<<<<< Updated upstream:gui-reactjs-project/src/app/components/Navbar/Navbar.tsx
 export default function Navbar() {
-=======
-export default function Index() {
->>>>>>> Stashed changes:gui-reactjs-project/src/app/components/Navbar/index.tsx
   const dispatch = useAppDispatch();
   const {user} = useAppSelector(state => state.userReducer);
   const [isClick, setClick] = useState(false);
@@ -61,7 +57,7 @@ export default function Index() {
           <Button variant="outlined">Login</Button>
         </Link>
         </div> : <OutsideClickHandler onOutsideClick={() => setClick(false)}>
-            <NavbarToggle isClicked={isClick} userName={user.fullname} onClick={(isClick) => setClick(isClick)}></NavbarToggle></OutsideClickHandler>
+            <NavbarToggle isClicked={isClick} avatar={user.avatarUrl} userName={user.fullname} onClick={(isClick) => setClick(isClick)}></NavbarToggle></OutsideClickHandler>
       }
     </nav>
   );

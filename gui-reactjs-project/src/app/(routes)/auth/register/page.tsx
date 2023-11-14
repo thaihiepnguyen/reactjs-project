@@ -79,7 +79,7 @@ function RegisterForm() {
 
     // Additional form submission logic, e.g., sending data to the server
     try {
-      const response = await axios.post("http://localhost:3001/auth/register", {
+      const response = await axios.post(`${process.env.API_URL}/auth/register`, {
         fullname,
         email,
         password,
