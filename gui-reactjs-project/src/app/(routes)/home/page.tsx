@@ -6,12 +6,17 @@ export default function Home() {
     <div style={{width: '100%', height: '100%', textAlign: "center"}}>
       {/* Home page */}
       <HomeBanner />
-        <div className={classes.home__section1}>
-          <div className={classes.bg} />
+      <br/>
+      <br/>
+      <div className={classes.home__section1}>
+        <div className={classes.bg} />
           <div className={classes.content}>
             <div className={classes.row}>
               <div className={classes.col__sm__8}>
-                <div className={classes.section__heading}>HEARING ASSIT</div>
+                <div className={classes.section__heading}>STUDY ONLINE 
+                <br/>
+                  MORE CONVENIENTLY AND SAFELY
+                </div>
                 <div className={classes.section__text}>
                   <p>Sign Language Prediction</p>
                   <h5>Make people closer together</h5>

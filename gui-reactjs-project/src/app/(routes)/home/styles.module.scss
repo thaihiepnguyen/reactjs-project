@@ -13,13 +13,13 @@
     .section__heading {
       font-size: 48px;
       font-weight: 800;
+      margin: 2rem;
     }
     .section__text {
       font-size: 28px;
       font-weight: normal;
       color: #607d8b;
-      margin-top: 32px;
-      margin-bottom: 0;
+      margin: 2rem;
       text-align: justify;
     }
     .getting__started {
@@ -95,3 +95,9 @@
       }
     }
   }
+
+.col__sm__8 {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
