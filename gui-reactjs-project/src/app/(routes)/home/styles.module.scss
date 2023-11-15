@@ -1,0 +1,97 @@
+.home__section1 {
+    color: #22283d;
+    position: relative;
+    .bg {
+      background: url(https://uploads.codesandbox.io/uploads/user/394a073e-ac76-4500-88bf-59a13ae9a863/XiTz-home-bg.png);
+      background-repeat: no-repeat;
+      width: 560px;
+      height: 100%;
+      position: absolute;
+      right: 0px;
+      opacity: 0.6;
+    }
+    .section__heading {
+      font-size: 48px;
+      font-weight: 800;
+    }
+    .section__text {
+      font-size: 28px;
+      font-weight: normal;
+      color: #607d8b;
+      margin-top: 32px;
+      margin-bottom: 0;
+      text-align: justify;
+    }
+    .getting__started {
+      margin: 16px 0;
+      font-size: 18px;
+      font-weight: 800;
+      .btn {
+        background-color: #0289ff;
+        border-radius: 24px;
+        padding: 16px 38px;
+        box-shadow: 0 3px 10px 0 #bdcfd4;
+        line-height: normal;
+        text-transform: uppercase;
+        color: #ffffff;
+      }
+    }
+    .btn1 {
+      margin: 16px 0;
+      font-size: 18px;
+      font-weight: 800;
+      .btn {
+        background-color: #0289ff;
+        border-radius: 24px;
+        padding: 16px 38px;
+        box-shadow: 0 3px 10px 0 #bdcfd4;
+        line-height: normal;
+        text-transform: uppercase;
+        color: #ffffff;
+      }
+    }
+  }
+  .home__section2 {
+    background: #f1f9ff;
+    font-size: 18px;
+    font-weight: normal;
+    color: #607d8b;
+    box-shadow: 0 3px 10px 0 #bdcfd4;
+    .section__heading {
+      font-size: 36px;
+      font-weight: 800;
+      color: #22283d;
+      text-align: center;
+    }
+    .section__text {
+      font-size: 28px;
+      font-weight: normal;
+      color: #607d8b;
+      text-align: center;
+      padding-bottom: 10px;
+    }
+    .feature__wrap {
+      padding: 50px 0 15px 0;
+      text-align: center;
+      .feature__img {
+        background: linear-gradient(to top, #0a6db8, #0289ff);
+        border-radius: 50%;
+        width: 160px;
+        height: 160px;
+        padding: 47px 53px;
+        color: #fff;
+        margin-bottom: 28px;
+        display: inline-block;
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      h2 {
+        font-size: 20px;
+        font-weight: 800;
+        color: #22283d;
+        margin-bottom: 22px;
+      }
+    }
+  }
