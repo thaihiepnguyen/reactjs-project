@@ -43,7 +43,7 @@ export default function NavbarToggle({avatar, userName }) {
           <Avatar>H</Avatar>
         ) : (
           <Avatar>
-            <img style={{ minWidth: 50 }} src={`${avatar}`}></img>
+            <img style={{ width: '100%', height: '100%', objectFit: 'cover' }} src={`${avatar}`}></img>
           </Avatar>
         )}
       </div>
