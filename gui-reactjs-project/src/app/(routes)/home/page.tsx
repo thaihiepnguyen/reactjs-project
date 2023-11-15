@@ -12,20 +12,20 @@ export default function Home() {
         <div className={classes.bg} />
           <div className={classes.content}>
             <div className={classes.row}>
-              <div className={classes.col__sm__8}>
-                <div className={classes.section__heading}>STUDY ONLINE 
+            <div className={classes.section__heading}>STUDY ONLINE MORE 
                 <br/>
-                  MORE CONVENIENTLY AND SAFELY
+                  CONVENIENTLY AND FAST
                 </div>
-                <div className={classes.section__text}>
-                  <p>Sign Language Prediction</p>
-                  <h5>Make people closer together</h5>
-                </div>
-                <div className={classes.getting__started}>
-                  <a className={classes.btn} href="#">
-                    About us
-                  </a>
-                </div>
+                <div className={classes.col__sm__8}>
+                  <div className={classes.section__text}>
+                    <p>Sign Language Prediction</p>
+                    <h5>Make people closer together</h5>
+                  </div>
+                  <div className={classes.getting__started}>
+                    <a className={classes.btn} href="#">
+                      About us
+                    </a>
+                  </div>
               </div>
             </div>
           </div>
