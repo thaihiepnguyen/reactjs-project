@@ -101,7 +101,7 @@ function RegisterForm() {
         // Handle other cases or success
         Swal.fire({
           title: "Register sucessfully!",
-          text: "Congratulations!",
+          text: "Please check your email to verify account!",
           icon: "success",
         })
         .then(()=>{
