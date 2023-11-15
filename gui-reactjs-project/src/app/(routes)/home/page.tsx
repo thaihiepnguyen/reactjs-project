@@ -18,7 +18,7 @@ export default function Home() {
                 </div>
                 <div className={classes.col__sm__8}>
                   <div className={classes.section__text}>
-                    <p>Sign Language Prediction</p>
+                    <p>Join all available classes for free!</p>
                     <h5>Make people closer together</h5>
                   </div>
                   <div className={classes.getting__started}>
