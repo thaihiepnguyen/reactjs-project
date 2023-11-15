@@ -11,21 +11,18 @@ export function middleware(request: NextRequest) {
 
   const userId = cookieStore.get('userId');
   const token = cookieStore.get('token');
-  console.log(userId, token)
+  let isLoggedIn = true;
   if(!userId || !token) {
-    if(pathName != "/auth/login") {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
-  } else {
-    if(pathName == "/auth/login") {
-      return NextResponse.redirect(new URL('/home', request.url))
-    }
+      isLoggedIn = false;
+  }
+  switch(pathName){
+    case '/home': return isLoggedIn ? null :  NextResponse.redirect(new URL('/', request.url))
+    case '/user/profile': return isLoggedIn ? null :  NextResponse.redirect(new URL('/', request.url))
+    case '/auth/login': return isLoggedIn ? NextResponse.redirect(new URL('/home', request.url)) : null
+    case '/auth/register': return isLoggedIn ? NextResponse.redirect(new URL('/home', request.url)) : null
   }
 
 
 }
  
 // List private route
-export const config = {
-  matcher: ['/home', '/user/profile', '/auth/login'],
-}
