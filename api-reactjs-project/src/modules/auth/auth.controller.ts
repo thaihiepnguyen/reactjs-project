@@ -1,10 +1,11 @@
-import {Body, Controller, Get, Post, Query, Res} from "@nestjs/common";
+import {Body, Controller, Get, Post, Query, Res, UseGuards, Request, HttpStatus, HttpCode} from "@nestjs/common";
 import {AuthService} from "./auth.service";
 import {LoginDto, RegisterDto} from "./auth.dto";
-import { Response } from "express";
 import {Cookies} from "../../app.decorator";
 import {MetaDataAuth} from "./auth.decorator";
 import {TBaseDto} from "../../app.dto";
+import {AuthGuard} from "@nestjs/passport";
+import {Public} from "./guards/public.guard";
 
 
 @Controller('auth')
@@ -14,23 +15,29 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) response: Response)
-    : Promise<TBaseDto<any>> {
+  async register(@Body() registerDto: RegisterDto): Promise<TBaseDto<any>> {
     return await this.authService.register(registerDto);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Public()
+  @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(
-    @Body() loginDto: LoginDto,
-    @Res({ passthrough: true }) response: Response
-  ): Promise<TBaseDto<any>> {
-    const { message, data, statusCode } = await this.authService.login(loginDto);
-    const { user } = data;
-    delete user.password;
+  async login(@Request() req): Promise<TBaseDto<any>> {
+    const { user } = req;
+    const payload = {
+      id: user.id,
+      fullname: user.fullname,
+      email: user.email,
+    }
+
     return {
-      message,
-      data,
-      statusCode
+      message: 'success',
+      statusCode: 200,
+      data: {
+        token: await this.authService.generateToken(payload),
+        user: user,
+      }
     }
   }
 
@@ -38,7 +45,6 @@ export class AuthController {
   async refreshToken(
     @MetaDataAuth('userId') userId: number,
     @Cookies('token') token: any,
-    @Res({ passthrough: true }) response: Response
   ): Promise<TBaseDto<any>> {
     const {refreshToken} = token;
 
@@ -46,7 +52,7 @@ export class AuthController {
   }
 
   @Post('login-social')
-  async loginSocial(@Body() loginSocialDto: any, @Res({ passthrough: true }) response: Response)
+  async loginSocial(@Body() loginSocialDto: any)
     : Promise<TBaseDto<any>> {
     return await this.authService.loginSocial(loginSocialDto);
   }

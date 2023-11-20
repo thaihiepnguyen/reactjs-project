@@ -10,7 +10,7 @@ import {TBaseDto} from "../../app.dto";
 import * as bcrypt from "bcrypt";
 import * as process from "process";
 import {UserService} from "../user/user.service";
-import {LoginDto, RegisterDto} from "./auth.dto";
+import {RegisterDto} from "./auth.dto";
 
 
 @Injectable()
@@ -25,8 +25,20 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  public async generateToken(payload: any)
-    : Promise<any> {
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) { return null; }
+
+    if (!user.isActive) { return null; }
+
+    const isMatch = await bcrypt.compare(pass, user.password);
+    if (!isMatch) { return null; }
+
+    delete user.password;
+    return user;
+  }
+
+  public async generateToken(payload): Promise<any> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         expiresIn: '1h'
@@ -47,7 +59,7 @@ export class AuthService {
   public async sendMail(toEmail, token): Promise<any> {
     const serverUrl = process.env.SERVER_URL || 'http://localhost:3001';
     const html = `<p>Click the following link to verify your email: <a href="${serverUrl}/auth/verify-email?token=${token.accessToken}">Verify Email</a></p>`;
-    return await this.mailerService.sendMail({
+    return this.mailerService.sendMail({
       to: toEmail,
       from: process.env.USER_NODEMAILER,
       subject: 'Verify Your Email',
@@ -67,7 +79,7 @@ export class AuthService {
       return false;
     } finally {
       await this.userRepository.update(
-        {email: payload.email},
+        {id: payload.id},
         {isActive: true}
       );
     }
@@ -75,61 +87,32 @@ export class AuthService {
   }
 
   public async register(registerDto: RegisterDto)
-    : Promise<TBaseDto<any>> {
+    : Promise<TBaseDto<undefined>> {
     const {fullname, email, password} = registerDto;
     const user = await this.userService.findUserByEmail(email);
     if (user) {
-      return {
-        message: 'User already exists'
-      }
+      return { message: 'User already exists' }
     }
 
     const SALT = process.env.SALT || 10;
     const encryptedPassword = await bcrypt.hash(password, SALT);
 
-    await this.userService.createUser(fullname, email, encryptedPassword);
-    const token = await this.generateToken(registerDto);
+    const userDB = await this.userService.createUser(fullname, email, encryptedPassword);
 
-    await this.sendMail(email, token);
+    const payload = {
+      id: userDB.id,
+      fullname: userDB.fullname,
+      email: userDB.email,
+    }
+
+    const tokenKey = await this.generateToken(payload);
+
+    await this.sendMail(email, tokenKey);
     return {
       message: 'User created successfully',
       statusCode: 200,
       data: undefined
     }
-  }
-
-  public async login(loginDto: LoginDto)
-    : Promise<TBaseDto<any>> {
-    const {email, password} = loginDto;
-    const user = await this.userService.findUserByEmail(email);
-    if (!user) {
-      throw new HttpException('User not found', 404);
-    }
-    if (!user.isActive) {
-      throw new BadRequestException('Please verify your email first',
-        { cause: new Error(), description: 'User is not active' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new BadRequestException('Please check your password',
-        { cause: new Error(), description: 'Incorrect password' });
-    }
-
-    const payload = {
-      id: user.id,
-      fullname: user.fullname,
-      email: user.email,
-    }
-
-    return {
-      message: 'success',
-      data: {
-        token: await this.generateToken(payload),
-        user: user,
-      },
-      statusCode: 200
-    };
   }
 
   public async refreshToken(userId: number, refreshToken: string): Promise<TBaseDto<any>> {

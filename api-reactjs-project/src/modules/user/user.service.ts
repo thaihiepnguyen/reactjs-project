@@ -14,22 +14,31 @@ export class UserService {
     @InjectConnection()
     private readonly connection: Connection
   ) {}
+
   async findUserByEmail(email: string): Promise<Users | undefined> {
     return await this.userRepository.findOne(
       {
-        where: {email}
+        where: {
+          email,
+          isValid: true
+        }
       }
     );
   }
 
-  async createUser(fullname: string, email: string, password: string): Promise<InsertResult> {
-    return await this.userRepository.createQueryBuilder()
+  async createUser(fullname: string, email: string, password: string): Promise<Users> {
+    const insertResult = await this.userRepository.createQueryBuilder()
       .insert()
       .into(Users)
       .values([
         {fullname, email, password}
       ])
       .execute();
+
+    return (
+      (insertResult?.['generatedMaps']?.[0] as Users) ||
+      ({} as Users)
+    )
   }
 
   async createOrUpdateUser(fullname: string, email: string, avatar: string): Promise<Users> {
