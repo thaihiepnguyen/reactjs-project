@@ -15,3 +15,16 @@ export class LoginDto {
   @IsEmail()
   email: string;
 }
+
+export class Data {
+  @IsNotEmpty()
+  name: string;
+  @IsNotEmpty()
+  email: string;
+  @IsNotEmpty()
+  image: string;
+}
+
+export class LoginSocialDto {
+  [user: string]: Data;
+}

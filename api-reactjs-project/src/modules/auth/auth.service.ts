@@ -56,9 +56,13 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  public async sendMail(toEmail, token): Promise<any> {
-    const serverUrl = process.env.SERVER_URL || 'http://localhost:3001';
-    const html = `<p>Click the following link to verify your email: <a href="${serverUrl}/auth/verify-email?token=${token.accessToken}">Verify Email</a></p>`;
+  public async sendMail(toEmail, token, payload): Promise<any> {
+    const { fullname } = payload;
+
+    const rawData = await this.connection.query(`SELECT * FROM email_templates WHERE id = 1`);
+    const content = rawData[0].content;
+    const html = content.replace('$user_name$', fullname).replace('$token$', token.accessToken);
+
     return this.mailerService.sendMail({
       to: toEmail,
       from: process.env.USER_NODEMAILER,
@@ -101,13 +105,13 @@ export class AuthService {
 
     const payload = {
       id: userDB.id,
-      fullname: userDB.fullname,
-      email: userDB.email,
+      fullname: fullname,
+      email: email,
     }
 
     const tokenKey = await this.generateToken(payload);
 
-    await this.sendMail(email, tokenKey);
+    await this.sendMail(email, tokenKey, payload);
     return {
       message: 'User created successfully',
       statusCode: 200,

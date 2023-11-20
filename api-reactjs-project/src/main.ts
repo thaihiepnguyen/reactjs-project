@@ -7,6 +7,8 @@ import {AuthGuard} from "./modules/auth/auth.guard";
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { config } from 'dotenv';
 import * as process from "process";
+import {NestExpressApplication} from "@nestjs/platform-express";
+import {join} from "path";
 config();
 
 async function dynamicImport(type): Promise<any> {
@@ -27,7 +29,7 @@ async function dynamicImport(type): Promise<any> {
 
 
 async function bootstrap() {
-  const app = await NestFactory.create(
+  const app = await NestFactory.create<NestExpressApplication>(
     AppModule.forRoot(await dynamicImport('module'))
   );
 
@@ -42,6 +44,8 @@ async function bootstrap() {
   app.useGlobalGuards(new AuthGuard());
   app.useGlobalPipes(new ValidationPipe())
   app.use(cookieParser());
+  app.setBaseViewsDir(join(__dirname, '..', 'src/views'));
+  app.setViewEngine('hbs');
 
   await app.listen(process.env.PORT || 3001);
   console.log('App is running on port: ', process.env.PORT || 3001);
