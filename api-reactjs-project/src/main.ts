@@ -11,26 +11,36 @@ import {NestExpressApplication} from "@nestjs/platform-express";
 import {join} from "path";
 config();
 
-async function dynamicImport(type): Promise<any> {
-  const PREFIX = '/src/modules';
-  const __dirname = fs.realpathSync('.');
-  const modules = fs.readdirSync(__dirname + PREFIX);
+function getFiles(type, prefix) {
+  const result = []
+  function innerRecursion(type, prefix) {
+    const __dirname = fs.realpathSync('.');
+    const files = fs.readdirSync(__dirname + '/src/' + prefix);
 
-  return (await Promise.all(modules.reduce((acc, cur) => {
-    const files = fs.readdirSync(__dirname + PREFIX + '/' + cur);
     for (let file of files) {
       if (file.endsWith(`.${type}.ts`)) {
-        acc.push(import(`./modules/${cur}/${cur}.${type}`) as never)
+        result.push(prefix + '/' +file)
+      }
+      else if (!file.includes('.')) {
+        innerRecursion(type, prefix + '/' + file)
       }
     }
-    return acc
-  }, []))).map((x) => x[Object.keys(x)[0]] || (x as any).default)
+  }
+  innerRecursion(type, prefix)
+  return result
 }
 
+async function dynamicImport(prefix) {
+  const moduleFiles = getFiles('module', prefix)
+  const modules = await Promise.all(moduleFiles.map(file => {
+    return import('./' + file.replace('.ts', '')) as never
+  }))
+  return modules.map((x) => x[Object.keys(x)[0]] || (x as any).default)
+}
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(
-    AppModule.forRoot(await dynamicImport('module'))
+    AppModule.forRoot(await dynamicImport('modules'))
   );
 
   const corsOptions: CorsOptions = {
