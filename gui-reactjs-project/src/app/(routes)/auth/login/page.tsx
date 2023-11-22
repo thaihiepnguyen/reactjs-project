@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 import { useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { setUser } from "@/redux/reducers/user";
+import github_icon from '../../../../../public/images/iconmonstr-github-1-240.png';
 
 function LoginForm() {
   const router = useRouter()
@@ -173,6 +174,18 @@ export default function Login() {
                 >
                 <img alt="Google icon" className={classes.google_icon} src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
                 Login with google
+            </Button>
+            <Button 
+                className={classes.loginGoogleBtn}
+                type="submit"
+                sx={{backgroundColor: "#fff", mt: 2}}
+                variant="contained"
+                // color="white"
+                fullWidth
+                onClick={()=>signIn('google', {callbackUrl: '/home'})}
+                >
+                <img alt="Github icon" className={classes.github_icon} src="https://cdn-icons-png.flaticon.com/512/25/25231.png"/>
+                Login with Github
             </Button>
             <Typography className={classes.switchText}variant="body2" align="center" gutterBottom>
               Don't have an account?{' '}
