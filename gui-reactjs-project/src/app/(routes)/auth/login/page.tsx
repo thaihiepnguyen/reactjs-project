@@ -118,7 +118,7 @@ function LoginForm() {
           }}
         />
         <Typography variant="body2" align="right" style={{ marginTop: '5px', marginBottom: '5px', fontStyle: 'italic' }}>
-          <Link href="#" color="primary">
+          <Link href={routes.forgotpassword} color="primary">
             Forgot Password?
           </Link>
         </Typography>
