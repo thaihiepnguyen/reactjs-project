@@ -13,6 +13,17 @@
   }
 }
 
+.loginGithubBtn {
+  color: blue;
+  background-color: white;
+  margin: 0;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: rgb(225, 218, 218); // Change to a lighter color on hover
+  }
+}
+
 .switchText {
   margin: 1rem;
 }

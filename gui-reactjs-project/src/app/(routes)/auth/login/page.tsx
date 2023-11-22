@@ -176,7 +176,7 @@ export default function Login() {
                 Login with google
             </Button>
             <Button 
-                className={classes.loginGoogleBtn}
+                className={classes.loginGithubBtn}
                 type="submit"
                 sx={{backgroundColor: "#fff", mt: 2}}
                 variant="contained"
