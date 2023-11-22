@@ -182,7 +182,7 @@ export default function Login() {
                 variant="contained"
                 // color="white"
                 fullWidth
-                onClick={()=>signIn('google', {callbackUrl: '/home'})}
+                onClick={()=>signIn('github', {callbackUrl: '/home'})}
                 >
                 <img alt="Github icon" className={classes.github_icon} src="https://cdn-icons-png.flaticon.com/512/25/25231.png"/>
                 Login with Github
