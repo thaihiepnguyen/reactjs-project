@@ -157,4 +157,46 @@ export class AuthService {
       }
     }
   }
+
+  public async forgotPassword(email: string): Promise<TBaseDto<any>> {
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) {
+      return { message: 'User with this email does not exist' };
+    }
+
+    const payload = {
+      id: user.id,
+      fullname: user.fullname,
+      email: user.email,
+    }
+
+    // Generate a unique reset token
+    const resetToken = await this.generateResetToken(user);
+
+    // Save the reset token in your database or cache (associate it with the user)
+
+    // Construct the link for password reset (example: http://yourdomain.com/reset-password?token=${resetToken})
+
+    // Send the password reset email
+    try {
+      // await this.sendMail(email, resetToken, payload);
+      return { message: 'call API successfully' };
+    } catch (error) {
+      console.error('Error sending email:', error);
+      return { message: 'Failed to send password reset email' };
+    }
+  }
+
+  private async generateResetToken(user: Users): Promise<string> {
+    const payload = {
+      id: user.id,
+      fullname: user.fullname,
+      email: user.email,
+    }
+
+    // Generate a unique reset token (you can use UUID or any token generation library)
+    const resetToken = this.generateToken(payload);
+    // Save the reset token associated with the user (in database or cache)
+    return resetToken;
+  }
 }
