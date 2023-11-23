@@ -6,13 +6,25 @@ function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isValidEmail, setIsValidEmail] = useState(false);
 
   const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setEmail(event.target.value);
+
+    // Check input email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = emailRegex.test(email);
+    setIsValidEmail(isValid);
+    setError('');
   };
 
   const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
+
+    if (!isValidEmail) {
+      setError('Please enter a valid email address.');
+      return;
+    }
 
     // try {
     //   const response = await axiosInstance.post(`/auth/forgot-password`, {
@@ -53,11 +65,11 @@ function ForgotPasswordForm() {
             {error}
           </Typography>
         )}
-        {successMessage && (
+        {/* {successMessage && (
           <Typography variant="body2" sx={{ my: 2 }} color="success">
             {successMessage}
           </Typography>
-        )}
+        )} */}
         <Button type="submit" variant="contained" color="primary" fullWidth>
           Reset Password
         </Button>
