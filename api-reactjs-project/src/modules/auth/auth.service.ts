@@ -71,6 +71,21 @@ export class AuthService {
     });
   }
 
+  public async sendResetPasswordMail(toEmail, token, payload): Promise<any> {
+    const { fullname } = payload;
+
+    const rawData = await this.connection.query(`SELECT * FROM email_templates WHERE id = 1`);
+    const content = rawData[0].content;
+    const html = content.replace('$user_name$', fullname).replace('$token$', token.accessToken);
+
+    return this.mailerService.sendMail({
+      to: toEmail,
+      from: process.env.USER_NODEMAILER,
+      subject: 'Verify Your Email',
+      html: html,
+    });
+  }
+
   public async verifyEmail(token: string): Promise<Boolean> {
     let payload: any;
     try {
@@ -173,13 +188,8 @@ export class AuthService {
     // Generate a unique reset token
     const resetToken = await this.generateResetToken(user);
 
-    // Save the reset token in your database or cache (associate it with the user)
-
-    // Construct the link for password reset (example: http://yourdomain.com/reset-password?token=${resetToken})
-
-    // Send the password reset email
     try {
-      // await this.sendMail(email, resetToken, payload);
+      await this.sendResetPasswordMail(email, resetToken, payload);
       return { message: 'call API successfully' };
     } catch (error) {
       console.error('Error sending email:', error);
