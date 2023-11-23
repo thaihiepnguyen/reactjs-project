@@ -12,7 +12,6 @@ import Swal from "sweetalert2";
 import { useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { setUser } from "@/redux/reducers/user";
-import github_icon from '../../../../../public/images/iconmonstr-github-1-240.png';
 
 function LoginForm() {
   const router = useRouter()
