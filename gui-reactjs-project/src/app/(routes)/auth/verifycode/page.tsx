@@ -1,7 +1,6 @@
 'use client'
 import React, { useState } from 'react';
 import { Container, Typography, TextField, Button } from '@mui/material';
-import axiosInstance from '@/app/routers/axios';
 
 function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
@@ -13,10 +12,9 @@ function ForgotPasswordForm() {
     setEmail(event.target.value);
 
     // Check input email
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValid = emailRegex.test(email);
-    setIsValidEmail(!isValid);
-    // console.log(isValid);
+    setIsValidEmail(isValid);
     setError('');
   };
 
@@ -28,33 +26,33 @@ function ForgotPasswordForm() {
       return;
     }
 
-    try {
-      const response = await axiosInstance.post(`/auth/forgot-password`, {
-        email,
-      });
-      console.log(response.data);
-      // Handle the response as needed
-      if (response.data) {
-        setSuccessMessage('Reset password link sent successfully. Please check your email.');
-        setError('');
-      }
-    } catch (error) {
-      // Handle error
-      console.error(error);
-      setError(error?.response?.data?.message || 'Something went wrong. Please try again.');
-      setSuccessMessage('');
-    }
+    // try {
+    //   const response = await axiosInstance.post(`/auth/forgot-password`, {
+    //     email,
+    //   });
+
+    //   // Handle the response as needed
+    //   if (response.data) {
+    //     setSuccessMessage('Reset password link sent successfully. Please check your email.');
+    //     setError('');
+    //   }
+    // } catch (error) {
+    //   // Handle error
+    //   console.error(error);
+    //   setError(error?.response?.data?.message || 'Something went wrong. Please try again.');
+    //   setSuccessMessage('');
+    // }
   };
 
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" align="center" gutterBottom>
-        Forgot Password
+        We sent you a mail to your email, check the verified code
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
-          type="email"
-          label="Email"
+          type="text"
+          label="Verified code"
           variant="outlined"
           margin="normal"
           autoComplete="email"
