@@ -4,6 +4,7 @@ import { Container, Typography, TextField, Button } from '@mui/material';
 import axiosInstance from '@/app/routers/axios';
 
 function ResetPasswordForm() {
+    const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -11,6 +12,10 @@ function ResetPasswordForm() {
     const [isValidPassword, setIsValidPassword] = useState(false);
     const [loading, setLoading] = useState(false);
   
+    const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+      setEmail(event.target.value);
+    };
+    
     const handleNewPasswordChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
       setNewPassword(event.target.value);
       setIsValidPassword(true);
@@ -35,19 +40,19 @@ function ResetPasswordForm() {
   
       try {
         const response = await axiosInstance.post(`/auth/reset-password`, {
+          email,
           newPassword,
-          confirmPassword,
         });
-        
-        if (response.data.message === 'password reset successful') {
-          setLoading(false);
-          setSuccessMessage('Password reset successfully.');
-          setError('');
-          // Redirect or handle success as needed
-        } else {
-          setError(response.data.message);
-          setSuccessMessage('');
-        }
+        console.log(response.data);
+        // if (response.data.message === 'password reset successful') {
+        //   setLoading(false);
+        //   setSuccessMessage('Password reset successfully.');
+        //   setError('');
+        //   // Redirect or handle success as needed
+        // } else {
+        //   setError(response.data.message);
+        //   setSuccessMessage('');
+        // }
       } catch (error) {
         console.error(error);
         setError(error?.response?.data?.message || 'Something went wrong. Please try again.');
@@ -61,6 +66,15 @@ function ResetPasswordForm() {
           Reset Password
         </Typography>
         <form onSubmit={handleSubmit}>
+          <TextField
+            type="email"
+            label="Email"
+            variant="outlined"
+            margin="normal"
+            fullWidth
+            required
+            onChange={handleEmailChange}
+          />
           <TextField
             type="password"
             label="New Password"
