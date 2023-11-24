@@ -36,7 +36,7 @@ function ForgotPasswordForm() {
       const response = await axiosInstance.post(`/auth/forgot-password`, {
         email,
       });
-      console.log(response.data.message);
+      console.log(response.data);
       // Handle the response as needed
       if (response.data.message === 'send reset password email successfully!') {
         setLoading(false);
