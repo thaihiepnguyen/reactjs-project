@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Container, Typography, TextField, Button } from '@mui/material';
 import axiosInstance from '@/app/routers/axios';
 import CircularProgress from '@/app/components/CircularProgress';
+import Swal from 'sweetalert2';
 
 function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
@@ -36,11 +37,13 @@ function ForgotPasswordForm() {
       const response = await axiosInstance.post(`/auth/forgot-password`, {
         email,
       });
-      // console.log(response.data);
-      // Handle the response as needed
+      
       if (response.data.message === 'send reset password email successfully!') {
-        setLoading(false);
-        // history.push({pathname: 'http://localhost:3000/auth/verifycode'});
+        Swal.fire({
+          title: "Reset link was sent sucessfully!",
+          text: "Please check your email",
+          icon: "success",
+        })
         setSuccessMessage('Reset password link sent successfully. Please check your email.');
         setError('');
       }
@@ -53,6 +56,8 @@ function ForgotPasswordForm() {
       console.error(error);
       setError(error?.response?.data?.message || 'Something went wrong. Please try again.');
       setSuccessMessage('');
+    } finally {
+      setLoading(false); // Reset loading state regardless of success or failure
     }
   };
 
@@ -86,6 +91,7 @@ function ForgotPasswordForm() {
             {successMessage}
           </Typography>
         )}
+        {loading ? <CircularProgress /> : ''}
       </form>
     </Container>
   );
