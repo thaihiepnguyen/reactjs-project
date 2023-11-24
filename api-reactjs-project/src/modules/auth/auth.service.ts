@@ -209,4 +209,30 @@ export class AuthService {
     // Save the reset token associated with the user (in database or cache)
     return resetToken;
   }
+
+  public async updateUserPassword(email: string, newPassword: string): Promise<TBaseDto<any>> {
+    const user = await this.userService.findUserByEmail(email);
+    if (!user) {
+      return { message: 'User with this email does not exist' };
+    }
+    // console.log(user);
+    
+    // Update user's password and reset token
+    try {
+      const updatedUser = await this.userService.updateUserPassword(email, newPassword);
+      // console.log(updatedUser);
+      if (!updatedUser) {
+        return { message: 'Failed to update password' };
+      }
+  
+      // Clear/reset the reset token and its expiration after successful password update
+      // await this.userService.clearResetToken(user.id);
+  
+      return { message: 'Password reset successfully!' };
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      return { message: 'Failed to reset password' };
+    }
+  }
+  
 }

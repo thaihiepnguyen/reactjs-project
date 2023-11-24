@@ -83,4 +83,9 @@
     async forgotPassword(@Body() body: { email: string }): Promise<TBaseDto<any>> {
       return await this.authService.forgotPassword(body.email);
     }
+
+    @Post('reset-password')
+    async resetPassword(@Body() body: { email: string, newPassword: string}): Promise<TBaseDto<any>> {
+      return await this.authService.updateUserPassword(body.email, body.newPassword);
+    }
   }

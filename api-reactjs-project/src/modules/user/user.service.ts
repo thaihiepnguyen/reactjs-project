@@ -67,6 +67,7 @@ export class UserService {
       },
     );
   }
+
   async updateUser(id:number, data: UpdateProfileUserDto) {
     id = id ? id : 0;
     let user = await this.userRepository.findOne({
@@ -92,5 +93,22 @@ export class UserService {
       })
     }
     return null;
+  }
+
+  async updateUserPassword(email: string, newPassword: string): Promise<Users | undefined> {
+    let user = await this.userRepository.findOne({
+      where: {email}
+    })
+    // console.log(user);
+    if (!user) {
+      // Handle case where the user does not exist
+      return undefined;
+    } else {
+      await this.userRepository.update((await user).id, {
+        password: newPassword
+      });
+      
+      return user;
+    }
   }
 }
