@@ -190,7 +190,7 @@ export class AuthService {
 
     try {
       await this.sendResetPasswordMail(email, resetToken, payload);
-      return { message: 'call API successfully' };
+      return { message: 'send reset password email successfully!' };
     } catch (error) {
       console.error('Error sending email:', error);
       return { message: 'Failed to send password reset email' };

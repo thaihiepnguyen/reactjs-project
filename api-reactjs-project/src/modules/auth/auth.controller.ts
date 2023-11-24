@@ -69,7 +69,7 @@
     @Post('forgot-password')
     async forgotPassword(@Body() body: { email: string }): Promise<TBaseDto<any>> {
       return await this.authService.forgotPassword(body.email);
-    }
+    }@Render('forgot-password-email')
 
     @Render('email')
     @Get('verify-email')
