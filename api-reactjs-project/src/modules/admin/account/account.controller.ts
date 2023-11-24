@@ -7,8 +7,7 @@ import {isNumber} from "@nestjs/common/utils/shared.utils";
 
 @Controller('admin/account')
 export class AccountController {
-  constructor(private readonly accountService: AccountService) {
-  }
+  constructor(private readonly accountService: AccountService) { }
   @Get('all')
   async getAll(): Promise<TBaseDto<Users[]>> {
     return {
@@ -55,6 +54,18 @@ export class AccountController {
     return {
       statusCode: 200,
       message: 'Update user successfully!'
+    }
+  }
+
+  @Get('get/:userId')
+  async getUserById(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<TBaseDto<Users>> {
+    const user = await this.accountService.getUserById(userId);
+    return {
+      statusCode: 200,
+      data: user,
+      message: 'Get user successfully!'
     }
   }
 }

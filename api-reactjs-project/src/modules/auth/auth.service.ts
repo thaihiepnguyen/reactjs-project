@@ -107,7 +107,7 @@ export class AuthService {
 
   public async register(registerDto: RegisterDto)
     : Promise<TBaseDto<undefined>> {
-    const {fullname, email, password} = registerDto;
+    const {fullname, email, password, roleId} = registerDto;
     const user = await this.userService.findUserByEmail(email);
     if (user) {
       return { message: 'User already exists' }
@@ -122,6 +122,7 @@ export class AuthService {
       id: userDB.id,
       fullname: fullname,
       email: email,
+      roleId: roleId || 1,
     }
 
     const tokenKey = await this.generateToken(payload);

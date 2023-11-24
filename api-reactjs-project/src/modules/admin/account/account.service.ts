@@ -60,4 +60,8 @@ export class AccountService {
       password: encryptedPassword
     })
   }
+
+  async getUserById(userId: number) {
+    return this.userService.findUserById(userId)
+  }
 }

@@ -9,6 +9,7 @@ import { config } from 'dotenv';
 import * as process from "process";
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {join} from "path";
+import { RolesGuard } from './modules/auth/roles/roles.guard';
 config();
 
 function getFiles(type, prefix) {
@@ -19,23 +20,23 @@ function getFiles(type, prefix) {
 
     for (let file of files) {
       if (file.endsWith(`.${type}.ts`)) {
-        result.push(prefix + '/' +file)
+        result.push(prefix + '/' +file);
       }
       else if (!file.includes('.')) {
-        innerRecursion(type, prefix + '/' + file)
+        innerRecursion(type, prefix + '/' + file);
       }
     }
   }
-  innerRecursion(type, prefix)
-  return result
+  innerRecursion(type, prefix);
+  return result;
 }
 
 async function dynamicImport(prefix) {
-  const moduleFiles = getFiles('module', prefix)
+  const moduleFiles = getFiles('module', prefix);
   const modules = await Promise.all(moduleFiles.map(file => {
     return import('./' + file.replace('.ts', '')) as never
-  }))
-  return modules.map((x) => x[Object.keys(x)[0]] || (x as any).default)
+  }));
+  return modules.map((x) => x[Object.keys(x)[0]] || (x as any).default);
 }
 
 async function bootstrap() {
@@ -52,7 +53,7 @@ async function bootstrap() {
   app.enableCors(corsOptions);
   
   app.useGlobalGuards(new AuthGuard());
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
   app.setBaseViewsDir(join(__dirname, '..', 'src/views'));
   app.setViewEngine('hbs');

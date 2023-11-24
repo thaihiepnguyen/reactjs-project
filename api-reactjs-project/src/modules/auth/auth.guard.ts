@@ -11,12 +11,11 @@ export class AuthGuard implements CanActivate {
   }
 
   async validateRequest(request): Promise<boolean> {
-    const userIdHeader = request.headers['x-user-id'];
-    const userNameHeader = request.headers['x-user-name'];
+    const { userId, userName } = request.cookies
 
-    request.metaDateAuth = {
-      userId: +userIdHeader,
-      userName: userNameHeader
+    request.metaDataAuth = {
+      userId: +userId,
+      userName: userName
     };
     return true
   }

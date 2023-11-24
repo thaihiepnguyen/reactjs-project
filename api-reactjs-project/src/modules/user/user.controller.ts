@@ -1,4 +1,4 @@
-import {Body, Controller, HttpException, Post, Res, UploadedFile, UseInterceptors} from "@nestjs/common";
+import {Body, Controller, HttpException, Post, Res, UploadedFile, UseGuards, UseInterceptors} from "@nestjs/common";
 import {Get} from "@nestjs/common";
 import {MetaDataAuth} from "../auth/auth.decorator";
 import {UserService} from "./user.service";
@@ -8,11 +8,16 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
 import {unlink} from "fs";
+import { Role } from "../auth/roles/role.enum";
+import { Roles } from "../auth/roles/roles.decorator";
+import { RolesGuard } from "../auth/roles/roles.guard";
+
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService,) {
   }
+
   @Get('profile')
   getProfile(@MetaDataAuth('userId') userId: number) {
     return this.userService.findUserById(userId);
