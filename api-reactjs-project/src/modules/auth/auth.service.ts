@@ -219,7 +219,10 @@ export class AuthService {
     
     // Update user's password and reset token
     try {
-      const updatedUser = await this.userService.updateUserPassword(email, newPassword);
+      const SALT = process.env.SALT || 10;
+      const encryptedPassword = await bcrypt.hash(newPassword, SALT);
+
+      const updatedUser = await this.userService.updateUserPassword(email, encryptedPassword);
       // console.log(updatedUser);
       if (!updatedUser) {
         return { message: 'Failed to update password' };
