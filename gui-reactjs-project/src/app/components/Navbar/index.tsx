@@ -4,7 +4,7 @@ import { Avatar, Button } from "@mui/material";
 import Link from "next/link";
 import { routes } from "@/app/routers/routes";
 import classes from "./styles.module.scss";
-import { HomeOutlined } from "@mui/icons-material";
+import { BrandingWatermarkRounded } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import axiosInstance from "@/app/routers/axios";
 import axios from "axios";
@@ -57,8 +57,8 @@ export default function Navbar() {
       {/*<Button variant="outlined" onClick={onClick}>Redux counter reducer: {value}</Button>*/}
       <div>
         <Link href={routes.home} className={classes.home}>
-          <HomeOutlined />
-          Home
+          <BrandingWatermarkRounded style={{marginRight: 10}}/>
+           Classroom
         </Link>
       </div>
       {

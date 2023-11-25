@@ -91,3 +91,6 @@ body *{
   font-family: inherit !important;
 }
 
+[toggle-data="true"] {
+  width: 5.3rem;
+}

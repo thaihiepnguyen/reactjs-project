@@ -1,11 +1,17 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Patch, Put} from "@nestjs/common";
+import {Body, Controller, Get, Param, ParseIntPipe, Patch, Put, UseGuards} from "@nestjs/common";
 import {AccountService} from "./account.service";
 import {Users} from "../../../typeorm";
 import {ActiveAccountDto, UpdateAccountDto} from "./account.dto";
 import {TBaseDto} from "../../../app.dto";
 import {isNumber} from "@nestjs/common/utils/shared.utils";
+import { RolesGuard } from "src/modules/auth/roles/roles.guard";
+import { Roles } from "src/modules/auth/roles/roles.decorator";
+import { Role } from "src/modules/auth/roles/role.enum";
 
+
+@UseGuards(RolesGuard)
 @Controller('admin/account')
+@Roles(Role.Admin)
 export class AccountController {
   constructor(private readonly accountService: AccountService) { }
   @Get('all')
