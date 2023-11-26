@@ -2,6 +2,7 @@
 
 import classes from "./styles.module.scss";
 import Link from "next/link";
+import { routes } from "@/app/routers/routes";
 import {HomeOutlined, SettingsOutlined,NotificationsNoneOutlined, ArrowBackIosOutlined, ArrowForwardIosOutlined, AccountCircleOutlined, SchoolOutlined} from '@mui/icons-material';
 import { useState } from "react";
 import classNames from 'classnames';
@@ -9,22 +10,22 @@ import classNames from 'classnames';
 const sidebarItems = [
   {
     name: 'Home',
-    href: '/home',
+    href: routes.home,
     icon: <HomeOutlined />
   },
   {
     name: 'My Courses',
-    href: '/user/my-courses',
+    href: routes.myCourses,
     icon: <SchoolOutlined />
   },
   {
     name: 'Notifications',
-    href: '/user/notifications',
+    href: routes.notification,
     icon: <NotificationsNoneOutlined />
   },
   {
     name: 'Edit Profile',
-    href: '/user/profile',
+    href: routes.profile,
     icon: <AccountCircleOutlined />
   },
   {

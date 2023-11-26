@@ -4,6 +4,6 @@ export const routes = {
   profile: "/user/profile",
   home: "/home",
   forgotpassword: "/auth/forgotpassword",
-  myCourses: "user/my-courses",
-  notification: "user/notification",
+  myCourses: "/user/my-courses",
+  notification: "/user/notification",
 };

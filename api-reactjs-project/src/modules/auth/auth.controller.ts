@@ -41,7 +41,7 @@ export class AuthController {
       fullname: user.fullname,
       email: user.email,
       roleId: user.roleId,
-    }
+    };
 
     return {
       message: 'success',
@@ -50,7 +50,7 @@ export class AuthController {
         token: await this.authService.generateToken(payload),
         user: user,
       }
-    }
+    };
   }
 
   @Get('refresh-token')
