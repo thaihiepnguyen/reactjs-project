@@ -1,4 +1,4 @@
-import {BadRequestException, HttpException, Injectable} from "@nestjs/common";
+import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
 import {Users} from "../../typeorm";
 import {Repository} from "typeorm";
 import {InjectConnection, InjectRepository} from "@nestjs/typeorm";
@@ -27,12 +27,12 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.userService.findUserByEmail(email);
-    if (!user) { return null; }
+    if (!user) { throw new HttpException('Email not exists', HttpStatus.FORBIDDEN)}
 
-    if (!user.isActive) { return null; }
+    if (!user.isActive) { throw new HttpException('User is not active', HttpStatus.FORBIDDEN) }
 
     const isMatch = await bcrypt.compare(pass, user.password);
-    if (!isMatch) { return null; }
+    if (!isMatch) { throw new HttpException('Password not correct', HttpStatus.FORBIDDEN) }
 
     delete user.password;
     return user;
