@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Tabs,
   Tab} from "@mui/material";
-import { Input } from "@mui/icons-material";
+import axiosInstance from "@/app/routers/axios";
 
 export default function MyNextJsExcelSheet() {
   const [items, setItems] = useState([]);
@@ -52,11 +52,20 @@ export default function MyNextJsExcelSheet() {
     });
   };
 
-  const handleSaveData = () => {
-    // console.log(items); an array objects
+  const handleSaveData = async () => {
+    // console.log(items); // an array objects
     // items[0] = [20127500, 20127500@gmail.com]
     // items[0][0] = 20127500
-
+    
+    const transformedItems = items.map(([studentId, email]) => ({ studentId, email }));
+    console.log(transformedItems[0].email);
+    try {
+      const response = await axiosInstance.post(`/admin/account/mappingExcel`, transformedItems );
+      // console.log('Data saved:', response.data);
+    } catch (error) {
+      console.error('Error saving data:', error);
+      // Handle error scenarios accordingly
+    }
 
   }
 
