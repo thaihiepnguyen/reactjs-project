@@ -161,34 +161,33 @@ export default function MyNextJsExcelSheet() {
           <br /><br /><br />
 
           {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-          {showSaveButton && (
-            <Button variant="contained" color="primary" onClick={handleSaveData}>
-              Save Data
-            </Button>
-            )}
-          {/* If admin chooses import excel file */}
-          {items.length > 0 && (
-              <TableContainer component={Paper}>
-                <Table aria-label="Excel Data Table">
-                  <TableHead>
-                    <TableRow>
-                      {Object.keys(items[0]).map((header, index) => (
-                        <TableCell key={index}>{header}</TableCell>
-                       ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {items.map((row, index) => (
-                      <TableRow key={index}>
-                        {Object.values(row).map((value, i) => (
-                          <TableCell key={i}>{value}</TableCell>
-                        ))}
-                      </TableRow>
-                     ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            {/* If admin chooses import excel file */}
+            {items.length > 0 && (
+                <TableContainer component={Paper}>
+                  <Table aria-label="Excel Data Table">
+                    <TableHead>
+                      <TableCell>Student ID</TableCell>
+                      <TableCell>Email</TableCell>
+                    </TableHead>
+                    <TableBody>
+                      {items.map((row, index) => (
+                        <TableRow key={index}>
+                          {Object.values(row).map((value, i) => (
+                            <TableCell key={i}>{value}</TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+              {showSaveButton && (
+              <Button variant="contained" color="primary" onClick={handleSaveData} style={{width: '10rem', height: '3rem'}}>
+                Save Data
+              </Button>
+              )}
+            </div>
           </> 
         )}
       
