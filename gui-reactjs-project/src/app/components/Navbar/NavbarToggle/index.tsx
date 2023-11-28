@@ -31,6 +31,7 @@ export default function NavbarToggle({avatar, userName }) {
     deleteCookie('token');
     deleteCookie('userId');
     deleteCookie('userName');
+    deleteCookie('role');
     dispatch(setUser(null));
     router.replace('/');
   }

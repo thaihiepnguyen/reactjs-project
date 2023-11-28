@@ -9,6 +9,7 @@ import {TBaseDto} from "../../app.dto";
 import * as bcrypt from "bcrypt";
 import * as process from "process";
 import {UserService} from "../user/user.service";
+import {RoleService} from "../role/role.service";
 import {RegisterDto} from "./auth.dto";
 import { Users } from "src/typeorm/entity/Users";
 
@@ -23,6 +24,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
     private readonly userService: UserService,
+    private readonly roleService: RoleService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -54,6 +56,10 @@ export class AuthService {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  public async getRole(userid: number): Promise<any> {
+    return await this.userRepository.createQueryBuilder("user").where("user.id = :id", { id: userid }).leftJoinAndSelect('user.role', 'role').getOne();
   }
 
   public async sendMail(toEmail, token, payload): Promise<any> {
@@ -107,7 +113,7 @@ export class AuthService {
 
   public async register(registerDto: RegisterDto)
     : Promise<TBaseDto<undefined>> {
-    const {fullname, email, password, roleId} = registerDto;
+    const {fullname, email, password, role} = registerDto;
     const user = await this.userService.findUserByEmail(email);
     if (user) {
       return { message: 'User already exists' }
@@ -117,6 +123,8 @@ export class AuthService {
     const encryptedPassword = await bcrypt.hash(password, SALT);
 
     const userDB = await this.userService.createUser(fullname, email, encryptedPassword);
+
+    const roleId = await this.roleService.getRoleId(role);
 
     const payload = {
       id: userDB.id,
@@ -158,11 +166,15 @@ export class AuthService {
   public async loginSocial(loginSocialDto: any): Promise<TBaseDto<any>> {
     const {name: fullname, email, image:avatar} = loginSocialDto.user;
     const user = await this.userService.createOrUpdateUser(fullname, email, avatar );
+    const role = await this.roleService.getRole(user.roleId);
+    user.role = role;
+    
     const payload = {
       id: user.id,
       fullname: user.fullname,
       email: user.email,
     }
+    
     const token = await this.generateToken(payload);
     return {
       message: 'success',

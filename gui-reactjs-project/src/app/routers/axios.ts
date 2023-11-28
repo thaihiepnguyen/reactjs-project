@@ -31,10 +31,12 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => {
+    console.log(response.data.data)
     if(response?.data?.data?.token) {
       setCookie('token', JSON.stringify(response.data.data.token))
       setCookie('userId', response.data.data.user.id)
       setCookie('userName', response.data.data.user.fullname)
+      setCookie('role', response.data.data.user.role)
     }
     return response;
   },

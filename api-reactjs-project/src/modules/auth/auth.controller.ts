@@ -42,6 +42,8 @@ export class AuthController {
       email: user.email,
       roleId: user.roleId,
     };
+    const role = await this.authService.getRole(user.id);
+    user.role = role?.role;
 
     return {
       message: 'success',

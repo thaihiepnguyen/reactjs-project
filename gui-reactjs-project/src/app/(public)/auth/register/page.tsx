@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 export default function Login() {
   const router = useRouter();
   router.push('/auth/welcome?type=signUp');
-  return <>.</>
 }
 
 // "use client";

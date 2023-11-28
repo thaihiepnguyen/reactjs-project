@@ -55,6 +55,7 @@ const SignupForm = memo((props: SignupFormProps) => {
         fullname: data.fullname,
         email: data.email,
         password: data.password,
+        role: data.role
       });
 
       // Handle the response as needed
@@ -88,10 +89,10 @@ const SignupForm = memo((props: SignupFormProps) => {
       <form className={classes.registerForm} onSubmit={handleSubmit(onSubmit)}>
         <h1>Create Account</h1>
         <div className={classes.socialContainer}>
-          <div className={classes.socialButton} onClick={()=>signIn('google', {callbackUrl: '/home'})}>
+          <div className={classes.socialButton} onClick={()=>signIn('google', {callbackUrl: '/?redirect=true'})}>
             <GoogleIcon />
           </div>
-          <div className={classes.socialButton}  onClick={()=>signIn('github', {callbackUrl: '/home'})}>
+          <div className={classes.socialButton}  onClick={()=>signIn('github', {callbackUrl: '/?redirect=true'})}>
             <GithubIcon />
           </div>
         </div>

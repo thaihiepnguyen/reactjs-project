@@ -81,10 +81,10 @@ const LoginForm = memo((props: LoginFormProps) => {
       <form className={classes.registerForm} onSubmit={handleSubmit(onSubmit)}>
         <h1>Sign in</h1>
         <div className={classes.socialContainer}>
-          <div className={classes.socialButton} onClick={()=>signIn('google', {callbackUrl: '/home'})}>
+          <div className={classes.socialButton} onClick={()=>signIn('google', {callbackUrl: '/?redirect=true'})}>
             <GoogleIcon />
           </div>
-          <div className={classes.socialButton}  onClick={()=>signIn('github', {callbackUrl: '/home'})}>
+          <div className={classes.socialButton}  onClick={()=>signIn('github', {callbackUrl: '/?redirect=true'})}>
             <GithubIcon />
           </div>
         </div>

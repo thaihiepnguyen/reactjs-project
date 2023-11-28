@@ -1,5 +1,6 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn} from "typeorm";
 import { EntityBase } from "../EntityBase";
+import { Roles } from "./Roles";
 
 @Entity('users', {schema: 'QLHSSV_DB'})
 export class Users extends EntityBase{
@@ -59,4 +60,8 @@ export class Users extends EntityBase{
     name: "phone"
   })
   phone: string;
+
+  @OneToOne(() => Roles)
+  @JoinColumn({name: 'role_id'})
+  role: Roles
 }

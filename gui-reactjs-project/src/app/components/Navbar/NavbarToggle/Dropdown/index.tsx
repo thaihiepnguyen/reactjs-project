@@ -21,6 +21,7 @@ export const Dropdown = () => {
     deleteCookie('token');
     deleteCookie('userId');
     deleteCookie('userName');
+    deleteCookie('role');
     dispatch(setUser(null));
   }
   return (

@@ -1,8 +1,22 @@
+'use client'
 import Link from "next/link";
 import classes from "./styles.module.scss";
 import clsx from "clsx";
 import { routes } from "@/app/routers/routes";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+
 const LandingPage = () => {
+  const searchPrms = useSearchParams();
+  const redirect = searchPrms.get('redirect')
+  if(redirect) {
+    if(typeof window !== "undefined") {
+      window.location.reload();
+    window.location.href = '/home';
+    }
+  }
+
+
   return (
     <>
       <div className={classes.header__info}>

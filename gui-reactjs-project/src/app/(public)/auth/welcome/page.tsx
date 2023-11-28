@@ -17,7 +17,9 @@ const GettingStarted = memo((props: GettingStartedProps) => {
 
   const [type, setType] = useState(typeStart || 'signIn');
 
-  router.replace('/auth/welcome');
+  if (typeStart) {
+    router.replace('/auth/welcome');
+  }
 
   const handleOnClick = (text: string) => {
     if (text !== type) {

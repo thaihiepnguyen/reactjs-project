@@ -8,6 +8,8 @@ export class RegisterDto {
   @IsEmail()
   email: string;
   @IsOptional()
+  role: string;
+  @IsOptional()
   roleId?: number;
 }
 

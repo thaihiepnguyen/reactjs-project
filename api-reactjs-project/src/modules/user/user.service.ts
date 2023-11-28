@@ -61,11 +61,7 @@ export class UserService {
   }
 
   async findUserById(id: number): Promise<Users | undefined> {
-    return await this.userRepository.findOne(
-      {
-        where: {id},
-      },
-    );
+    return await this.userRepository.createQueryBuilder("user").where("user.id = :id", { id: id }).leftJoinAndSelect('user.role', 'role').getOne();
   }
 
   async updateUser(id:number, data: UpdateProfileUserDto) {
