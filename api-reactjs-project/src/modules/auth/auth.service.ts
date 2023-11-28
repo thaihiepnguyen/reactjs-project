@@ -1,5 +1,4 @@
 import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
-import {Users} from "../../typeorm";
 import {Repository} from "typeorm";
 import {InjectConnection, InjectRepository} from "@nestjs/typeorm";
 import {Connection} from "mysql2";
@@ -11,6 +10,7 @@ import * as bcrypt from "bcrypt";
 import * as process from "process";
 import {UserService} from "../user/user.service";
 import {RegisterDto} from "./auth.dto";
+import { Users } from "src/typeorm/entity/Users";
 
 
 @Injectable()

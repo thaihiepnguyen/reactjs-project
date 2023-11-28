@@ -3,20 +3,15 @@ import {Get} from "@nestjs/common";
 import {MetaDataAuth} from "../auth/auth.decorator";
 import {UserService} from "./user.service";
 import { UpdateProfileUserDto } from "./user.dto";
-import { TBaseDto } from "src/app.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
 import {unlink} from "fs";
-import { Role } from "../auth/roles/role.enum";
-import { Roles } from "../auth/roles/roles.decorator";
-import { RolesGuard } from "../auth/roles/roles.guard";
 
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService,) {
-  }
+  constructor(private readonly userService: UserService) {}
 
   @Get('profile')
   getProfile(@MetaDataAuth('userId') userId: number) {
@@ -36,7 +31,6 @@ export class UserController {
     })
   }))
   async updateProfile(@UploadedFile() file: Express.Multer.File, @MetaDataAuth('userId') userId: number, @Body() updateDto: UpdateProfileUserDto
-                      // , @Res({ passthrough: true }) response: Response
   ) {
     if (file) {
       updateDto.avatarUrl = file.path;
@@ -55,5 +49,4 @@ export class UserController {
       };
     }
   }
-
 }

@@ -9,7 +9,7 @@ import { config } from 'dotenv';
 import * as process from "process";
 import {NestExpressApplication} from "@nestjs/platform-express";
 import {join} from "path";
-import { RolesGuard } from './modules/auth/roles/roles.guard';
+import {getEntities} from "./typeorm";
 config();
 
 function getFiles(type, prefix) {
@@ -40,8 +40,13 @@ async function dynamicImport(prefix) {
 }
 
 async function bootstrap() {
+  const modules = await dynamicImport('modules');
+  const entities = await getEntities();
   const app = await NestFactory.create<NestExpressApplication>(
-    AppModule.forRoot(await dynamicImport('modules'))
+    AppModule.forRoot({
+     modules,
+     entities,
+    }),
   );
 
   const corsOptions: CorsOptions = {
