@@ -150,3 +150,4 @@ VALUES ('verify_email', '
     </tr>
     <!-- end copy block -->
   </table>');
+

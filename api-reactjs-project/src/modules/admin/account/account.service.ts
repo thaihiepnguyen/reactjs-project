@@ -1,10 +1,10 @@
 import {HttpException, Injectable} from "@nestjs/common";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Users} from "../../../typeorm";
 import {Repository} from "typeorm";
 import {UserService} from "../../user/user.service";
 import * as process from "process";
 import * as bcrypt from "bcrypt";
+import { Users } from "src/typeorm/entity/Users";
 
 
 @Injectable()

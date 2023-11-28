@@ -1,6 +1,5 @@
 import {DynamicModule, MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
 import {TypeOrmModule} from "@nestjs/typeorm";
-import entities from "./typeorm";
 import {AuthMiddleware} from "./modules/auth/auth.middleware";
 import {MailerModule} from "@nestjs-modules/mailer";
 import {ConfigModule} from "@nestjs/config";
@@ -10,7 +9,7 @@ import { join } from 'path';
 
 @Module({})
 export class AppModule implements NestModule {
-  static forRoot(modules): DynamicModule {
+  static forRoot({ modules, entities }): DynamicModule {
     return {
       module: AppModule,
       imports: [

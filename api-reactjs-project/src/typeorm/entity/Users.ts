@@ -1,5 +1,5 @@
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import {EntityBase} from "./EntityBase";
+import { EntityBase } from "../EntityBase";
 
 @Entity('users', {schema: 'QLHSSV_DB'})
 export class Users extends EntityBase{

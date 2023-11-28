@@ -1,10 +1,10 @@
 import {Injectable} from "@nestjs/common";
 import {InjectConnection, InjectRepository} from "@nestjs/typeorm";
-import {Roles, Users} from "../../typeorm";
 import {InsertResult, QueryResult, Repository} from "typeorm";
 import {Connection} from "mysql2/index";
 import { UpdateProfileUserDto } from "./user.dto";
 import { unlink } from "fs";
+import { Users } from "src/typeorm/entity/Users";
 
 @Injectable()
 export class UserService {

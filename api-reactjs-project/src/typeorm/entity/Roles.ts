@@ -1,5 +1,5 @@
 import {Column, Entity} from "typeorm";
-import {EntityBase} from "./EntityBase";
+import { EntityBase } from "../EntityBase";
 
 @Entity('roles', {schema: 'QLHSSV_DB'})
 export class Roles extends EntityBase{
