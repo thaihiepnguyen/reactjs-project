@@ -5,15 +5,21 @@ import { memo, useState } from 'react';
 import { Box } from '@mui/material';
 import clsx from 'clsx';
 import classes from './styles.module.scss';
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface GettingStartedProps {}
 
 const GettingStarted = memo((props: GettingStartedProps) => {
-  const [type, setType] = useState('signIn');
+  const searchParams = useSearchParams()
+  const router = useRouter()
+ 
+  const typeStart = searchParams.get('type')
 
-  const containerClass = 'container ' + (type === 'signUp' ? 'right-panel-active' : '');
+  const [type, setType] = useState(typeStart || 'signIn');
 
-  const handleOnClick = text => {
+  router.replace('/auth/welcome');
+
+  const handleOnClick = (text: string) => {
     if (text !== type) {
       setType(text);
       return;
