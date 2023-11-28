@@ -14,6 +14,7 @@ export default function MyNextJsExcelSheet() {
   const [newStudentId, setNewStudentId] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [selectedTab, setSelectedTab] = useState(0);
+  const [showSaveButtonMappingTable, setShowSaveButtonMappingTable] = useState(false);
 
   const readExcel = (file: Blob) => {
     const promise = new Promise((resolve, reject) => {
@@ -52,7 +53,7 @@ export default function MyNextJsExcelSheet() {
   };
 
   const handleSaveData = () => {
-    // console.log(items[0][1]);
+    // console.log(items); an array objects
     // items[0] = [20127500, 20127500@gmail.com]
     // items[0][0] = 20127500
 
@@ -61,13 +62,14 @@ export default function MyNextJsExcelSheet() {
 
   const handleManualMapping = () => {
     setShowManualMapping(!showManualMapping);
-    setShowSaveButton(!showSaveButton);
     setManualMappingData([]); // Clear any previous manual mapping data
   };
 
   const handleManualSave = () => {
-    // Handle saving manually mapped data to backend (if needed)
-    // You can access manualMappingData for the manually mapped data
+    console.log(typeof(manualMappingData[0]));
+    // manualMappingData is an array
+    // manualMappingData[0].email = email of the 1st student
+    // manualMappingData[0].studentId = id of the 1st student
     setShowManualMapping(false); // Hide the manual mapping table after saving
   };
 
@@ -78,6 +80,7 @@ export default function MyNextJsExcelSheet() {
   };
 
   const handlePushToTable = () => {
+    setShowSaveButtonMappingTable(true);
     if (newStudentId.trim() !== "" && newEmail.trim() !== "") {
       setManualMappingData([
         ...manualMappingData,
@@ -168,34 +171,42 @@ export default function MyNextJsExcelSheet() {
             </Button>
           </div>
           
-          <TableContainer component={Paper}>
-            <Table aria-label="Manual Mapping Table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Student ID</TableCell>
-                  <TableCell>Email</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {manualMappingData.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <TextField
-                        value={row?.studentId || ""}
-                        onChange={(e) => handleManualInputChange(index, 'studentId', e.target.value)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        value={row?.email || ""}
-                        onChange={(e) => handleManualInputChange(index, 'email', e.target.value)}
-                      />
-                    </TableCell>
+          {/* Manual Mapping Table */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <TableContainer component={Paper}>
+              <Table aria-label="Manual Mapping Table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Student ID</TableCell>
+                    <TableCell>Email</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {manualMappingData.map((row, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <TextField
+                          value={row?.studentId || ""}
+                          onChange={(e) => handleManualInputChange(index, 'studentId', e.target.value)}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextField
+                          value={row?.email || ""}
+                          onChange={(e) => handleManualInputChange(index, 'email', e.target.value)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {showSaveButtonMappingTable && (
+              <Button variant="contained" color="primary" onClick={handleManualSave} style={{ marginTop: '10px' }}>
+                Save Data
+              </Button>
+              )}
+            </div>
         </>
       )}
     </div>
