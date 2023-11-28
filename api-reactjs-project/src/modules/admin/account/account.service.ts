@@ -64,4 +64,24 @@ export class AccountService {
   async getUserById(userId: number) {
     return this.userService.findUserById(userId)
   }
+
+  async mappingExcel(items: {studentId: string, email: string}[]) {
+    for (const item of items) {
+      const { studentId, email } = item;
+     
+      // Check if the email exists in the database
+      const existingUser = await this.userRepository.findOne({ where: { email } });
+  
+      if (existingUser) {
+        await this.userRepository.update((await existingUser).id, {
+          studentId: studentId
+        });
+        
+      } else {
+        // Handle scenario where the email doesn't exist in the database
+        // You might want to log this or handle it as per your application's logic
+        console.log(`Email ${email} not found in the database.`);
+      }
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Patch, Put, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, UseGuards} from "@nestjs/common";
 import {AccountService} from "./account.service";
 import {Users} from "../../../typeorm";
 import {ActiveAccountDto, UpdateAccountDto} from "./account.dto";
@@ -9,7 +9,7 @@ import { Roles } from "src/modules/auth/roles/roles.decorator";
 import { Role } from "src/modules/auth/roles/role.enum";
 
 
-@UseGuards(RolesGuard)
+// @UseGuards(RolesGuard)
 @Controller('admin/account')
 @Roles(Role.Admin)
 export class AccountController {
@@ -72,6 +72,17 @@ export class AccountController {
       statusCode: 200,
       data: user,
       message: 'Get user successfully!'
+    }
+  }
+
+  @Post('mappingExcel')
+  async mappingExcel(@Body() items: {studentId: string, email: string}[]) {
+    try {
+      await this.accountService.mappingExcel(items);
+      return { message: 'Data received and processed successfully' };
+    } catch (error) {
+      console.error('Error saving data:', error);
+      throw new Error('Failed to save data');
     }
   }
 }

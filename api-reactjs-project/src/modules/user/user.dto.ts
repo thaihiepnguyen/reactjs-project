@@ -8,6 +8,8 @@ export class UserDto {
   @IsEmail()
   email: string;
   @IsOptional()
+  studentId: string;
+  @IsOptional()
   avatarUrl: string;
   @IsOptional()
   is_active: number;

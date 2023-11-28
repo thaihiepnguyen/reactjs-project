@@ -17,6 +17,12 @@ export class Users extends EntityBase{
 
   @Column("varchar", {
     length: 255,
+    name: "studentId"
+  })
+  studentId: string;
+  
+  @Column("varchar", {
+    length: 255,
     name: "fullname"
   })
   fullname: string;
