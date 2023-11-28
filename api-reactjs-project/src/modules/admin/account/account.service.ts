@@ -65,7 +65,7 @@ export class AccountService {
     return this.userService.findUserById(userId)
   }
 
-  async mappingExcel(items: {studentId: string, email: string}[]) {
+  async mapping(items: {studentId: string, email: string}[]) {
     for (const item of items) {
       const { studentId, email } = item;
      
@@ -76,7 +76,7 @@ export class AccountService {
         await this.userRepository.update((await existingUser).id, {
           studentId: studentId
         });
-        
+
       } else {
         // Handle scenario where the email doesn't exist in the database
         // You might want to log this or handle it as per your application's logic

@@ -75,11 +75,11 @@ export class AccountController {
     }
   }
 
-  @Post('mappingExcel')
+  @Post('mapping')
   async mappingExcel(@Body() items: {studentId: string, email: string}[]) {
     try {
-      await this.accountService.mappingExcel(items);
-      return { message: 'Data received and processed successfully' };
+      await this.accountService.mapping(items);
+      return { message: 'Everything is updated' };
     } catch (error) {
       console.error('Error saving data:', error);
       throw new Error('Failed to save data');
