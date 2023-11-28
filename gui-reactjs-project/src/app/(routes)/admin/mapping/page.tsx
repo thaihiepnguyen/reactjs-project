@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Tabs,
   Tab} from "@mui/material";
 import axiosInstance from "@/app/routers/axios";
+import Swal from "sweetalert2";
 
 export default function MyNextJsExcelSheet() {
   const [items, setItems] = useState([]);
@@ -58,13 +59,23 @@ export default function MyNextJsExcelSheet() {
     // items[0][0] = 20127500
     
     const transformedItems = items.map(([studentId, email]) => ({ studentId, email }));
-    console.log(transformedItems[0].email);
+    // console.log(transformedItems[0].email);
     try {
       const response = await axiosInstance.post(`/admin/account/mappingExcel`, transformedItems );
       // console.log('Data saved:', response.data);
+      Swal.fire({
+        title: "Save successfully!",
+        text: response.data,
+        icon: "success",
+      })
     } catch (error) {
       console.error('Error saving data:', error);
       // Handle error scenarios accordingly
+      Swal.fire({
+        title: "Error",
+        text: "Something went wrong in process",
+        icon: "error",
+      })
     }
 
   }
@@ -74,11 +85,30 @@ export default function MyNextJsExcelSheet() {
     setManualMappingData([]); // Clear any previous manual mapping data
   };
 
-  const handleManualSave = () => {
-    console.log(typeof(manualMappingData[0]));
+  const handleManualSave = async () => {
+    // console.log(manualMappingData);
     // manualMappingData is an array
     // manualMappingData[0].email = email of the 1st student
     // manualMappingData[0].studentId = id of the 1st student
+
+    try {
+      const response = await axiosInstance.post(`/admin/account/mapping`, manualMappingData );
+      // console.log('Data saved:', response.data);
+      Swal.fire({
+        title: "Save successfully!",
+        text: response.data,
+        icon: "success",
+      })
+    } catch (error) {
+      console.error('Error saving data:', error);
+      // Handle error scenarios accordingly
+      Swal.fire({
+        title: "Error",
+        text: "Something went wrong in process",
+        icon: "error",
+      })
+    }
+
     setShowManualMapping(false); // Hide the manual mapping table after saving
   };
 
