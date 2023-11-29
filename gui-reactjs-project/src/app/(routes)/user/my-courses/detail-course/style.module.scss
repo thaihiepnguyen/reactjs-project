@@ -1,0 +1,35 @@
+.titleContainer {
+    position: relative;
+
+    .titleCourse{
+        position: absolute;
+        bottom: 0;
+        margin: 0 1rem;
+    }
+}
+ 
+.codeCourse {
+    width: 14.5rem;
+    padding: 0.5rem 1.2rem;
+    border: 1px lightgrey solid;
+    border-radius: 10px;
+    // align-items: center;
+    .boxClassCourseTitle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.code {
+    font-size: 20px;
+    color: rgb(194,100,1);
+    fill: rgb(194,100,1);
+}
+
+.deadline {
+    width: 14.5rem;
+    padding: 1.5rem 1.2rem;
+    border: 1px lightgrey solid;
+    border-radius: 10px;
+}
