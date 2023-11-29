@@ -5,14 +5,14 @@ import { ROLES_KEY } from './roles.decorator';
 import { JwtService } from '@nestjs/jwt';
 
 const ROLES_MAAPING = {
-  1: [Role.User],
+  1: [Role.Student],
   2: [Role.Teacher],
   3: [Role.Admin],
   4: [Role.Guest],
 }
 
 const ROLES_MAAPING_REVERSE = {
-  [Role.User]: 1,
+  [Role.Student]: 1,
   [Role.Teacher]: 2,
   [Role.Admin]: 3,
   [Role.Guest]: 4,

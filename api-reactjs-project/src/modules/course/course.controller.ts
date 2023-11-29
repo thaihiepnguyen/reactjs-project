@@ -1,18 +1,19 @@
 import { Controller, Get } from "@nestjs/common";
 import { Role } from "../auth/roles/role.enum";
 import { Roles } from "../auth/roles/roles.decorator";
+import { CourseService } from "./course.service";
+import { MetaDataAuth } from "../auth/auth.decorator";
 
 
 @Controller('courses')
 export class CourseController {
-  @Get('all/:userId/student-courses')
-  getAllStudentCourses() {
-    return 'All courses';
-  }
+  constructor(
+    private readonly courseService: CourseService
+  ) {}
 
-  @Roles(Role.Teacher)
-  @Get('all/:teacher/teacher-courses')
-  getAllTeacherCourses() {
-    return 'All courses';
+  @Get('user/my-courses')
+  @Roles(Role.Student, Role.Teacher)
+  async getMyCourses(@MetaDataAuth('userId') userId: number) {
+    return this.courseService.getMyCourses(userId);
   }
 }

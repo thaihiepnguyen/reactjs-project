@@ -26,10 +26,4 @@ export class Courses extends EntityBase{
     name: "teacher_ids"
   })
   teacherIds: string;
-
-  @Column("varchar", {
-    length: 255,
-    name: "student_ids"
-  })
-  studentIds: string;
 }

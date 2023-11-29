@@ -60,8 +60,17 @@ export class UserService {
     }
   }
 
+<<<<<<< Updated upstream
   async findUserById(id: number): Promise<Users | undefined> {
     return await this.userRepository.createQueryBuilder("user").where("user.id = :id", { id: id }).leftJoinAndSelect('user.role', 'role').getOne();
+=======
+async findUserById(id: number): Promise<Users | undefined> {
+    return await this.userRepository.findOne(
+      {
+        where: {id},
+      },
+    );
+>>>>>>> Stashed changes
   }
 
   async updateUser(id:number, data: UpdateProfileUserDto) {
