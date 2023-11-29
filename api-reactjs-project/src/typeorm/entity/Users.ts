@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
 import {Column, Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn} from "typeorm";
-=======
-import {Column, Entity} from "typeorm";
->>>>>>> Stashed changes
 import { EntityBase } from "../EntityBase";
 import { Roles } from "./Roles";
 
