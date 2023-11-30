@@ -3,9 +3,9 @@ import { InjectConnection, InjectRepository } from "@nestjs/typeorm";
 import { Courses } from "src/typeorm/entity/Courses";
 import { Participants } from "src/typeorm/entity/Participants";
 import { Users } from "src/typeorm/entity/Users";
-import { Connection, In, Repository } from "typeorm";
-import { MyCoursesResponse } from "./course.typing";
-import { title } from "process";
+import {Connection, In, Like, Repository} from "typeorm";
+import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class CourseService {
@@ -18,7 +18,7 @@ export class CourseService {
     private readonly connection: Connection
   ) {}
 
-  async getMyCourses(userId: number): Promise<MyCoursesResponse[]> {
+  async getEnrolledCourses(userId: number): Promise<EnrolledCoursesResponse[]> {
     const participants = await this.participantRepository.find({
       select: ['courseId'],
       where: {
@@ -81,4 +81,99 @@ export class CourseService {
   
     return date.toLocaleDateString('en-GB', options);
   };
+
+  async addMyCourses(userId: number, name: string, description: string, classCode?: string): Promise<boolean> {
+    if (!classCode) {
+      classCode  = uuidv4()
+      try {
+        await this.coursesRepository
+          .createQueryBuilder()
+          .insert()
+          .into(Courses)
+          .values([{title: name, description: description, teacherIds: userId.toString(), classCode}])
+          .execute();
+      } catch (e) {
+        console.log(e);
+        return false;
+      }
+      return true;
+    } else {
+      const classCodes = await this.coursesRepository.find({
+        select: {
+          classCode: true
+        }
+      })
+      const isCodeExisted = classCodes.reduce((acc, cur) => {
+        if (cur.classCode === classCode) {
+          acc = true
+        }
+        return acc
+      }, false)
+
+      if (!isCodeExisted) {
+        try {
+          await this.coursesRepository
+            .createQueryBuilder()
+            .insert()
+            .into(Courses)
+            .values([{title: name, description: description, teacherIds: userId.toString(), classCode}])
+            .execute();
+        } catch (e) {
+          console.log(e);
+          return false;
+        }
+        return true;
+      } else {
+        return false
+      }
+    }
+  }
+
+  async getMyCourses(userId: number): Promise<MyCoursesResponse[]> {
+    const courses = await this.coursesRepository.find({
+      where: {
+        teacherIds: Like(`%${userId}%`),
+        isValid: true
+      }
+    });
+
+    return courses.map(item => {
+      return {
+        title: item.title,
+        description: item.description,
+        lastModify: this._formatDate(item.updatedAt)
+      }
+    });
+  }
+
+  async enrollCourse(userId: number, classCode: string): Promise<boolean> {
+    const course = await this.coursesRepository.findOne({
+      select: {
+        id: true
+      },
+      where: {
+        classCode
+      }
+    })
+
+    if (!course) {
+      return false
+    }
+
+    try {
+      await this.participantRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Participants)
+        .values([{
+          studentId: userId,
+          courseId: course.id
+        }])
+        .execute()
+    } catch (e) {
+      return false
+    }
+
+    return true
+  }
 }

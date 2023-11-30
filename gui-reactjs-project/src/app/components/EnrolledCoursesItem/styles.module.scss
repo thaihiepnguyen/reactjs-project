@@ -1,0 +1,99 @@
+.classItem {
+  display: flex;
+  flex-direction: column;
+  height: 17.375rem;
+  width: 17.75rem;
+  text-align: left;
+  margin-bottom: 1.5rem;
+  margin-right: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e6e6e6;
+  overflow: hidden;
+  .className {
+    background-color: rgb(57, 81, 135);
+    height: 100%;
+    width: 100%;
+    top: 0;
+    flex: 2;
+    position: relative;
+    .classAvt {
+      border-radius: 50%;
+      position: absolute;
+      bottom: -50%;
+      right: 1rem;
+      object-fit: cover;
+      width: 75px;
+      height: 75px;
+    }
+    .titleContainer {
+      width: 100%;
+      height: 100%;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      color: #fff;
+      .classTitle {
+        max-width: 230px;
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        .classTitleText {
+          color: #fff;
+          font-size: 1.25rem;
+          text-decoration: none;
+        }
+        .classTitleText:hover {
+          color: #fff;
+          text-decoration: underline;
+        }
+      }
+      .classDescription {
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        .classDescriptionText {
+          font-size: 0.75rem;
+        }
+      }
+
+      .classTeacherText {
+        color: #fff;
+        font-size: 0.9rem;
+        text-decoration: none;
+      }
+      .classTeacherText:hover {
+        color: #fff;
+        text-decoration: underline;
+      }
+    }
+  }
+  .classBackground {
+    height: 100%;
+    width: 100%;
+    flex: 3;
+    background-image: url('https://img.freepik.com/free-vector/tired-overworked-secretary-accountant-working-laptop-near-pile-folders-throwing-papers-vector-illustration-stress-work-workaholic-busy-office-employee-concept_74855-13264.jpg?w=1480&t=st=1701365161~exp=1701365761~hmac=ec59bee68bee3131880f551439cd4c876f501e71935b65fd1aace1d90b682d12');
+    background-size: cover;
+  }
+  .classInformation {
+    color: #3c4043;
+    height: 100%;
+    width: 100%;
+    border-top: 1px solid #e6e6e6;
+    flex: 0.5;
+    padding: 0.75rem;
+    text-align: left;
+    // justify-content: center;
+    .classDate {
+      display: flex;
+      // align-content: center;
+      align-items: center;
+      .classDateText {
+        height: 15px;
+        text-align: center;
+        margin-left: 0.5rem;
+        font-size: 0.75rem;
+      }
+    }
+  }
+}

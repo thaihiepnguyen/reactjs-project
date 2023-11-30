@@ -1,4 +1,4 @@
-export type MyCoursesResponse = {
+export type EnrolledCoursesResponse = {
   title: string
   description: string
   teacherName: string
@@ -6,3 +6,8 @@ export type MyCoursesResponse = {
   lastModify: string
 }
 
+export type MyCoursesResponse = {
+  title: string
+  description: string
+  lastModify: string
+}

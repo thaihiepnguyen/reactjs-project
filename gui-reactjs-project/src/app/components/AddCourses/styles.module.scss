@@ -1,0 +1,29 @@
+.addClass {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  color: #3c4043;
+  height: 17.375rem;
+  width: 17.75rem;
+  text-align: left;
+  margin-bottom: 1.5rem;
+  margin-right: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e6e6e6;
+  overflow: hidden;
+  background-color: #fff;
+  .addIcon {
+    font-size: 50px !important;
+  }
+  .addTextContainer {
+    .addText {
+
+    }
+  }
+}
+.addClass:hover {
+  cursor: pointer;
+  background-color: #f1f3f4;
+}
