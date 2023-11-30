@@ -61,11 +61,11 @@ export default function MappingPage() {
     const transformedItems = items.map(([studentId, email]) => ({ studentId, email }));
     // console.log(transformedItems[0].email);
     try {
-      const response = await axiosInstance.post(`/admin/account/mappingExcel`, transformedItems );
+      const response = await axiosInstance.post(`/admin/account/mapping`, transformedItems );
       // console.log('Data saved:', response.data);
       Swal.fire({
         title: "Save successfully!",
-        text: response.data,
+        text: response.data[0],
         icon: "success",
       })
     } catch (error) {
@@ -142,7 +142,7 @@ export default function MappingPage() {
         <Tab label="Manual Mapping" />
       </Tabs>
       {selectedTab === 0 && (
-        <div style={{width: '50%'}}>
+        <div style={{width: '100%'}}>
           <input
             type="file"
             onChange={(e) => {
@@ -150,6 +150,7 @@ export default function MappingPage() {
               readExcel(file);
             }} 
             style={{
+              margin: '20px 0',
               padding: '10px',
               borderRadius: '5px',
               backgroundColor: '#f9f9f9',
@@ -215,7 +216,7 @@ export default function MappingPage() {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
             <TableContainer component={Paper}
-              style={{width: '50%', border: '1px lighgrey solid'}}>
+              style={{width: '100%', border: '1px lighgrey solid'}}>
               <Table aria-label="Manual Mapping Table">
                 <TableHead>
                   <TableRow>
@@ -247,7 +248,7 @@ export default function MappingPage() {
             </TableContainer>
             </div>
             {showSaveButtonMappingTable && (
-              <div style={{ alignSelf: 'flex-end', width: '58.4%' }}>
+              <div style={{ alignSelf: 'flex-end' }}>
                 <Button variant="contained" color="primary" onClick={handleManualSave}>
                   Save Data
                 </Button>
