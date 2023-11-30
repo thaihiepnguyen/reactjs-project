@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
 
-export default function MyNextJsExcelSheet() {
+export default function MappingPage() {
   const [items, setItems] = useState([]);
   const [showSaveButton, setShowSaveButton] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -142,7 +142,7 @@ export default function MyNextJsExcelSheet() {
         <Tab label="Manual Mapping" />
       </Tabs>
       {selectedTab === 0 && (
-        <>
+        <div style={{width: '50%'}}>
           <input
             type="file"
             onChange={(e) => {
@@ -188,7 +188,7 @@ export default function MyNextJsExcelSheet() {
               </Button>
               )}
             </div>
-          </> 
+          </div> 
         )}
       
       {selectedTab === 1 && (
@@ -198,11 +198,13 @@ export default function MyNextJsExcelSheet() {
               label="Student ID"
               value={newStudentId}
               onChange={(e) => setNewStudentId(e.target.value)}
+              style={{width: '10rem'}}
             />
             <TextField
               label="Email"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
+              style={{width: '20rem'}}
             />
             <Button variant="contained" color="primary" onClick={handlePushToTable}>
               Push to Table
@@ -210,8 +212,10 @@ export default function MyNextJsExcelSheet() {
           </div>
           
           {/* Manual Mapping Table */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-            <TableContainer component={Paper}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <TableContainer component={Paper}
+              style={{width: '50%', border: '1px lighgrey solid'}}>
               <Table aria-label="Manual Mapping Table">
                 <TableHead>
                   <TableRow>
@@ -226,12 +230,14 @@ export default function MyNextJsExcelSheet() {
                         <TextField
                           value={row?.studentId || ""}
                           onChange={(e) => handleManualInputChange(index, 'studentId', e.target.value)}
+                          style={{width: '8rem'}}
                         />
                       </TableCell>
                       <TableCell>
                         <TextField
                           value={row?.email || ""}
                           onChange={(e) => handleManualInputChange(index, 'email', e.target.value)}
+                          style={{width: '20rem'}}
                         />
                       </TableCell>
                     </TableRow>
@@ -239,12 +245,15 @@ export default function MyNextJsExcelSheet() {
                 </TableBody>
               </Table>
             </TableContainer>
-            {showSaveButtonMappingTable && (
-              <Button variant="contained" color="primary" onClick={handleManualSave} style={{ marginTop: '10px' }}>
-                Save Data
-              </Button>
-              )}
             </div>
+            {showSaveButtonMappingTable && (
+              <div style={{ alignSelf: 'flex-end', width: '58.4%' }}>
+                <Button variant="contained" color="primary" onClick={handleManualSave}>
+                  Save Data
+                </Button>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
