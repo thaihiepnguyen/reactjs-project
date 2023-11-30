@@ -3,8 +3,16 @@ import React, {useState} from 'react';
 import classes from './style.module.scss';
 import MenuListComposition from '@/app/components/MenuListComposition/page';
 import { Button } from '@mui/material';
+import CreateNotificationForm from '@/app/components/CreateNotificationForm/page';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
 export default function DetailCourse(){
-    return(
+  const [showTable, setShowTable] = useState(false);
+  const handleClickCreationDiv = () => {
+    setShowTable(!showTable);
+  }
+
+  return(
     <div className={classes.container}>
       <div className={classes.titleContainer}>
         <img className={classes.backgroundImgContainer} aria-hidden="true" src="https://edtechframework.com/wp-content/uploads/2021/03/03-March-google-classroom-banner-rainbow-and-clouds-01.png" data-iml="5098.800000011921" />
@@ -29,6 +37,18 @@ export default function DetailCourse(){
             <br/>
             <Button variant="text">View excercises</Button>
           </div>
+        </div>
+        <div className={classes.rightSection}>
+          {!showTable && 
+            <div
+              className={classes.createNotificationDiv}
+              onClick={handleClickCreationDiv}
+              >
+              <p>Create notification for the class</p>
+              <AddCircleOutlineIcon />
+            </div>
+          }
+          {showTable && <CreateNotificationForm onHideForm={handleClickCreationDiv} /> }
         </div>
       </div>
     </div>
