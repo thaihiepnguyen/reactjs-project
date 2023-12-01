@@ -3,7 +3,7 @@
 import classes from "./styles.module.scss";
 import Link from "next/link";
 import { routes } from "@/app/routers/routes";
-import {HomeOutlined, SettingsOutlined,NotificationsNoneOutlined, ArrowBackIosOutlined, ArrowForwardIosOutlined, AccountCircleOutlined, SchoolOutlined} from '@mui/icons-material';
+import {HomeOutlined, SettingsOutlined,NotificationsNoneOutlined, ArrowBackIosOutlined, ArrowForwardIosOutlined, AccountCircleOutlined, SchoolOutlined, MenuBookOutlined} from '@mui/icons-material';
 import { useState } from "react";
 import classNames from 'classnames';
 
@@ -17,6 +17,11 @@ const sidebarItems = [
     name: 'My Courses',
     href: routes.myCourses,
     icon: <SchoolOutlined />
+  },
+  {
+    name: 'Enrolled Courses',
+    href: routes.enrolledCourses,
+    icon: <MenuBookOutlined />
   },
   {
     name: 'Notifications',

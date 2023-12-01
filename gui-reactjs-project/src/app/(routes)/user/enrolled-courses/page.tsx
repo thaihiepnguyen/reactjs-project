@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import axiosInstance from "@/app/routers/axios";
 import EnrolledCoursesItem from "@/app/components/EnrolledCoursesItem";
 import AddCourses from "@/app/components/AddCourses";
-import AddCoursesModal from "@/app/components/AddCourses/AddCoursesModal";
 import EnrollCoursesModal from "@/app/components/AddCourses/EnrollCourseModal";
 
 export default function Page() {

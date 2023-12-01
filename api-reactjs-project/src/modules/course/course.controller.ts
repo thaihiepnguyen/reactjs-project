@@ -4,6 +4,7 @@ import { Roles } from "../auth/roles/roles.decorator";
 import { CourseService } from "./course.service";
 import { MetaDataAuth } from "../auth/auth.decorator";
 import {TBaseDto} from "../../app.dto";
+import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 
 
 @Controller('courses')
@@ -14,9 +15,9 @@ export class CourseController {
 
   @Get('user/enrolled-courses')
   @Roles(Role.Student, Role.Teacher)
-  async getEnrolledCourses(@MetaDataAuth('userId') userId: number): Promise<TBaseDto<any>> {
+  async getEnrolledCourses(@MetaDataAuth('userId') userId: number): Promise<TBaseDto<EnrolledCoursesResponse[]>> {
     return {
-      message: 'Get my courses successfully',
+      message: 'Get enrolled courses successfully',
       data: await this.courseService.getEnrolledCourses(userId),
       statusCode: 200,
     };
@@ -24,8 +25,7 @@ export class CourseController {
 
   @Get('user/my-courses')
   @Roles(Role.Teacher)
-  async getMyCourses(@MetaDataAuth('userId') userId: number): Promise<TBaseDto<any>> {
-    console.log('userId', userId)
+  async getMyCourses(@MetaDataAuth('userId') userId: number): Promise<TBaseDto<MyCoursesResponse[]>> {
     return {
       message: 'Get my courses successfully',
       data: await this.courseService.getMyCourses(userId),
@@ -40,20 +40,8 @@ export class CourseController {
     @Body('name') name: string,
     @Body('description') description: string,
     @Body('classCode') classCode?: string,
-  ): Promise<any> {
-    const inserted = await this.courseService.addMyCourses(userId, name, description, classCode)
-    if (!inserted) {
-      return {
-        message: 'Add a course failed',
-        data: null,
-        statusCode: 400,
-      };
-    }
-    return {
-      message: 'Add a course successfully',
-      data: null,
-      statusCode: 201,
-    };
+  ): Promise<TBaseDto<null>> {
+    return await this.courseService.addMyCourses(userId, name, description, classCode)
   }
 
   @Post('user/enroll-courses/add')
@@ -61,7 +49,7 @@ export class CourseController {
   async enrollCourse(
     @MetaDataAuth('userId') userId: number,
     @Body('classCode') classCode: string,
-  ): Promise<any> {
+  ): Promise<TBaseDto<null>> {
     const enrolled = await this.courseService.enrollCourse(userId, classCode)
     if (!enrolled) {
       return {

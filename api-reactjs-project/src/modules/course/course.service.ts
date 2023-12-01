@@ -6,6 +6,7 @@ import { Users } from "src/typeorm/entity/Users";
 import {Connection, In, Like, Repository} from "typeorm";
 import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 import { v4 as uuidv4 } from 'uuid';
+import {TBaseDto} from "../../app.dto";
 
 @Injectable()
 export class CourseService {
@@ -82,7 +83,7 @@ export class CourseService {
     return date.toLocaleDateString('en-GB', options);
   };
 
-  async addMyCourses(userId: number, name: string, description: string, classCode?: string): Promise<boolean> {
+  async addMyCourses(userId: number, name: string, description: string, classCode?: string): Promise<TBaseDto<any>> {
     if (!classCode) {
       classCode  = uuidv4()
       try {
@@ -94,9 +95,17 @@ export class CourseService {
           .execute();
       } catch (e) {
         console.log(e);
-        return false;
+        return {
+          message: e,
+          data: null,
+          statusCode: 400,
+        };
       }
-      return true;
+      return {
+        message: 'Add a course successfully',
+        data: null,
+        statusCode: 201,
+      };
     } else {
       const classCodes = await this.coursesRepository.find({
         select: {
@@ -119,12 +128,23 @@ export class CourseService {
             .values([{title: name, description: description, teacherIds: userId.toString(), classCode}])
             .execute();
         } catch (e) {
-          console.log(e);
-          return false;
+          return {
+            message: e,
+            data: null,
+            statusCode: 400,
+          };
         }
-        return true;
+        return {
+          message: 'Add a course successfully',
+          data: null,
+          statusCode: 201,
+        };
       } else {
-        return false
+        return {
+          message: 'The class Id existed',
+          data: null,
+          statusCode: 400,
+        }
       }
     }
   }
