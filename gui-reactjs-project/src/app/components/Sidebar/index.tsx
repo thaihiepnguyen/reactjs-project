@@ -42,7 +42,10 @@ const sidebarItems = [
 
 export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const [active, setActive] = useState<number>(0);
+  const [active, setActive] = useState<number>(sidebarItems.reduce((acc, cur, index) => {
+    if (window.location.href == 'http://localhost:3000' + cur.href) acc = index
+    return acc
+  }, 0));
   const toggle = () => setSidebarOpen((prev) => !prev);
 
   return <>
