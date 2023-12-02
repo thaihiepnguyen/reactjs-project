@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {Injectable, CanActivate, ExecutionContext, UnauthorizedException} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from './role.enum';
 import { ROLES_KEY } from './roles.decorator';
@@ -38,8 +38,12 @@ export class RolesGuard implements CanActivate {
 
     const token = this.jwtService.verify(accessToken);
     const role = token.roleId;
-    if (!role) return false;
+    if (!role) throw new UnauthorizedException();
 
-    return requiredRoles.includes(role);
+    if (!requiredRoles.includes(role)) {
+      throw new UnauthorizedException();
+    } else {
+      return true;
+    }
   }
 }

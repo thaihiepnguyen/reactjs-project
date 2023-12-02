@@ -26,18 +26,28 @@ export default function AddCoursesModal(props) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const response = await axiosInstance.post('courses/user/my-courses/add', courseData);
-    closeModel(true);
-    if (response.data.statusCode == 201) {
+    let response
+    try {
+      response = await axiosInstance.post('courses/user/my-courses/add', courseData);
+      closeModel(true);
+      if (response.data.statusCode == 201) {
+        await Swal.fire({
+          title: response.data.message,
+          text: 'Congratulations!',
+          icon: 'success',
+        })
+        window.location.reload();
+      } else {
+        Swal.fire({
+          title: response.data.message,
+          text: 'Please try again!',
+          icon: 'error',
+        })
+      }
+    }
+    catch (e) {
       await Swal.fire({
-        title: response.data.message,
-        text: 'Congratulations!',
-        icon: 'success',
-      })
-      window.location.reload();
-    } else {
-      Swal.fire({
-        title: response.data.message,
+        title: 'UnauthorizedException!',
         text: 'Please try again!',
         icon: 'error',
       })
