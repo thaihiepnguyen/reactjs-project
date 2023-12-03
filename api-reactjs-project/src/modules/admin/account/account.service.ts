@@ -12,21 +12,24 @@ export class AccountService {
   constructor(
     @InjectRepository(Users)
     private readonly userRepository: Repository<Users>,
-    private readonly userService: UserService
+    private readonly userService: UserService 
   ) {}
 
   async getAll(): Promise<Users[]> {
     return this.userRepository.find({
       select: {
+        id: true,
         fullname: true,
         email: true,
         isActive: true,
         avatarUrl: true,
         roleId: true,
+        isValid: true,
+        studentId: true,
       },
-      where: {
-        isValid: true
-      }
+      // where: {
+      //   isValid: true
+      // }
     });
   }
 

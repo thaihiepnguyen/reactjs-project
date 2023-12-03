@@ -3,6 +3,10 @@
 /gui-reactjs-project/node_modules
 /api-reactjs-project/node_modules
 
+
+api-reactjs-project/package-lock.json
+gui-reactjs-project/package-lock.json
+
 # Logs
 logs
 *.log

@@ -31,7 +31,7 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => {
-    console.log(response.data.data)
+    console.log(response)
     if(response?.data?.data?.token) {
       setCookie('token', JSON.stringify(response.data.data.token))
       setCookie('userId', response.data.data.user.id)
@@ -41,6 +41,15 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
+    if (error?.response?.status === 401) {
+      if (getCookie('token')) {
+        deleteCookie('token');
+        deleteCookie('userId');
+        deleteCookie('userName');
+        deleteCookie('role');
+        window.location.reload();
+      }
+    }
     return Promise.reject(error);
   }
 );

@@ -119,7 +119,7 @@ const LoginForm = memo((props: LoginFormProps) => {
           </Grid>
         </Grid>
 
-        <button className={classes.signupButton}>Sign Up</button>
+        <button className={classes.signupButton}>Sign In</button>
       </form>
     </div>
   );

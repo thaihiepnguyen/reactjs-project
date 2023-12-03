@@ -1,45 +1,89 @@
-'use client';
+"use client";
 
 import classes from "./styles.module.scss";
 import Link from "next/link";
 import { routes } from "@/app/routers/routes";
-import {HomeOutlined, SettingsOutlined,NotificationsNoneOutlined, ArrowBackIosOutlined, ArrowForwardIosOutlined, AccountCircleOutlined, SchoolOutlined} from '@mui/icons-material';
-import { useState } from "react";
+import {HomeOutlined, SettingsOutlined,NotificationsNoneOutlined, ArrowBackIosOutlined, ArrowForwardIosOutlined, AccountCircleOutlined, SchoolOutlined, MenuBookOutlined} from '@mui/icons-material';
+import {useEffect, useMemo, useState} from "react";
 import classNames from 'classnames';
+import { usePathname } from 'next/navigation'
+import { useAppSelector } from "@/redux/hook";
 
-const sidebarItems = [
+const sidebarItems_student = [
   {
-    name: 'Home',
+    name: "Home",
     href: routes.home,
-    icon: <HomeOutlined />
+    icon: <HomeOutlined />,
   },
   {
-    name: 'My Courses',
+    name: "My Courses",
     href: routes.myCourses,
-    icon: <SchoolOutlined />
+    icon: <SchoolOutlined />,
   },
   {
-    name: 'Notifications',
+    name: 'Enrolled Courses',
+    href: routes.enrolledCourses,
+    icon: <MenuBookOutlined />
+  },
+  {
+    name: 'Enrolled Courses',
+    href: routes.enrolledCourses,
+    icon: <MenuBookOutlined />
+  },
+  {
+    name: "Notifications",
     href: routes.notification,
-    icon: <NotificationsNoneOutlined />
+    icon: <NotificationsNoneOutlined />,
   },
   {
-    name: 'Edit Profile',
+    name: "Edit Profile",
     href: routes.profile,
-    icon: <AccountCircleOutlined />
+    icon: <AccountCircleOutlined />,
   },
   {
-    name: 'Settings',
-    href: '/settings',
-    icon: <SettingsOutlined />
-  }
-]
+    name: "Settings",
+    href: "/settings",
+    icon: <SettingsOutlined />,
+  },
+];
+
+const sidebarItems_admin = [
+  {
+    name: "Users",
+    href: routes.admin_user,
+    icon: <AccountCircleOutlined />,
+  },
+  {
+    name: "Student Ids Mapping",
+    href: routes.admin_mapping,
+    icon: <SettingsOutlined />,
+  },
+];
 
 export default function Sidebar() {
+  const { user } = useAppSelector((state) => state.userReducer);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const pathname = usePathname();
   const [active, setActive] = useState<number>(0);
   const toggle = () => setSidebarOpen((prev) => !prev);
 
+  const sidebarItems = useMemo(()=>{
+    switch (user?.role?.name) {
+      case 'admin':
+        return sidebarItems_admin;
+      case'student':
+        return sidebarItems_student;
+      default:
+        return [];
+    }
+  }, [user])
+
+  useEffect(() => {
+    setActive(sidebarItems.reduce((acc, cur, index) => {
+      if (pathname == cur.href) acc = index
+      return acc
+    }, 0))
+  }, [pathname])
   return <>
     <div className={classes.sidebarWrapper}>
       <button className={classes.sidebarButton} onClick={toggle}>{ sidebarOpen ? <ArrowBackIosOutlined/> : <ArrowForwardIosOutlined/>}</button>

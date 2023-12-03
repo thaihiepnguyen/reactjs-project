@@ -79,7 +79,7 @@ export class AuthService {
 
   public async sendResetPasswordMail(toEmail, token, payload): Promise<any> {
     const { fullname } = payload;
-
+    // console.log("send email");
     const rawData = await this.connection.query(`SELECT * FROM email_templates WHERE id = 2`);
     const content = rawData[0].content;
     const html = content.replace('$user_name$', fullname).replace('$token$', token.accessToken);
@@ -202,7 +202,7 @@ export class AuthService {
     const resetToken = await this.generateResetToken(user);
 
     try {
-      // await this.sendResetPasswordMail(email, resetToken, payload);
+      await this.sendResetPasswordMail(email, resetToken, payload);
       return { message: 'send reset password email successfully!' };
     } catch (error) {
       console.error('Error sending email:', error);

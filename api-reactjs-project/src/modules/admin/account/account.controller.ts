@@ -3,13 +3,11 @@ import {AccountService} from "./account.service";
 import {ActiveAccountDto, UpdateAccountDto} from "./account.dto";
 import {TBaseDto} from "../../../app.dto";
 import {isNumber} from "@nestjs/common/utils/shared.utils";
-import { RolesGuard } from "src/modules/auth/roles/roles.guard";
 import { Roles } from "src/modules/auth/roles/roles.decorator";
 import { Role } from "src/modules/auth/roles/role.enum";
 import { Users } from "src/typeorm/entity/Users";
 
 
-// @UseGuards(RolesGuard)
 @Controller('admin/account')
 @Roles(Role.Admin)
 export class AccountController {

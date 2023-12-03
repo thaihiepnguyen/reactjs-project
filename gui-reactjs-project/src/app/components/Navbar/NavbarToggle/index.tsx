@@ -15,6 +15,7 @@ import { signOut } from "next-auth/react"
 import Link from "next/link";
 
 export default function NavbarToggle({avatar, userName }) {
+  console.log(avatar)
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
