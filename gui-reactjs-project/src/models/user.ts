@@ -7,6 +7,7 @@ export interface User {
   avatarUrl: string;
   phone: string;
   role: Role;
+  roleId: number;
   isValid: boolean;
   isActive: boolean;
 }

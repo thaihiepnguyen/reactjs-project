@@ -15,8 +15,18 @@ export class AddAccountDto {
   @IsString()
   fullname: string;
 
-  @IsNumber()
-  roleId: number;
+  @IsString()
+  role: number;
+
+  @IsString()
+  @IsOptional()
+  phone: number;
+
+  @IsString()
+  isActive: boolean;
+
+  @IsOptional()
+  avatarUrl: string;
 }
 
 export class UpdateAccountDto {

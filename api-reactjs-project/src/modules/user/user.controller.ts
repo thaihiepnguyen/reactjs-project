@@ -33,7 +33,7 @@ export class UserController {
   async updateProfile(@UploadedFile() file: Express.Multer.File, @MetaDataAuth('userId') userId: number, @Body() updateDto: UpdateProfileUserDto
   ) {
     if (file) {
-      updateDto.avatarUrl = file.path;
+      updateDto.avatarUrl = process.env.SERVER_URL + "/" + file.path;
     }
     const user = await this.userService.updateUser(userId, updateDto);
     if(!user && file) {

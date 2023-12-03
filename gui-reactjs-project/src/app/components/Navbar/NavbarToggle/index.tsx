@@ -14,16 +14,20 @@ import { useRouter } from 'next/navigation'
 import { signOut } from "next-auth/react"
 import Link from "next/link";
 
-export default function NavbarToggle({avatar, userName }) {
+interface NavbarToggleProps {
+  avatar: string;
+  userName: string;
+}
+export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
   console.log(avatar)
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleClick = (event: MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
 
   };
-  const handleClose = (e:MouseEvent<HTMLElement>) => {
+  const handleClose = (e:React.MouseEvent<HTMLElement>) => {
     setAnchorEl(null);
   };
 

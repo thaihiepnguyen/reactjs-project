@@ -13,11 +13,13 @@ import InputSelect from "../input/InputsSelect";
 import UploadImage from "../UploadImage";
 import { useRouter } from "next/navigation";
 import classes from "./styles.module.scss"
+import { VALIDATION } from "../EditProfile";
 
 export interface UserFormData {
   avatar: File | string;
   fullname: string;
   email: string;
+  phone: string;
   password: string;
   role: OptionItem;
   isActive: boolean;
@@ -35,6 +37,7 @@ const UserForm = memo(({ itemEdit, onSubmit }: Props) => {
       avatar: yup.mixed(),
       fullname: yup.string().required("Full name is required."),
       email: yup.string().email("Please enter a valid email adress").required("Email is required."),
+      phone: yup.string().matches(VALIDATION.phone, { message: "Please input valid phone number", excludeEmptyString: true }),
       password: itemEdit
         ? yup.string()
         : yup
@@ -71,21 +74,14 @@ const UserForm = memo(({ itemEdit, onSubmit }: Props) => {
   };
 
   const _onSubmit = (data: UserFormData) => {
-    console.log(data);
     const form = new FormData()
-    // form.append('firstName', data.firstName)
-    // form.append('lastName', data.lastName)
-    // form.append('email', data.email)
-    // form.append('countryId', `${data.countryId.id}`)
-    // form.append('isNotify', `${data.isNotify}`)
-    // form.append('company', data.company)
-    // form.append('phone', data.phone)
-    // if(!itemEdit || itemEdit?.adminTypeId !== EAdminType.SUPER_ADMIN) {
-    //   form.append('adminTypeId', `${data.adminTypeId.id}`)
-    //   form.append('verified', `${data.verified}`)
-    // }
-    // if (!itemEdit) form.append('password', data.password)
-    // if (typeof data.avatar === 'object') form.append('avatar', data.avatar)
+    form.append('fullname', data.fullname)
+    form.append('email', data.email)
+    form.append('phone', data.phone)
+    form.append('role', `${data.role.id}`)
+    form.append('isActive', `${data.isActive ? "true" : "" }`)
+    if (!itemEdit) form.append('password', data.password)
+    if (typeof data.avatar === 'object') form.append('avatar', data.avatar)
     onSubmit(form)
   };
 
@@ -154,6 +150,9 @@ const UserForm = memo(({ itemEdit, onSubmit }: Props) => {
                       />
                     </Grid>
                   )}
+                  <Grid item xs={12} sm={6}>
+                    <Inputs title="Phone" name="phone" type="text" inputRef={register("phone")} errorMessage={errors.phone?.message} />
+                  </Grid>
                   <Grid item xs={12} sm={6}>
                     <InputSelect
                       fullWidth
