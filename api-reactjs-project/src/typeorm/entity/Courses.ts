@@ -29,7 +29,7 @@ export class Courses extends EntityBase{
 
   @Column("varchar", {
     length: 255,
-    name: "student_ids"
+    name: "class_code"
   })
-  studentIds: string;
+  classCode: string;
 }

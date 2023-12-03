@@ -1,19 +1,16 @@
 .classItem {
   display: flex;
   flex-direction: column;
-  height: 18.375rem;
-  width: 18.75rem;
+  height: 17.375rem;
+  width: 17.75rem;
   text-align: left;
   margin-bottom: 1.5rem;
   margin-right: 1.5rem;
   border-radius: 0.5rem;
   border: 1px solid #e6e6e6;
   overflow: hidden;
-  // background-clip: padding-box;
   .className {
-    // background-image: url('https://img.freepik.com/free-vector/happy-women-learning-language-online-isolated-flat-vector-illustration-cartoon-female-characters-taking-individual-lessons-through-messenger-education-digital-technology-concept_74855-10088.jpg?t=st=1700998705~exp=1700999305~hmac=2ccd8224b01e2eca12d9d68b64642ab34d1b5f1fc88c561a74703c7dc8b50a49');
-    background-color: rgb(64, 102, 206);
-    // background-size: cover;
+    background-color: rgb(57, 81, 135);
     height: 100%;
     width: 100%;
     top: 0;
@@ -22,8 +19,11 @@
     .classAvt {
       border-radius: 50%;
       position: absolute;
-      bottom: -25%;
+      bottom: -50%;
       right: 1rem;
+      object-fit: cover;
+      width: 75px;
+      height: 75px;
     }
     .titleContainer {
       width: 100%;
@@ -35,7 +35,7 @@
       color: #fff;
       .classTitle {
         max-width: 230px;
-        overflow-x: hidden; 
+        overflow-x: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
         .classTitleText {
@@ -49,6 +49,9 @@
         }
       }
       .classDescription {
+        overflow-x: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         .classDescriptionText {
           font-size: 0.75rem;
         }
@@ -69,7 +72,7 @@
     height: 100%;
     width: 100%;
     flex: 3;
-    background-image: url('https://img.freepik.com/free-vector/happy-women-learning-language-online-isolated-flat-vector-illustration-cartoon-female-characters-taking-individual-lessons-through-messenger-education-digital-technology-concept_74855-10088.jpg?t=st=1700998705~exp=1700999305~hmac=2ccd8224b01e2eca12d9d68b64642ab34d1b5f1fc88c561a74703c7dc8b50a49');
+    background-image: url('https://img.freepik.com/free-vector/tired-overworked-secretary-accountant-working-laptop-near-pile-folders-throwing-papers-vector-illustration-stress-work-workaholic-busy-office-employee-concept_74855-13264.jpg?w=1480&t=st=1701365161~exp=1701365761~hmac=ec59bee68bee3131880f551439cd4c876f501e71935b65fd1aace1d90b682d12');
     background-size: cover;
   }
   .classInformation {

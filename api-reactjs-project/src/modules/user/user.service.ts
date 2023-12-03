@@ -5,6 +5,7 @@ import {Connection} from "mysql2/index";
 import { UpdateProfileUserDto } from "./user.dto";
 import { unlink } from "fs";
 import { Users } from "src/typeorm/entity/Users";
+import * as process from "process";
 
 @Injectable()
 export class UserService {
@@ -61,7 +62,11 @@ export class UserService {
   }
 
   async findUserById(id: number): Promise<Users | undefined> {
-    return await this.userRepository.createQueryBuilder("user").where("user.id = :id", { id: id }).leftJoinAndSelect('user.role', 'role').getOne();
+    return await this.userRepository
+      .createQueryBuilder("user")
+      .where("user.id = :id", { id: id })
+      .leftJoinAndSelect('user.role', 'role')
+      .getOne();
   }
 
   async updateUser(id:number, data: UpdateProfileUserDto) {
@@ -78,7 +83,7 @@ export class UserService {
         unlink(user.avatarUrl, () => {});
       }
       await this.userRepository.update(user.id, {
-        avatarUrl: data.avatarUrl,
+        avatarUrl: process.env.SERVER_URL + "/" + data.avatarUrl,
         fullname: data.fullname,
         phone: data.phone
       })
