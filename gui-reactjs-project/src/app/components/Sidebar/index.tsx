@@ -26,11 +26,6 @@ const sidebarItems_student = [
     icon: <MenuBookOutlined />
   },
   {
-    name: 'Enrolled Courses',
-    href: routes.enrolledCourses,
-    icon: <MenuBookOutlined />
-  },
-  {
     name: "Notifications",
     href: routes.notification,
     icon: <NotificationsNoneOutlined />,
@@ -72,6 +67,8 @@ export default function Sidebar() {
       case 'admin':
         return sidebarItems_admin;
       case'student':
+        return sidebarItems_student;
+      case'teacher':
         return sidebarItems_student;
       default:
         return [];

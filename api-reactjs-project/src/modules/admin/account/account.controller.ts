@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards} from "@nestjs/common";
 import {AccountService} from "./account.service";
 import {ActiveAccountDto, UpdateAccountDto} from "./account.dto";
 import {TBaseDto} from "../../../app.dto";
@@ -13,11 +13,11 @@ import { Users } from "src/typeorm/entity/Users";
 export class AccountController {
   constructor(private readonly accountService: AccountService) { }
   @Get('all')
-  async getAll(): Promise<TBaseDto<Users[]>> {
+  async getAll(@Query('page', ParseIntPipe) page: number): Promise<TBaseDto<Users[]>> {
     return {
       statusCode: 200,
-      data: await this.accountService.getAll(),
-      message: 'Get all account successfully!'
+      data: await this.accountService.getAll(page),
+      message: 'Get all accounts successfully!'
     };
   }
 

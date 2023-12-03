@@ -6,7 +6,7 @@ import * as process from "process";
 import * as bcrypt from "bcrypt";
 import { Users } from "src/typeorm/entity/Users";
 
-
+const PAGING_LIMIT = 15;
 @Injectable()
 export class AccountService {
   constructor(
@@ -15,8 +15,11 @@ export class AccountService {
     private readonly userService: UserService 
   ) {}
 
-  async getAll(): Promise<Users[]> {
-    return this.userRepository.find({
+  async getAll(page: number): Promise<any> {
+    const offset = (page - 1) * PAGING_LIMIT;
+
+    const [list, count] = await Promise.all(
+      [this.userRepository.find({
       select: {
         id: true,
         fullname: true,
@@ -27,10 +30,17 @@ export class AccountService {
         isValid: true,
         studentId: true,
       },
-      // where: {
-      //   isValid: true
-      // }
-    });
+      take: PAGING_LIMIT,
+      skip: offset
+    }), this.userRepository.count()]);
+
+    return {
+      list,
+      currentPage: page,
+      totalItem: count,
+      totalPage: Math.floor(count / PAGING_LIMIT) + 1,
+      size: list.length
+    }
   }
 
   async activeUser(userId: number, isActive: boolean): Promise<void> {
