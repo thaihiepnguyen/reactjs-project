@@ -1,9 +1,12 @@
 export interface User {
+  id: number;
+  studentId: string;
   fullname: string,
   email: string,
   avatarUrl: string,
   phone: string,
-  role: Role
+  role: Role,
+  isValid: boolean
 }
 
 export interface Role {
