@@ -67,7 +67,7 @@ export class AuthService {
 
     const rawData = await this.connection.query(`SELECT * FROM email_templates WHERE id = 1`);
     const content = rawData[0].content;
-    const html = content.replace('$user_name$', fullname).replace('$token$', token.accessToken);
+    const html = content.replace('$user_name$', fullname).replace('$token$', token.accessToken).replace("$url$", process.env.SERVER_URL);
 
     return this.mailerService.sendMail({
       to: toEmail,
@@ -232,7 +232,6 @@ export class AuthService {
       const SALT = process.env.SALT || 10;
       const encryptedPassword = await bcrypt.hash(password, SALT);
       const updatedUser = await this.userService.updateUserPassword(response.email, encryptedPassword);
-      console.log(updatedUser);
       if (!updatedUser) {
         return { message: 'Failed to update password' };
       }
