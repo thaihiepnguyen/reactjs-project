@@ -4,13 +4,15 @@ import { Container, Typography, TextField, Button } from '@mui/material';
 import axiosInstance from '@/app/routers/axios';
 import CircularProgress from '@/app/components/CircularProgress';
 import Swal from 'sweetalert2';
+import { useAppDispatch } from '@/redux/hook';
+import { setLoading } from '@/redux/reducers/loading';
 
 function ForgotPasswordForm() {
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setEmail(event.target.value);
@@ -31,7 +33,7 @@ function ForgotPasswordForm() {
       return;
     }
 
-    setLoading(true); // Set loading state to true
+    dispatch(setLoading(true)); // Set loading state to true
 
     try {
       const response = await axiosInstance.post(`/auth/forgot-password`, {
@@ -44,12 +46,14 @@ function ForgotPasswordForm() {
           text: "Please check your email",
           icon: "success",
         })
-        setSuccessMessage('Reset password link sent successfully. Please check your email.');
         setError('');
       }
       else {
-        setError(response.data.message);
-        setSuccessMessage('');
+        Swal.fire({
+          title: "Oops",
+          text: response.data.message,
+          icon: "error",
+        })
       }
     } catch (error) {
       // Handle error
@@ -57,7 +61,7 @@ function ForgotPasswordForm() {
       setError(error?.response?.data?.message || 'Something went wrong. Please try again.');
       setSuccessMessage('');
     } finally {
-      setLoading(false); // Reset loading state regardless of success or failure
+      dispatch(setLoading(false)); // Reset loading state regardless of success or failure
     }
   };
 
@@ -82,7 +86,6 @@ function ForgotPasswordForm() {
             {error}
           </Typography>
         )}
-         {/* {loading && <CircularProgress />}  */}
         <Button type="submit" variant="contained" color="primary" fullWidth>
           Reset Password
         </Button>
@@ -91,7 +94,6 @@ function ForgotPasswordForm() {
             {successMessage}
           </Typography>
         )}
-        {loading ? <CircularProgress /> : ''}
       </form>
     </Container>
   );

@@ -1,7 +1,8 @@
 import { TableHead, TableRow, TableCell, TableSortLabel } from '@mui/material';
-import { SortItem, TableHeaderLabel } from "models/general";
+
 import classes from './styles.module.scss';
 import clsx from 'clsx';
+import { TableHeaderLabel, SortItem } from '@/models/general';
 
 interface Props {
   className?: string

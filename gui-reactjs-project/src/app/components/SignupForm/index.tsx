@@ -13,6 +13,8 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { routes } from "@/app/routers/routes";
 import { signIn } from "next-auth/react";
+import { setLoading } from '@/redux/reducers/loading';
+import { useAppDispatch } from '@/redux/hook';
 
 
 interface SignupFormProps {}
@@ -25,6 +27,7 @@ interface ISignupFormData {
 }
 const SignupForm = memo((props: SignupFormProps) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const validationSchema = useMemo(
     () =>
@@ -51,12 +54,14 @@ const SignupForm = memo((props: SignupFormProps) => {
 
   const onSubmit = async (data: ISignupFormData) => {
     try {
+      dispatch(setLoading(true));
       const response = await axiosInstance.post(`/auth/register`, {
         fullname: data.fullname,
         email: data.email,
         password: data.password,
         role: data.role
       });
+      dispatch(setLoading(false));
 
       // Handle the response as needed
       if (response.data.message === 'User already exists') {

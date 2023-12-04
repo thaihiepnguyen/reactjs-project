@@ -13,9 +13,11 @@ import Swal from "sweetalert2";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { setUser } from "@/redux/reducers/user";
 import ParagraphSmall from "../text/ParagraphSmall";
+import { setLoading } from "@/redux/reducers/loading";
 
 export const VALIDATION = {
   phone: /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
+  password: /^(?=.*\d)(?=.*[A-Z]).{8,}$/
 };
 
 export interface UserFormData {
@@ -55,6 +57,7 @@ const EditProfile = () => {
     form.append("avatar", data.avatar);
     form.append("phone", data.phone);
     form.append("email", data.email);
+    dispatch(setLoading(true));
     UserService.UpdateProfile(form)
       .then((res) => {
         Swal.fire({
@@ -70,7 +73,8 @@ const EditProfile = () => {
           })
           .catch((e) => {
             dispatch(setUser(null));
-          });
+          })
+          .finally(() => dispatch(setLoading(false)));
       })
       .catch((err) => {
         console.log(err);

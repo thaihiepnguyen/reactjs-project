@@ -99,7 +99,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  async resetPassword(@Body() body: { email: string, newPassword: string}): Promise<TBaseDto<any>> {
-    return await this.authService.updateUserPassword(body.email, body.newPassword);
+  async resetPassword(@Body() body: { token: string, password: string}) {
+    return await this.authService.updateUserPassword(body.token, body.password);
   }
 }

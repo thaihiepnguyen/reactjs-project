@@ -16,6 +16,7 @@ import { useAppDispatch } from "@/redux/hook";
 import Swal from "sweetalert2";
 import { setUser } from "@/redux/reducers/user";
 import { signIn } from "next-auth/react";
+import { setLoading } from '@/redux/reducers/loading';
 
 interface LoginFormProps {}
 
@@ -51,11 +52,11 @@ const LoginForm = memo((props: LoginFormProps) => {
 
   const onSubmit = async (data: ILoginFormData) => {
     try {
+      dispatch(setLoading(true));
       const response = await axiosInstance.post(`/auth/login`, {
         email: data.email,
         password: data.password,
       });
-
       // Handle the response as needed
       if (response.data) {
         dispatch(setUser(response.data.data.user));
@@ -75,6 +76,8 @@ const LoginForm = memo((props: LoginFormProps) => {
         icon: 'error',
       });
     }
+    dispatch(setLoading(false));
+
   };
   return (
     <div className='form-container login-container'>

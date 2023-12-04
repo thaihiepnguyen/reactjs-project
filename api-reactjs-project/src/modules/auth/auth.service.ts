@@ -77,12 +77,12 @@ export class AuthService {
     });
   }
 
-  public async sendResetPasswordMail(toEmail, token, payload): Promise<any> {
+  public async sendResetPasswordMail(toEmail, token, payload, url): Promise<any> {
     const { fullname } = payload;
     // console.log("send email");
     const rawData = await this.connection.query(`SELECT * FROM email_templates WHERE id = 2`);
     const content = rawData[0].content;
-    const html = content.replace('$user_name$', fullname).replace('$token$', token.accessToken);
+    const html = content.replace('$user_name$', fullname).replace('$token$', token).replace('$url$', url).replace('$email$', toEmail);
 
     return this.mailerService.sendMail({
       to: toEmail,
@@ -198,11 +198,14 @@ export class AuthService {
       email: user.email,
     }
 
-    // Generate a unique reset token
-    const resetToken = await this.generateResetToken(user);
+    const [token] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        expiresIn: '24h'
+      }),
+    ]);
 
     try {
-      await this.sendResetPasswordMail(email, resetToken, payload);
+      await this.sendResetPasswordMail(email, token, payload, process.env.CLIENT_URL);
       return { message: 'send reset password email successfully!' };
     } catch (error) {
       console.error('Error sending email:', error);
@@ -223,32 +226,47 @@ export class AuthService {
     return resetToken;
   }
 
-  public async updateUserPassword(email: string, newPassword: string): Promise<TBaseDto<any>> {
-    const user = await this.userService.findUserByEmail(email);
-    if (!user) {
-      return { message: 'User with this email does not exist' };
-    }
-    // console.log(user);
-    
-    // Update user's password and reset token
-    try {
+  public async updateUserPassword(token: string, password: string) {
+    this.jwtService.verifyAsync(token)
+    .then(async (response) => {
       const SALT = process.env.SALT || 10;
-      const encryptedPassword = await bcrypt.hash(newPassword, SALT);
-
-      const updatedUser = await this.userService.updateUserPassword(email, encryptedPassword);
-      // console.log(updatedUser);
+      const encryptedPassword = await bcrypt.hash(password, SALT);
+      const updatedUser = await this.userService.updateUserPassword(response.email, encryptedPassword);
+      console.log(updatedUser);
       if (!updatedUser) {
         return { message: 'Failed to update password' };
       }
+      return { message: 'Change password successfully' };
+    })
+    .catch((error) => {
+      throw new HttpException("Cannot validate token", 404)
+    })
+
+  //   const user = await this.userService.findUserByEmail(email);
+  //   if (!user) {
+  //     return { message: 'User with this email does not exist' };
+  //   }
+  //   // console.log(user);
+    
+  //   // Update user's password and reset token
+  //   try {
+  //     const SALT = process.env.SALT || 10;
+  //     const encryptedPassword = await bcrypt.hash(newPassword, SALT);
+
+  //     const updatedUser = await this.userService.updateUserPassword(email, encryptedPassword);
+  //     // console.log(updatedUser);
+  //     if (!updatedUser) {
+  //       return { message: 'Failed to update password' };
+  //     }
   
-      // Clear/reset the reset token and its expiration after successful password update
-      // await this.userService.clearResetToken(user.id);
+  //     // Clear/reset the reset token and its expiration after successful password update
+  //     // await this.userService.clearResetToken(user.id);
   
-      return { message: 'Password reset successfully!' };
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      return { message: 'Failed to reset password' };
-    }
+  //     return { message: 'Password reset successfully!' };
+  //   } catch (error) {
+  //     console.error('Error resetting password:', error);
+  //     return { message: 'Failed to reset password' };
+  //   }
+  // }
   }
-  
 }
