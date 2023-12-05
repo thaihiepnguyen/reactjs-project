@@ -5,18 +5,22 @@ import clsx from "clsx";
 import { routes } from "@/app/routers/routes";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/redux/hook";
+import { useEffect } from "react";
 
 const LandingPage = () => {
   const searchPrms = useSearchParams();
+  const router = useRouter();
+  const {user} = useAppSelector(state => state.userReducer)
   const redirect = searchPrms.get('redirect')
-  if(redirect) {
-    if(typeof window !== "undefined") {
-      window.location.reload();
-    window.location.href = '/home';
+ 
+  useEffect(() => {
+    if(redirect && user) {
+      if(typeof window !== "undefined") {
+        router.push("/home")
+      }
     }
-  }
-
-
+  }, [user])
   return (
     <>
       <div className={classes.header__info}>

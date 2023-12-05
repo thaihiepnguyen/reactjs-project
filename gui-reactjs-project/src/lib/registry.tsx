@@ -3,7 +3,8 @@
 import React, { useState } from 'react'
 import { useServerInsertedHTML } from 'next/navigation'
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components'
- 
+import { useSession } from "next-auth/react";
+
 export default function StyledComponentsRegistry({
   children,
 }: {

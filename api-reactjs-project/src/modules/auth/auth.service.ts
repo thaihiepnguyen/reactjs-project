@@ -67,11 +67,11 @@ export class AuthService {
 
     const rawData = await this.connection.query(`SELECT * FROM email_templates WHERE id = 1`);
     const content = rawData[0].content;
-    const html = content.replace('$user_name$', fullname).replace('$token$', token.accessToken).replace("$url$", process.env.SERVER_URL);
+    const html = content.replace('$user_name$', fullname).replace('$token$', token.accessToken).replace("$url$", process.env.CLIENT_URL);
 
     return this.mailerService.sendMail({
       to: toEmail,
-      from: process.env.USER_NODEMAILER,
+      from: process.env.USER_NODEMAILER, 
       subject: 'Verify Your Email',
       html: html,
     });

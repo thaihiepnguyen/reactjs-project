@@ -1,8 +1,15 @@
 import axiosInstance from "@/app/routers/axios";
 
 export default class UserService {
-  static CreateUser = () => {
-    //API.get....
+  static activeAccount = async (token: string) => {
+    return await axiosInstance
+      .get(`/auth/verify-email?token=${token}`)
+      .then((res) => {
+        return Promise.resolve(res.data);
+      })
+      .catch((e) => {
+        return Promise.reject(e?.response?.data);
+      });
   };
   static async UpdateProfile(data: FormData): Promise<any> {
     return await axiosInstance

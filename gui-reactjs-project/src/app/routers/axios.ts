@@ -47,7 +47,6 @@ axiosInstance.interceptors.response.use(
         deleteCookie('userId');
         deleteCookie('userName');
         deleteCookie('role');
-        window.location.reload();
       }
     }
     return Promise.reject(error);
