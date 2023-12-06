@@ -54,7 +54,7 @@ export class AccountController {
   }
 
   @Get('all')
-  async getAll(@Query('page', ParseIntPipe) page: number): Promise<TBaseDto<Users[]>> {
+  async getAll(@Query('page', ParseIntPipe) page: number): Promise<TBaseDto<any>> {
     return {
       statusCode: 200,
       data: await this.accountService.getAll(page),

@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, Param, ParseIntPipe, Post, Put, UseGuards} from "@nestjs/common";
 import { Role } from "../auth/roles/role.enum";
 import { Roles } from "../auth/roles/roles.decorator";
 import { CourseService } from "./course.service";
@@ -25,9 +25,10 @@ export class CourseController {
 
   @Get('user/my-courses')
   async getMyCourses(@MetaDataAuth('userId') userId: number): Promise<TBaseDto<MyCoursesResponse[]>> {
+    const courses = await this.courseService.getMyCourses(userId)
     return {
       message: 'Get my courses successfully',
-      data: await this.courseService.getMyCourses(userId),
+      data: courses,
       statusCode: 200,
     };
   }
@@ -64,5 +65,25 @@ export class CourseController {
       data: null,
       statusCode: 201,
     };
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Teacher)
+  @Put('remove/:id')
+  async removeCourse(
+    @MetaDataAuth('userId') userId: number,
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<TBaseDto<any>> {
+    return this.courseService.removeCourse(id)
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Teacher)
+  @Put('un-enroll/:id')
+  async unenrollCourse(
+    @MetaDataAuth('userId') userId: number,
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<TBaseDto<any>> {
+    return this.courseService.unenrollCourse(userId, id)
   }
 }

@@ -45,7 +45,8 @@ export class CourseService {
         description: item.description,
         teacherName: index[item.teacherIds.split(',')[0]].fullname,
         teacherAvatar: index[item.teacherIds.split(',')[0]].avatarUrl,
-        lastModify: this._formatDate(item.updatedAt)
+        lastModify: this._formatDate(item.updatedAt),
+        id: item.id
       }
     });
   }
@@ -161,7 +162,8 @@ export class CourseService {
       return {
         title: item.title,
         description: item.description,
-        lastModify: this._formatDate(item.updatedAt)
+        lastModify: this._formatDate(item.updatedAt),
+        id: item.id
       }
     });
   }
@@ -195,5 +197,47 @@ export class CourseService {
     }
 
     return true
+  }
+
+  async removeCourse(id: number): Promise<TBaseDto<any>> {
+    try {
+      await this.coursesRepository.update(id,
+        {
+          isValid: false
+        })
+    } catch (e) {
+      console.log(e)
+      return {
+        message: 'failed',
+        statusCode: 400,
+        data: null
+      }
+    }
+    return {
+      message: 'success',
+      statusCode: 200,
+      data: null
+    }
+  }
+
+  async unenrollCourse(userId: number, id: number) {
+    try {
+      await this.participantRepository.delete({
+        courseId: id,
+        studentId: userId
+      })
+    } catch (e) {
+      console.log(e)
+      return {
+        message: 'failed',
+        statusCode: 400,
+        data: null
+      }
+    }
+    return {
+      message: 'success',
+      statusCode: 200,
+      data: null
+    }
   }
 }

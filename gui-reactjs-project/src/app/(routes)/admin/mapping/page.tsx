@@ -61,7 +61,7 @@ export default function MappingPage() {
     const transformedItems = items.map(([studentId, email]) => ({ studentId, email }));
     // console.log(transformedItems[0].email);
     try {
-      const response = await axiosInstance.post(`/admin/account/mapping`, transformedItems );
+      const response = await .post(`/admin/account/mapping`, transformedItems );
       // console.log('Data saved:', response.data);
       Swal.fire({
         title: "Save successfully!",
@@ -92,7 +92,7 @@ export default function MappingPage() {
     // manualMappingData[0].studentId = id of the 1st student
 
     try {
-      const response = await axiosInstance.post(`/admin/account/mapping`, manualMappingData );
+      const response = await .post(`/admin/account/mapping`, manualMappingData );
       // console.log('Data saved:', response.data);
       Swal.fire({
         title: "Save successfully!",

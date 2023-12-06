@@ -19,7 +19,6 @@ interface NavbarToggleProps {
   userName: string;
 }
 export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
-  console.log(avatar)
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

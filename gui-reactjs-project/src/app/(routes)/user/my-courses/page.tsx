@@ -29,6 +29,7 @@ export default function Page() {
           title={course.title}
           description={course.description}
           lastModify={course.lastModify}
+          id={course.id}
           />
         })
       }

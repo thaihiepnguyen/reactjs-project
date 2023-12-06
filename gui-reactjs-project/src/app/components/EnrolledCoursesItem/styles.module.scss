@@ -33,6 +33,11 @@
       flex-direction: column;
       justify-content: space-around;
       color: #fff;
+      .moreVer {
+        position: absolute;
+        right: 4px;
+        top: 8px;
+      }
       .classTitle {
         max-width: 230px;
         overflow-x: hidden;
