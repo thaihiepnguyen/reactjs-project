@@ -7,11 +7,12 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/hook";
 import { useEffect } from "react";
-
+import { useTranslation , appWithTranslation } from 'next-i18next';
 const LandingPage = () => {
+  const { t } = useTranslation();
   const searchPrms = useSearchParams();
   const router = useRouter();
-  const {user} = useAppSelector(state => state.userReducer)
+  const {user} = useAppSelector((state: { userReducer: any; }) => state.userReducer)
   const redirect = searchPrms.get('redirect')
  
   useEffect(() => {
@@ -25,13 +26,13 @@ const LandingPage = () => {
     <>
       <div className={classes.header__info}>
         <div className={classes.header__info_description}>
-          <h1>Education for everyone in the internet</h1>
+          <h1>{t('landing_page_header')}</h1>
           <p>
-            Thousands of people around the world are already learning new things in <strong>lessins</strong>, what are you waiting for to join?
+            {t('landing_page_description')}
           </p>
           <div className={classes.header__buttons}>
-            <Link href={routes.login} className={clsx([classes.btn, classes.btn_black])}>Join us</Link>
-            <button className={classes.btn}>Contact sales &gt;</button>
+            <Link href={routes.login} className={clsx([classes.btn, classes.btn_black])}>{t('join us')}</Link>
+            <button className={classes.btn}>{t('contact sale')} &gt;</button>
           </div>
         </div>
         <div className={classes.header__info_image}>
@@ -85,9 +86,9 @@ const LandingPage = () => {
       <main className={classes.main}>
         <div className={classes.main__info}>
           <div className={classes.main__description}>
-            <h2>Thousands of people around the world are already learning</h2>
-            <p>We deliver high quality content that will impact in your profesional life. Get started now or read the docs to know more.</p>
-            <button className={clsx([classes.btn, classes.btn_blue])}>Read the docs &gt;</button>
+            <h2>{t('landing_page_h2')}</h2>
+            <p>{t('landing_page_description2')}</p>
+            <button className={clsx([classes.btn, classes.btn_blue])}>{t('read the doc')} &gt;</button>
           </div>
           <div className={classes.main__image}>
             <img src="./images/phone-2.png" alt="" />
@@ -146,4 +147,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default appWithTranslation(LandingPage);
