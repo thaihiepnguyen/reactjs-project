@@ -6,8 +6,7 @@ export const routes = {
   forgotpassword: "/auth/forgotpassword",
   myCourses: "/user/my-courses",
   enrolledCourses: "/user/enrolled-courses",
-  notification: "/user/notification",
-
+  notifications: "/user/notifications",
   admin_user: "/admin/user",
   admin_mapping: "/admin/mapping",
 };

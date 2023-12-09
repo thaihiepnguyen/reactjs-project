@@ -27,7 +27,7 @@ const sidebarItems_student = [
   },
   {
     name: "Notifications",
-    href: routes.notification,
+    href: routes.notifications,
     icon: <NotificationsNoneOutlined />,
   },
   {

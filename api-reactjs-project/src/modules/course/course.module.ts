@@ -10,6 +10,6 @@ import { Participants } from "src/typeorm/entity/Participants";
   imports: [TypeOrmModule.forFeature([Courses, Participants])],
   controllers: [CourseController],
   providers: [CourseService],
-  exports: []
+  exports: [CourseService]
 })
 export class CourseModule {}

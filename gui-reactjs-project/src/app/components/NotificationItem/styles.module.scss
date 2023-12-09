@@ -1,0 +1,12 @@
+.notificationItemContainer {
+  display: flex;
+  padding: 0.5rem 0;
+  .avatarContainer {
+    flex: 1;
+  }
+  .messageContainer {
+    flex: 5;
+    display: flex;
+    flex-direction: column;
+  }
+}
