@@ -33,7 +33,7 @@ export class NotificationController {
   @Post('teacher/push/courses')
   async pushCourses(
     @Body('title') title: string,
-    @Body('message') message: string,
+    @Body('content') message: string,
     @Body('id', ParseIntPipe) id: number,
     @MetaDataAuth('userId') userId: number
   ): Promise<TBaseDto<any>> {
