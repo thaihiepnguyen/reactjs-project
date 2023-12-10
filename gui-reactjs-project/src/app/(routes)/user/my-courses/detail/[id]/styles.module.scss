@@ -1,17 +1,19 @@
 .container {
-  width: 70%;
+  width: 80%;
   margin: 0 auto;
 
   .backgroundImgContainer {
     width: 100%;
+    border-radius: 0.7rem;
   }
 }
 .titleContainer {
   position: relative;
 
   .titleCourse{
+    color: white;
     position: absolute;
-    bottom: 0;
+    bottom: 0.7rem;
     margin: 0 1rem;
   }
 }

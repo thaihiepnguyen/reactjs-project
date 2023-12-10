@@ -8,7 +8,6 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useRouter } from 'next/router'
 
 export default function Page({ params }: { params: { id: string } }){
-  console.log(params.id)
   const [showTable, setShowTable] = useState(false);
   const handleClickCreationDiv = () => {
     setShowTable(!showTable);
@@ -17,7 +16,7 @@ export default function Page({ params }: { params: { id: string } }){
   return(
     <div className={classes.container}>
       <div className={classes.titleContainer}>
-        <img className={classes.backgroundImgContainer} aria-hidden="true" src="https://edtechframework.com/wp-content/uploads/2021/03/03-March-google-classroom-banner-rainbow-and-clouds-01.png" data-iml="5098.800000011921" />
+        <img className={classes.backgroundImgContainer} aria-hidden="true" src="https://gstatic.com/classroom/themes/img_learnlanguage.jpg" data-iml="5098.800000011921" />
         <h1 className={classes.titleCourse}>ABC Classroom</h1>
       </div>
       <br/><br/>
