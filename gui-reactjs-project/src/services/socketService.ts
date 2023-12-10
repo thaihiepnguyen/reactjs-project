@@ -28,4 +28,8 @@ export default class SocketService {
       callback(data)
     })
   }
+
+  public close() {
+    this._socket.close()
+  }
 }

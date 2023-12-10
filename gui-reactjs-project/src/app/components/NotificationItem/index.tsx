@@ -3,7 +3,7 @@ import {Avatar} from "@mui/material";
 
 
 export default function NotificationItem(
-  { avatarUrl, userName, message }
+  { avatarUrl, userName, title, time }
 ) {
   return <>
     <div className={classes.notificationItemContainer}>
@@ -15,7 +15,8 @@ export default function NotificationItem(
 
       <div className={classes.messageContainer}>
         <h5>{userName}</h5>
-        <p>{message}</p>
+        <p>{title}</p>
+        <span className={classes.minutes}> {time === 0 ? 'a new message' : `${time} minutes ago`}</span>
       </div>
     </div>
   </>

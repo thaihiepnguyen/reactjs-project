@@ -1,15 +1,17 @@
 .notificationContainer {
   margin-left: 1.5rem;
   margin-top: 1.5rem;
-  padding-left: 1.5rem;
-  padding-top: 1.5rem;
+  padding: 1rem;
   border: 1px solid #e6e6e6;
   width: 100%;
+  height: 80%;
   border-radius: 20px;
   display: flex;
   .listNotification {
+    overflow-y: scroll;
     flex: 1.2;
     border-right: 1px solid #e6e6e6;
+    padding-right: 1rem;
   }
   .detailNotification {
     flex: 3;

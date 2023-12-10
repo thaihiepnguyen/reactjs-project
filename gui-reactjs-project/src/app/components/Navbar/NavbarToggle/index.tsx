@@ -14,12 +14,14 @@ import { useRouter } from 'next/navigation'
 import { signOut } from "next-auth/react"
 import Link from "next/link";
 import { useTranslation , appWithTranslation } from 'next-i18next';
+import SocketService from "@/services/socketService";
 
 interface NavbarToggleProps {
   avatar: string;
   userName: string;
 }
 export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
+  const socketService = SocketService.instance()
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -33,6 +35,7 @@ export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
   };
 
   const logout = () => {
+    socketService.close()
     signOut();
     deleteCookie('token');
     deleteCookie('userId');

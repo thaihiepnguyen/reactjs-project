@@ -35,23 +35,6 @@ export class GatewayService implements OnModuleInit {
     return
   }
 
-
-  @SubscribeMessage('events')
-  onEvent(
-    @MessageBody() data: any,
-    @ConnectedSocket() client: any,
-  ): Observable<WsResponse<any>> | any{
-    console.log(data)
-    // const event = 'events';
-    // const response = [1, 2, 3];
-    //
-    // return from(response).pipe(
-    //   map(data => ({ event, data })),
-    // );
-    client.join(data.room)
-    this.server.in('room-002').emit('events', data + "hon nhieu" as any)
-  }
-
   public pushNotification(rooms: string[], payload: any) {
     this.server.in(rooms).emit('subscribeCourses', payload)
   }

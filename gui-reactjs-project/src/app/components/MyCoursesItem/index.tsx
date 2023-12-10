@@ -18,7 +18,7 @@ export default function MyCoursesItem(props) {
             <MenuCourses id={id}/>
           </div>
           <div className={classes.classTitle}>
-            <Link href={routes.myCourses} className={classes.classTitleText}>{title}</Link>
+            <Link href={routes.courseDetail + id} className={classes.classTitleText}>{title}</Link>
           </div>
           <div className={classes.classDescription}>
             <span className={classes.classDescriptionText}>{description}</span>
