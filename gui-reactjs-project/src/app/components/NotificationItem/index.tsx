@@ -3,10 +3,10 @@ import {Avatar} from "@mui/material";
 
 
 export default function NotificationItem(
-  { avatarUrl, userName, title, time }
+  { avatarUrl, userName, title, time, onClick, index }
 ) {
   return <>
-    <div className={classes.notificationItemContainer}>
+    <div className={classes.notificationItemContainer} onClick={()  => onClick(index)}>
       <div className={classes.avatarContainer}>
         <Avatar>
           <img style={{ width: '100%', height: '100%', objectFit: 'cover' }} src={`${avatarUrl}`}></img>

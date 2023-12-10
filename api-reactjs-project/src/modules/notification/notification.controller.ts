@@ -54,6 +54,7 @@ export class NotificationController {
     return 'OK'
   }
 
+
   @Get('student')
   async getNotifications(
     @MetaDataAuth('userId') userId: number

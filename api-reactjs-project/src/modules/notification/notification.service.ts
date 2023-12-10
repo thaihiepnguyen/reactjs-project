@@ -113,10 +113,12 @@ export class NotificationService {
       `
       SELECT
         p.student_id as studentId,
-        u.fullname
+        u.fullname,
+        c.title
       FROM participants as p
       LEFT JOIN users as u ON p.student_id = u.id
-      WHERE p.course_id = ? and u.is_valid = 1
+      LEFT JOIN courses as c ON p.course_id = c.id
+      WHERE p.course_id = ? and u.is_valid = 1 and c.is_valid = 1
       GROUP BY p.student_id;
       `
     const rawData = await this.connection.query(sql, [id])
@@ -125,7 +127,7 @@ export class NotificationService {
     const notiValues = rawData.map(item => {
       return {
         title: title,
-        content: `Chào ${item.fullname}, \n${message} \nTrân trọng, \n${teacher.fullname}`,
+        content: `<h5>Thông báo từ lớp học ${item.title} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${teacher.fullname}</h5>`,
         from: teacher.id,
         to: item.studentId
       }
@@ -139,7 +141,7 @@ export class NotificationService {
     const payload = {
       avatarUrl: teacher.avatarUrl,
       userName: teacher.fullname,
-      message: message,
+      message: `<h5>Thông báo từ lớp học ${rawData[0].title} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${teacher.fullname}</h5>`,
       title: title,
       time: 0,
     }

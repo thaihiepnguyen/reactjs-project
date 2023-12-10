@@ -8,7 +8,6 @@ export class AuthMiddleware implements NestMiddleware {
   constructor(private jwtService: JwtService) {}
   use(req: Request, res: Response, next: NextFunction) {
     const cookies = req.cookies;
-
     if (!cookies) {
       return res.status(401).json({
         statusCode: 401,

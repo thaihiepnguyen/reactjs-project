@@ -8,12 +8,16 @@
   border-radius: 20px;
   display: flex;
   .listNotification {
-    overflow-y: scroll;
     flex: 1.2;
     border-right: 1px solid #e6e6e6;
     padding-right: 1rem;
   }
+  .list {
+    overflow-y: scroll;
+    height: 90%;
+  }
   .detailNotification {
+    padding: 20px;
     flex: 3;
   }
 }
