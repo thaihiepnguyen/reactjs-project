@@ -240,4 +240,17 @@ export class CourseService {
       data: null
     }
   }
+
+  async getMyCourseDetail(id: number) {
+    return {
+      message: 'success',
+      statusCode: 200,
+      data: await this.coursesRepository.findOne({
+        where: {
+          id,
+          isValid: true
+        }
+      })
+    };
+  }
 }

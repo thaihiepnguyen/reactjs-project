@@ -9,5 +9,5 @@ export const routes = {
   notifications: "/user/notifications",
   admin_user: "/admin/user",
   admin_mapping: "/admin/mapping",
-  courseDetail: "/user/course-detail/"
+  courseDetail: "/user/my-courses/detail/"
 };

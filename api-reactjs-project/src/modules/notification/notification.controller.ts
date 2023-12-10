@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, ParseIntPipe, Post, UseGuards} from "@nestjs/common";
 import {NotificationService} from "./notification.service";
 import {RolesGuard} from "../auth/roles/roles.guard";
 import {Role} from "../auth/roles/role.enum";
@@ -21,6 +21,23 @@ export class NotificationController {
     @MetaDataAuth('userId') userId: number
   ): Promise<TBaseDto<any>> {
     await this.notificationService.pushAllCourses(userId, message, title)
+    return {
+      message: 'success',
+      statusCode: 200,
+      data: null
+    }
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Teacher)
+  @Post('teacher/push/courses')
+  async pushCourses(
+    @Body('title') title: string,
+    @Body('message') message: string,
+    @Body('id', ParseIntPipe) id: number,
+    @MetaDataAuth('userId') userId: number
+  ): Promise<TBaseDto<any>> {
+    await this.notificationService.pushCourses(id, userId, message, title)
     return {
       message: 'success',
       statusCode: 200,

@@ -1,8 +1,8 @@
 import {Body, Controller, Get, Param, ParseIntPipe, Post, Put, UseGuards} from "@nestjs/common";
-import { Role } from "../auth/roles/role.enum";
-import { Roles } from "../auth/roles/roles.decorator";
-import { CourseService } from "./course.service";
-import { MetaDataAuth } from "../auth/auth.decorator";
+import {Role} from "../auth/roles/role.enum";
+import {Roles} from "../auth/roles/roles.decorator";
+import {CourseService} from "./course.service";
+import {MetaDataAuth} from "../auth/auth.decorator";
 import {TBaseDto} from "../../app.dto";
 import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 import {RolesGuard} from "../auth/roles/roles.guard";
@@ -85,5 +85,14 @@ export class CourseController {
     @Param('id', ParseIntPipe) id: number
   ): Promise<TBaseDto<any>> {
     return this.courseService.unenrollCourse(userId, id)
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Student, Role.Teacher)
+  @Get('user/my-courses/detail/:id')
+  async getMyCourseDetail(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<TBaseDto<any>> {
+    return this.courseService.getMyCourseDetail(id)
   }
 }

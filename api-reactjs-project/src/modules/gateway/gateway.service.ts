@@ -35,7 +35,7 @@ export class GatewayService implements OnModuleInit {
     return
   }
 
-  public pushNotification(rooms: string[], payload: any) {
+  public pushNotification(rooms: string[] | string, payload: any) {
     this.server.in(rooms).emit('subscribeCourses', payload)
   }
 }

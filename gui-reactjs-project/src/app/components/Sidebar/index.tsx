@@ -77,10 +77,11 @@ export default function Sidebar() {
 
   useEffect(() => {
     setActive(sidebarItems.reduce((acc, cur, index) => {
-      if (pathname == cur.href) acc = index
-      return acc
+      if (pathname.includes(cur.href)) acc = index
+      return acc;
     }, 0))
   }, [pathname])
+
   return <>
     <div className={classes.sidebarWrapper}>
       <button className={classes.sidebarButton} onClick={toggle}>{ sidebarOpen ? <ArrowBackIosOutlined/> : <ArrowForwardIosOutlined/>}</button>
