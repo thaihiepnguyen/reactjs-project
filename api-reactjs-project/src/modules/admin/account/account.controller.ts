@@ -135,4 +135,12 @@ export class AccountController {
       throw new Error('Failed to save data');
     }
   }
+
+  @Get('/search')
+  async search(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('q') query: string,
+  ): Promise<TBaseDto<any>> {
+    return this.accountService.search(page, query);
+  }
 }
