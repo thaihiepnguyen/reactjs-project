@@ -28,4 +28,5 @@ export class UpdateProfileUserDto {
   phone: string;
   @IsOptional()
   avatarUrl: string;
+  studentId: string | (() => string);
 }

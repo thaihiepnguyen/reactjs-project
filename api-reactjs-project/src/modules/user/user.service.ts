@@ -87,7 +87,8 @@ export class UserService {
       await this.userRepository.update(user.id, {
         avatarUrl: data.avatarUrl,
         fullname: data.fullname,
-        phone: data.phone
+        phone: data.phone,
+        studentId: data.studentId
       })
       return await this.userRepository.findOne({
         where: {
