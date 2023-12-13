@@ -25,6 +25,7 @@ export interface UserFormData {
   fullname: string;
   email: string;
   phone: string;
+  studentId: string;
 }
 
 const EditProfile = () => {
@@ -51,12 +52,18 @@ const EditProfile = () => {
     mode: "onChange",
   });
 
+  const isStudentIdEnabled = useMemo(() => {
+    return !user || !user.studentId; // Enable if user doesn't have a student ID
+  }, [user]);
+
   const onSubmit = (data: UserFormData) => {
     const form = new FormData();
     form.append("fullname", data.fullname);
     form.append("avatar", data.avatar);
     form.append("phone", data.phone);
     form.append("email", data.email);
+    form.append("studentId", data.studentId);
+
     dispatch(setLoading(true));
     UserService.UpdateProfile(form)
       .then((res) => {
@@ -92,6 +99,7 @@ const EditProfile = () => {
         phone: user?.phone,
         email: user?.email,
         avatar: `${user?.avatarUrl}`,
+        studentId: user?.studentId
       });
     }
   }, [user]);
@@ -156,7 +164,20 @@ const EditProfile = () => {
             errorMessage={errors.phone?.message}
           />
         </Grid>
-        <Button sx={{mt: 4, ml: 1}} type="submit" variant="contained" children={"Save change"} className={classes.btnSave} />
+        <Grid item xs={12} sm={6}>
+          <Inputs
+            title="Student ID"
+            name="studentId"
+            type="text"
+            placeholder="Enter your student ID"
+            inputRef={register("studentId")}
+            errorMessage={errors.studentId?.message}
+            // disabled={!isStudentIdEnabled} // Enable/disable based on condition
+          />
+          <Grid>
+            <Button type="submit" variant="contained" children={"Save change"} className={classes.btnSave} />
+          </Grid>
+        </Grid>
       </Grid>
     </form>
   );
