@@ -8,6 +8,7 @@ import {useEffect, useMemo, useState} from "react";
 import classNames from 'classnames';
 import { usePathname } from 'next/navigation'
 import { useAppSelector } from "@/redux/hook";
+import { useTranslation } from "next-i18next";
 
 const sidebarItems_student = [
   {
