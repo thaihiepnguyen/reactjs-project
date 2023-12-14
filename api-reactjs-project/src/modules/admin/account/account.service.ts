@@ -1,6 +1,6 @@
 import {HttpException, Injectable} from "@nestjs/common";
-import {InjectConnection, InjectRepository} from "@nestjs/typeorm";
-import {Connection, Repository} from "typeorm";
+import {InjectConnection} from "@nestjs/typeorm";
+import {Connection} from "typeorm";
 import {UserService} from "../../user/user.service";
 import * as process from "process";
 import * as bcrypt from "bcrypt";
@@ -11,8 +11,6 @@ const PAGING_LIMIT = 15;
 @Injectable()
 export class AccountService {
   constructor(
-    @InjectRepository(Users)
-    private readonly userRepository: Repository<Users>,
     private readonly userService: UserService,
     @InjectConnection()
     private readonly connection: Connection
@@ -22,7 +20,7 @@ export class AccountService {
     const offset = (page - 1) * PAGING_LIMIT;
 
     const [list, count] = await Promise.all(
-      [this.userRepository.find({
+      [this.connection.getRepository(Users).find({
       select: {
         id: true,
         fullname: true,
@@ -35,7 +33,7 @@ export class AccountService {
       },
       take: PAGING_LIMIT,
       skip: offset
-    }), this.userRepository.count()]);
+    }), this.connection.getRepository(Users).count()]);
 
     return {
       list,
@@ -52,7 +50,7 @@ export class AccountService {
       throw new HttpException('User not found!', 404);
     }
 
-    await this.userRepository.update({id: userId}, {isActive: isActive});
+    await this.connection.getRepository(Users).update({id: userId}, {isActive: isActive});
   }
 
   async updateUser(
@@ -68,7 +66,7 @@ export class AccountService {
       encryptedPassword = await bcrypt.hash(password, SALT);
     }
 
-    await this.userRepository.update({id: userId}, {
+    await this.connection.getRepository(Users).update({id: userId}, {
       avatarUrl,
       fullname,
       email,
@@ -86,10 +84,10 @@ export class AccountService {
       const { studentId, email } = item;
      
       // Check if the email exists in the database
-      const existingUser = await this.userRepository.findOne({ where: { email } });
+      const existingUser = await this.connection.getRepository(Users).findOne({ where: { email } });
   
       if (existingUser) {
-        await this.userRepository.update((await existingUser).id, {
+        await this.connection.getRepository(Users).update((await existingUser).id, {
           studentId: studentId
         });
 

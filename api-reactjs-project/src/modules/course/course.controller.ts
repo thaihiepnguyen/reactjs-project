@@ -6,6 +6,7 @@ import {MetaDataAuth} from "../auth/auth.decorator";
 import {TBaseDto} from "../../app.dto";
 import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 import {RolesGuard} from "../auth/roles/roles.guard";
+import { Courses } from "src/typeorm/entity/Courses";
 
 
 @Controller('courses')
@@ -73,7 +74,7 @@ export class CourseController {
   async removeCourse(
     @MetaDataAuth('userId') userId: number,
     @Param('id', ParseIntPipe) id: number
-  ): Promise<TBaseDto<any>> {
+  ): Promise<TBaseDto<null>> {
     return this.courseService.removeCourse(id)
   }
 
@@ -83,7 +84,7 @@ export class CourseController {
   async unenrollCourse(
     @MetaDataAuth('userId') userId: number,
     @Param('id', ParseIntPipe) id: number
-  ): Promise<TBaseDto<any>> {
+  ): Promise<TBaseDto<null>> {
     return this.courseService.unenrollCourse(userId, id)
   }
 
@@ -92,7 +93,7 @@ export class CourseController {
   @Get('user/my-courses/detail/:id')
   async getMyCourseDetail(
     @Param('id', ParseIntPipe) id: number
-  ): Promise<TBaseDto<any>> {
+  ): Promise<TBaseDto<Courses>> {
     return this.courseService.getMyCourseDetail(id)
   }
 }

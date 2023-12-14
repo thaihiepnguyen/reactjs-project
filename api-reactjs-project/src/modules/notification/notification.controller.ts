@@ -45,16 +45,6 @@ export class NotificationController {
     }
   }
 
-  @Post('test')
-  async pushTest(
-    @Body('title') title: string,
-    @Body('message') message: string,
-  ) {
-    await this.notificationService.pushAllCourses(61, title, message)
-    return 'OK'
-  }
-
-
   @Get('student')
   async getNotifications(
     @MetaDataAuth('userId') userId: number

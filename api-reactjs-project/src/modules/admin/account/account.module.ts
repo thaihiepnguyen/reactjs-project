@@ -7,7 +7,6 @@ import { Users } from "src/typeorm/entity/Users";
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users])],
   controllers: [AccountController],
   providers: [AccountService, UserService],
   exports: []

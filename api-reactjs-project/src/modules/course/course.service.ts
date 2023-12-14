@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { InjectConnection, InjectRepository } from "@nestjs/typeorm";
+import { InjectConnection } from "@nestjs/typeorm";
 import { Courses } from "src/typeorm/entity/Courses";
 import { Participants } from "src/typeorm/entity/Participants";
 import { Users } from "src/typeorm/entity/Users";
-import {Connection, In, Like, Repository} from "typeorm";
+import {Connection, In, Like} from "typeorm";
 import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 import { v4 as uuidv4 } from 'uuid';
 import {TBaseDto} from "../../app.dto";
@@ -11,16 +11,12 @@ import {TBaseDto} from "../../app.dto";
 @Injectable()
 export class CourseService {
   constructor(
-    @InjectRepository(Courses)
-    private readonly coursesRepository: Repository<Courses>,
-    @InjectRepository(Participants)
-    private readonly participantRepository: Repository<Participants>,
     @InjectConnection()
     private readonly connection: Connection
   ) {}
 
   async getEnrolledCourses(userId: number): Promise<EnrolledCoursesResponse[]> {
-    const participants = await this.participantRepository.find({
+    const participants = await this.connection.getRepository(Participants).find({
       select: ['courseId'],
       where: {
         studentId: userId
@@ -30,7 +26,7 @@ export class CourseService {
     if (courseIds.length === 0) {
       return [];
     }
-    const courses = await this.coursesRepository.find({
+    const courses = await this.connection.getRepository(Courses).find({
       where: {
         id: In(courseIds),
         isValid: true
@@ -84,11 +80,11 @@ export class CourseService {
     return date.toLocaleDateString('en-GB', options);
   };
 
-  async addMyCourses(userId: number, name: string, description: string, classCode?: string): Promise<TBaseDto<any>> {
+  async addMyCourses(userId: number, name: string, description: string, classCode?: string): Promise<TBaseDto<null>> {
     if (!classCode) {
       classCode  = uuidv4()
       try {
-        await this.coursesRepository
+        await this.connection.getRepository(Courses)
           .createQueryBuilder()
           .insert()
           .into(Courses)
@@ -108,7 +104,7 @@ export class CourseService {
         statusCode: 201,
       };
     } else {
-      const classCodes = await this.coursesRepository.find({
+      const classCodes = await this.connection.getRepository(Courses).find({
         select: {
           classCode: true
         }
@@ -122,7 +118,7 @@ export class CourseService {
 
       if (!isCodeExisted) {
         try {
-          await this.coursesRepository
+          await this.connection.getRepository(Courses)
             .createQueryBuilder()
             .insert()
             .into(Courses)
@@ -151,7 +147,7 @@ export class CourseService {
   }
 
   async getMyCourses(userId: number): Promise<MyCoursesResponse[]> {
-    const courses = await this.coursesRepository.find({
+    const courses = await this.connection.getRepository(Courses).find({
       where: {
         teacherIds: Like(`%${userId}%`),
         isValid: true
@@ -169,7 +165,7 @@ export class CourseService {
   }
 
   async enrollCourse(userId: number, classCode: string): Promise<boolean> {
-    const course = await this.coursesRepository.findOne({
+    const course = await this.connection.getRepository(Courses).findOne({
       select: {
         id: true
       },
@@ -183,7 +179,7 @@ export class CourseService {
     }
 
     try {
-      await this.participantRepository
+      await this.connection.getRepository(Participants)
         .createQueryBuilder()
         .insert()
         .into(Participants)
@@ -199,9 +195,9 @@ export class CourseService {
     return true
   }
 
-  async removeCourse(id: number): Promise<TBaseDto<any>> {
+  async removeCourse(id: number): Promise<TBaseDto<null>> {
     try {
-      await this.coursesRepository.update(id,
+      await this.connection.getRepository(Courses).update(id,
         {
           isValid: false
         })
@@ -220,9 +216,9 @@ export class CourseService {
     }
   }
 
-  async unenrollCourse(userId: number, id: number) {
+  async unenrollCourse(userId: number, id: number): Promise<TBaseDto<null>> {
     try {
-      await this.participantRepository.delete({
+      await this.connection.getRepository(Participants).delete({
         courseId: id,
         studentId: userId
       })
@@ -241,11 +237,11 @@ export class CourseService {
     }
   }
 
-  async getMyCourseDetail(id: number) {
+  async getMyCourseDetail(id: number): Promise<TBaseDto<Courses>> {
     return {
       message: 'success',
       statusCode: 200,
-      data: await this.coursesRepository.findOne({
+      data: await this.connection.getRepository(Courses).findOne({
         where: {
           id,
           isValid: true

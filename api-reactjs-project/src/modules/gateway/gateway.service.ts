@@ -8,7 +8,7 @@ import {
 } from "@nestjs/websockets";
 import {Server} from 'socket.io'
 import {OnModuleInit} from "@nestjs/common";
-import {from, map, Observable} from "rxjs";
+import {Observable} from "rxjs";
 
 
 @WebSocketGateway({ cors: true })
