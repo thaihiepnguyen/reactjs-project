@@ -5,7 +5,6 @@ import MenuListComposition from '@/app/components/MenuListComposition/page';
 import { Button } from '@mui/material';
 import CreateNotificationForm from '@/app/components/CreateNotificationForm/page';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { useRouter } from 'next/router'
 import axiosInstance from "@/app/routers/axios";
 
 export default function Page({ params }: { params: { id: string } }){

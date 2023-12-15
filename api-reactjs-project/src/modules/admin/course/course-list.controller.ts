@@ -1,11 +1,13 @@
-import { Controller, Get, ParseIntPipe, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Put, Query } from "@nestjs/common";
 import { CourseListService } from "./course-list.service";
 import { TBaseDto } from "src/app.dto";
-import { CourseService } from "src/modules/course/course.service";
+import { Roles } from "src/modules/auth/roles/roles.decorator";
+import { Role } from "src/modules/auth/roles/role.enum";
 
 
 
 @Controller('/admin/course')
+@Roles(Role.Admin)
 export class CourseListController {
   constructor(
     private readonly courseListSerivce: CourseListService,
@@ -26,5 +28,13 @@ export class CourseListController {
     @Query('q') query: string,
   ): Promise<TBaseDto<any>> {
     return this.courseListSerivce.search(page, query);
+  }
+
+  @Put('/putActive/:courseId')
+  async active(
+    @Body('isActive') isActive: boolean,
+    @Param('courseId', ParseIntPipe) courseId: number
+  ): Promise<TBaseDto<null>> {
+    return this.courseListSerivce.putActive(courseId, isActive);
   }
 }

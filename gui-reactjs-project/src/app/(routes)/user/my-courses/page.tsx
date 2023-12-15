@@ -30,6 +30,7 @@ export default function Page() {
           description={course.description}
           lastModify={course.lastModify}
           id={course.id}
+          isActive={course.isActive}
           />
         })
       }

@@ -174,7 +174,7 @@ export class CourseService {
       }
     })
 
-    if (!course) {
+    if (!course || !course.isActive) {
       return false
     }
 
@@ -238,15 +238,25 @@ export class CourseService {
   }
 
   async getMyCourseDetail(id: number): Promise<TBaseDto<Courses>> {
+    const course = await this.connection.getRepository(Courses).findOne({
+      where: {
+        id,
+        isValid: true
+      }
+    });
+
+    if (!course.isActive) {
+      return {
+        message: 'This course is blocked by admin',
+        statusCode: 403,
+        data: null
+      }
+    }
+
     return {
       message: 'success',
       statusCode: 200,
-      data: await this.connection.getRepository(Courses).findOne({
-        where: {
-          id,
-          isValid: true
-        }
-      })
+      data: course
     };
   }
 }
