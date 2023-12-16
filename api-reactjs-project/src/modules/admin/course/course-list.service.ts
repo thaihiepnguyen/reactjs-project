@@ -113,7 +113,7 @@ export class CourseListService {
     return pattern.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace('Đ', 'D');
   }
 
-  async   putActive(courseId: number, isActive: boolean): Promise<TBaseDto<null>> {
+  async putActive(courseId: number, isActive: boolean): Promise<TBaseDto<null>> {
     try {
       await this.connection.getRepository(Courses)
       .update({
@@ -121,6 +121,7 @@ export class CourseListService {
       }, {
         isActive: isActive
       })
+      // console.log(courseId + " " + isActive );
     }
     catch(e) {
       console.log(e);
