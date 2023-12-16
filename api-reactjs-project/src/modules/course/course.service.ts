@@ -167,14 +167,17 @@ export class CourseService {
   async enrollCourse(userId: number, classCode: string): Promise<boolean> {
     const course = await this.connection.getRepository(Courses).findOne({
       select: {
-        id: true
+        id: true,
+        isActive: true,
+        isValid: true
       },
       where: {
         classCode
       }
-    })
+    });
 
-    if (!course || !course.isActive) {
+    console.log(course);
+    if (!course || !course.isValid || !course.isActive) {
       return false
     }
 
@@ -189,6 +192,7 @@ export class CourseService {
         }])
         .execute()
     } catch (e) {
+      console.log(e)
       return false
     }
 
