@@ -20,6 +20,8 @@ export default function MenuCourses({id}) {
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    event.preventDefault();
+    event.stopPropagation();
   };
   const UnenrollCourse = async () => {
     setAnchorEl(null);
@@ -34,7 +36,9 @@ export default function MenuCourses({id}) {
     }
   };
 
-  const handleClose = () => {
+  const handleClose = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     setAnchorEl(null);
   }
 

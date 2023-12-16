@@ -7,8 +7,10 @@ import AddCourses from "@/app/components/AddCourses";
 import EnrollCoursesModal from "@/app/components/AddCourses/EnrollCourseModal";
 import { useAppSelector } from "@/redux/hook";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
   const { enrolledCourses: courses } = useAppSelector((state) => state.courseReducer);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -21,17 +23,15 @@ export default function Page() {
           <>
             {courses.map((course, index) => {
               return (
-                <Link href={`/course/${course.id}`}>
-                  <EnrolledCoursesItem
-                    key={index}
-                    title={course.title}
-                    description={course.description}
-                    teacherName={course.teacherName}
-                    teacherAvatar={course.teacherAvatar}
-                    lastModify={course.lastModify}
-                    id={course.id}
-                  />
-                </Link>
+                <EnrolledCoursesItem
+                  key={index}
+                  title={course.title}
+                  description={course.description}
+                  teacherName={course.teacherName}
+                  teacherAvatar={course.teacherAvatar}
+                  lastModify={course.lastModify}
+                  id={course.id}
+                />
               );
             })}
           </>

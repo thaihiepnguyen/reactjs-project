@@ -22,16 +22,14 @@ export default function Page() {
           <>
             {courses.map((course, index) => {
               return (
-                <Link href={`/course/${course.id}`}>
-                  <MyCoursesItem
-                    key={index}
-                    title={course.title}
-                    description={course.description}
-                    lastModify={course.lastModify}
-                    id={course.id}
-                    isActive={course.isActive}
-                  />
-                </Link>
+                <MyCoursesItem
+                  key={index}
+                  title={course.title}
+                  description={course.description}
+                  lastModify={course.lastModify}
+                  id={course.id}
+                  isActive={course.isActive}
+                />
               );
             })}
           </>
