@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
 import { Users } from 'src/typeorm/entity/Users';
-import { Connection, In, Like } from 'typeorm';
+import { Connection, In, Like, Repository } from 'typeorm';
 import { EnrolledCoursesResponse, MyCoursesResponse } from './course.typing';
 import { v4 as uuidv4 } from 'uuid';
 import { TBaseDto } from '../../app.dto';
@@ -265,7 +265,7 @@ export class CourseService {
     };
   }
 
-  async getMyCourseDetail(id: number, userId): Promise<TBaseDto<Courses>> {
+  async getMyCourseDetail(id: number, userId): Promise<TBaseDto<any>> {
     const course = await this.connection.getRepository(Courses).findOne({
       where: {
         id
@@ -296,12 +296,30 @@ export class CourseService {
     }
  
     const participantIds = participants?.map(participant => participant.studentId);
-    console.log(participantIds);
+ 
     if (course?.teacherIds?.includes(userId) || participantIds?.includes(userId)) {
+      const teacherIds = course?.teacherIds?.split(", ")?.map(idStr => +idStr);
+    
+      const teacherList = await this.connection.getRepository(Users).find({
+        where: {
+          id: In(teacherIds)
+        }
+      })
+
+      const studentList = await this.connection.getRepository(Users).find({
+        where: {
+          id: In(participantIds)
+        }
+      })
+
       return {
         message: 'success',
         statusCode: 200,
-        data: course,
+        data: {
+          ...course,
+          teacherList: teacherList,
+          studentList: studentList
+        },
       };
     } else {
       return {

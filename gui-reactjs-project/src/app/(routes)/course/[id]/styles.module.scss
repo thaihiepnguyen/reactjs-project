@@ -1,5 +1,16 @@
+.root {
+  width: 100%;
+  padding: 0 30px;
+
+  .menu {
+    margin-bottom: 16px;
+    button {
+      text-transform: none;
+    }
+  }
+}
 .container {
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
 
   .backgroundImgContainer {
@@ -74,4 +85,15 @@
 
 .rightSection > * {
   width: 100%;
+}
+
+.infoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }

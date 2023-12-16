@@ -94,7 +94,7 @@ export class CourseController {
   async getMyCourseDetail(
     @MetaDataAuth('userId') userId: number,
     @Param('id', ParseIntPipe) id: number
-  ): Promise<TBaseDto<Courses>> {
+  ): Promise<TBaseDto<any>> {
     return this.courseService.getMyCourseDetail(id, userId)
   }
 }

@@ -40,9 +40,13 @@ export function middleware(request: NextRequest) {
   if (pathName.startsWith("/home") && !isLoggedIn) {
     return NextResponse.redirect(new URL("/?redirect=true", request.url));
   }
+  if (pathName.startsWith("/course") && !isLoggedIn) {
+    return NextResponse.redirect(new URL("/?redirect=true", request.url));
+  }
   if (pathName.startsWith("/home") &&  isAdmin) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
+  
   if (pathName.startsWith("/user") && !isLoggedIn) {
     return NextResponse.redirect(new URL("/", request.url));
   }
