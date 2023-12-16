@@ -44,7 +44,6 @@ export default class AdminService {
   static async putActive(courseId: number, isActive: boolean) {
     try {
       const response = await axiosInstance.put(`/admin/course/putActive/${courseId}`, { isActive });
-      // console.log(courseId + ' - ' + isActive);
       return Promise.resolve(response.data);
     } catch (error) {
       return Promise.reject(error?.response?.data);

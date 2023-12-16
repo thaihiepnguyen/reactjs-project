@@ -115,14 +115,15 @@ const List = memo(() => {
 
   const handleStatusToggle = (course: Course) => {
     const updatedList = data?.list.map((c) =>
-      c.id === course.id ? { ...c, isValid: !c.isValid } : c
+      c.id === course.id ? { ...c, isActive: c.isActive === 1 ? 0 : 1  } : c
     );
-    console.log(updatedList);
+    
     setData((prevData) => ({
       ...prevData,
       list: updatedList,
     }));
-    AdminService.putActive(course.id, !course.isValid);
+
+    AdminService.putActive(course.id, !course.isActive);
   };
 
   return (
