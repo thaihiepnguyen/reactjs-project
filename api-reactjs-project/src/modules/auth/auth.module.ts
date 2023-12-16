@@ -17,7 +17,7 @@ import { RoleService } from "../role/role.service";
       global: true,
       secret: 'secretKey',
       signOptions: {
-        expiresIn: '1h'
+        expiresIn: '24h'
       }
     }), PassportModule],
   controllers: [AuthController],
