@@ -6,6 +6,7 @@ import EnrolledCoursesItem from "@/app/components/EnrolledCoursesItem";
 import AddCourses from "@/app/components/AddCourses";
 import EnrollCoursesModal from "@/app/components/AddCourses/EnrollCourseModal";
 import { useAppSelector } from "@/redux/hook";
+import Link from "next/link";
 
 export default function Page() {
   const { enrolledCourses: courses } = useAppSelector((state) => state.courseReducer);
@@ -20,15 +21,17 @@ export default function Page() {
           <>
             {courses.map((course, index) => {
               return (
-                <EnrolledCoursesItem
-                  key={index}
-                  title={course.title}
-                  description={course.description}
-                  teacherName={course.teacherName}
-                  teacherAvatar={course.teacherAvatar}
-                  lastModify={course.lastModify}
-                  id={course.id}
-                />
+                <Link href={`/course/${course.id}`}>
+                  <EnrolledCoursesItem
+                    key={index}
+                    title={course.title}
+                    description={course.description}
+                    teacherName={course.teacherName}
+                    teacherAvatar={course.teacherAvatar}
+                    lastModify={course.lastModify}
+                    id={course.id}
+                  />
+                </Link>
               );
             })}
           </>
