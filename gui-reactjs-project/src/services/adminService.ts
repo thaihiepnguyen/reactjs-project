@@ -31,4 +31,13 @@ export default class AdminService {
       return Promise.reject(e?.response?.data);
     })
   };
+
+  static async getAllCourse(page: number) {
+    return await axiosInstance.get(`/admin/course/all?page=${page}`)
+    .then((res) => {
+      return Promise.resolve(res.data);
+    }).catch((e) => {
+      return Promise.reject(e?.response?.data);
+    })
+  }
 }

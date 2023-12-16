@@ -26,6 +26,7 @@ export class CourseListService {
         teacherIds: true,
         classCode: true,
         isValid: true,
+        isActive: true
       },
       take: PAGING_LIMIT,
       skip: offset
@@ -41,7 +42,8 @@ export class CourseListService {
         description: item.description,
         classCode: item.classCode,
         isValid: item.isValid,
-        teachers: ids
+        teachers: ids,
+        isActive: item.isActive
       }
     });
 
