@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Put, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
 import { CourseListService } from "./course-list.service";
 import { TBaseDto } from "src/app.dto";
 import { Roles } from "src/modules/auth/roles/roles.decorator";
