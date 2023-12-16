@@ -1,55 +1,57 @@
-import { Injectable } from "@nestjs/common";
-import { InjectConnection } from "@nestjs/typeorm";
-import { Courses } from "src/typeorm/entity/Courses";
-import { Participants } from "src/typeorm/entity/Participants";
-import { Users } from "src/typeorm/entity/Users";
-import {Connection, In, Like} from "typeorm";
-import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
+import { Injectable } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/typeorm';
+import { Courses } from 'src/typeorm/entity/Courses';
+import { Participants } from 'src/typeorm/entity/Participants';
+import { Users } from 'src/typeorm/entity/Users';
+import { Connection, In, Like } from 'typeorm';
+import { EnrolledCoursesResponse, MyCoursesResponse } from './course.typing';
 import { v4 as uuidv4 } from 'uuid';
-import {TBaseDto} from "../../app.dto";
+import { TBaseDto } from '../../app.dto';
 
 @Injectable()
 export class CourseService {
   constructor(
     @InjectConnection()
-    private readonly connection: Connection
+    private readonly connection: Connection,
   ) {}
 
   async getEnrolledCourses(userId: number): Promise<EnrolledCoursesResponse[]> {
-    const participants = await this.connection.getRepository(Participants).find({
-      select: ['courseId'],
-      where: {
-        studentId: userId
-      }
-    })
-    const courseIds = participants.map(p => p.courseId as number);
+    const participants = await this.connection
+      .getRepository(Participants)
+      .find({
+        select: ['courseId'],
+        where: {
+          studentId: userId,
+        },
+      });
+    const courseIds = participants.map((p) => p.courseId as number);
     if (courseIds.length === 0) {
       return [];
     }
     const courses = await this.connection.getRepository(Courses).find({
       where: {
         id: In(courseIds),
-        isValid: true
-      }
+        isValid: true,
+      },
     });
 
     const index = await this._indexTeachersByCourses(courses);
 
-    return courses.map(item => {
+    return courses.map((item) => {
       return {
         title: item.title,
         description: item.description,
         teacherName: index[item.teacherIds.split(',')[0]].fullname,
         teacherAvatar: index[item.teacherIds.split(',')[0]].avatarUrl,
         lastModify: this._formatDate(item.updatedAt),
-        id: item.id
-      }
+        id: item.id,
+      };
     });
   }
 
   async _indexTeachersByCourses(courses: Courses[]) {
     const teacherIds = courses.reduce((acc, cur) => {
-      const ids = cur.teacherIds.split(',').map(id => Number(id));
+      const ids = cur.teacherIds.split(',').map((id) => Number(id));
       for (const id of ids) {
         if (!acc.includes(id)) {
           acc.push(id);
@@ -61,8 +63,8 @@ export class CourseService {
     const teachers = await this.connection.getRepository(Users).find({
       where: {
         id: In(teacherIds),
-        isValid: true
-      }
+        isValid: true,
+      },
     });
 
     return teachers.reduce((acc, cur) => {
@@ -76,19 +78,32 @@ export class CourseService {
       month: 'short',
       year: 'numeric',
     };
-  
-    return date.toLocaleDateString('en-GB', options);
-  };
 
-  async addMyCourses(userId: number, name: string, description: string, classCode?: string): Promise<TBaseDto<null>> {
+    return date.toLocaleDateString('en-GB', options);
+  }
+
+  async addMyCourses(
+    userId: number,
+    name: string,
+    description: string,
+    classCode?: string,
+  ): Promise<TBaseDto<null>> {
     if (!classCode) {
-      classCode  = uuidv4()
+      classCode = uuidv4();
       try {
-        await this.connection.getRepository(Courses)
+        await this.connection
+          .getRepository(Courses)
           .createQueryBuilder()
           .insert()
           .into(Courses)
-          .values([{title: name, description: description, teacherIds: userId.toString(), classCode}])
+          .values([
+            {
+              title: name,
+              description: description,
+              teacherIds: userId.toString(),
+              classCode,
+            },
+          ])
           .execute();
       } catch (e) {
         console.log(e);
@@ -106,23 +121,31 @@ export class CourseService {
     } else {
       const classCodes = await this.connection.getRepository(Courses).find({
         select: {
-          classCode: true
-        }
-      })
+          classCode: true,
+        },
+      });
       const isCodeExisted = classCodes.reduce((acc, cur) => {
         if (cur.classCode === classCode) {
-          acc = true
+          acc = true;
         }
-        return acc
-      }, false)
+        return acc;
+      }, false);
 
       if (!isCodeExisted) {
         try {
-          await this.connection.getRepository(Courses)
+          await this.connection
+            .getRepository(Courses)
             .createQueryBuilder()
             .insert()
             .into(Courses)
-            .values([{title: name, description: description, teacherIds: userId.toString(), classCode}])
+            .values([
+              {
+                title: name,
+                description: description,
+                teacherIds: userId.toString(),
+                classCode,
+              },
+            ])
             .execute();
         } catch (e) {
           return {
@@ -141,7 +164,7 @@ export class CourseService {
           message: 'The class Id existed',
           data: null,
           statusCode: 400,
-        }
+        };
       }
     }
   }
@@ -150,113 +173,135 @@ export class CourseService {
     const courses = await this.connection.getRepository(Courses).find({
       where: {
         teacherIds: Like(`%${userId}%`),
-        isValid: true
-      }
+        isValid: true,
+      },
     });
 
-    return courses.map(item => {
+    return courses.map((item) => {
       return {
         title: item.title,
         description: item.description,
         lastModify: this._formatDate(item.updatedAt),
-        id: item.id
-      }
+        id: item.id,
+      };
     });
   }
 
-  async enrollCourse(userId: number, classCode: string): Promise<boolean> {
+  async enrollCourse(userId: number, classCode: string): Promise<boolean> { 
     const course = await this.connection.getRepository(Courses).findOne({
-      select: {
-        id: true
-      },
       where: {
-        classCode
-      }
-    })
-
+        classCode,
+      },
+    });
     if (!course || !course.isActive) {
-      return false
+      return false;
     }
 
     try {
-      await this.connection.getRepository(Participants)
+      await this.connection
+        .getRepository(Participants)
         .createQueryBuilder()
         .insert()
         .into(Participants)
-        .values([{
-          studentId: userId,
-          courseId: course.id
-        }])
-        .execute()
+        .values([
+          {
+            studentId: userId,
+            courseId: course.id,
+          },
+        ])
+        .execute();
     } catch (e) {
-      return false
+      return false;
     }
 
-    return true
+    return true;
   }
 
   async removeCourse(id: number): Promise<TBaseDto<null>> {
     try {
-      await this.connection.getRepository(Courses).update(id,
-        {
-          isValid: false
-        })
+      await this.connection.getRepository(Courses).update(id, {
+        isValid: false,
+      });
     } catch (e) {
-      console.log(e)
+      console.log(e);
       return {
         message: 'failed',
         statusCode: 400,
-        data: null
-      }
+        data: null,
+      };
     }
     return {
       message: 'success',
       statusCode: 200,
-      data: null
-    }
+      data: null,
+    };
   }
 
   async unenrollCourse(userId: number, id: number): Promise<TBaseDto<null>> {
     try {
       await this.connection.getRepository(Participants).delete({
         courseId: id,
-        studentId: userId
-      })
+        studentId: userId,
+      });
     } catch (e) {
-      console.log(e)
+      console.log(e);
       return {
         message: 'failed',
         statusCode: 400,
-        data: null
-      }
+        data: null,
+      };
     }
     return {
       message: 'success',
       statusCode: 200,
-      data: null
-    }
+      data: null,
+    };
   }
 
-  async getMyCourseDetail(id: number): Promise<TBaseDto<Courses>> {
+  async getMyCourseDetail(id: number, userId): Promise<TBaseDto<Courses>> {
     const course = await this.connection.getRepository(Courses).findOne({
       where: {
-        id,
-        isValid: true
-      }
+        id
+      },
     });
+    const participants = await this.connection.getRepository(Participants).find({
+      where: {
+        courseId: course?.id
+      },
+      select: {
+        studentId: true
+      }
+    })
 
+    if (!course) {
+      return {
+        message: 'Course not found',
+        statusCode: 404,
+        data: null,
+      };
+    }
     if (!course.isActive) {
       return {
         message: 'This course is blocked by admin',
         statusCode: 403,
-        data: null
-      }
+        data: null,
+      };
     }
-
-    return {
-      message: 'success',
-      statusCode: 200,
-      data: course
-    };
+ 
+    const participantIds = participants?.map(participant => participant.studentId);
+    console.log(participantIds);
+    if (course?.teacherIds?.includes(userId) || participantIds?.includes(userId)) {
+      return {
+        message: 'success',
+        statusCode: 200,
+        data: course,
+      };
+    } else {
+      return {
+        message: 'Course not found',
+        statusCode: 404,
+        data: null,
+      };
+    }
   }
 }
