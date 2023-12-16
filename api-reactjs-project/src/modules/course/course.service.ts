@@ -159,6 +159,7 @@ export class CourseService {
         title: item.title,
         description: item.description,
         lastModify: this._formatDate(item.updatedAt),
+        isActive: item.isActive,
         id: item.id
       }
     });
@@ -176,7 +177,6 @@ export class CourseService {
       }
     });
 
-    console.log(course);
     if (!course || !course.isValid || !course.isActive) {
       return false
     }

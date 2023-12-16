@@ -5,10 +5,9 @@ export interface Course {
     isActive?: boolean;
     title?: string;
     description?: string;
-    teacher_id?: number;
-    class_code?: string;
-    created_at?: string;
-    updated_at?: string;
+    teacherId?: number;
+    createdAt?: string;
+    updatedAt?: string;
     lastModify?: any;
     teacherName?: string;
     teacherAvatar?: string;

@@ -11,5 +11,6 @@ export type MyCoursesResponse = {
   title: string
   description: string
   lastModify: string
+  isActive: boolean
   id: number
 }

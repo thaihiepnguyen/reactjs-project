@@ -10,7 +10,6 @@ export const getEnrolledCoursesAction = createAction("course/getEnrolledCourse")
 function* requestGetEnrolledCourses() {
   const response: AxiosResponse = yield call(axiosInstance.get, "/courses/user/enrolled-courses");
 
-  console.log(response, 123123132);
   yield put(setEnrolledCourse(response.data.data));
 }
 
