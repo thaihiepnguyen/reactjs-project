@@ -182,19 +182,26 @@ export class CourseService {
         title: item.title,
         description: item.description,
         lastModify: this._formatDate(item.updatedAt),
-        id: item.id,
-      };
+        isActive: item.isActive,
+        id: item.id
+      }
     });
   }
 
   async enrollCourse(userId: number, classCode: string): Promise<boolean> { 
     const course = await this.connection.getRepository(Courses).findOne({
-      where: {
-        classCode,
+      select: {
+        id: true,
+        isActive: true,
+        isValid: true
       },
+      where: {
+        classCode
+      }
     });
-    if (!course || !course.isActive) {
-      return false;
+
+    if (!course || !course.isValid || !course.isActive) {
+      return false
     }
 
     try {

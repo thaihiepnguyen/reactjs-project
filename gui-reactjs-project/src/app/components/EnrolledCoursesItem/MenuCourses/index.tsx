@@ -5,6 +5,8 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
+import { useAppDispatch } from '@/redux/hook';
+import { getEnrolledCourse } from '@/redux/reducers/courses';
 
 const options = [
   'Unenroll course',
@@ -13,6 +15,7 @@ const options = [
 const ITEM_HEIGHT = 30;
 
 export default function MenuCourses({id}) {
+  const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -27,7 +30,7 @@ export default function MenuCourses({id}) {
         text: 'Congratulations!',
         icon: 'success',
       })
-      window.location.reload();
+      dispatch(getEnrolledCourse());
     }
   };
 
