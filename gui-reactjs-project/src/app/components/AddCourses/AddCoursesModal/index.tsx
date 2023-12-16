@@ -47,7 +47,7 @@ export default function AddCoursesModal(props) {
     }
     catch (e) {
       await Swal.fire({
-        title: 'UnauthorizedException!',
+        title: "Only teacher can create a course",
         text: 'Please try again!',
         icon: 'error',
       })
