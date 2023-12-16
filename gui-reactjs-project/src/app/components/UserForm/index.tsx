@@ -23,6 +23,7 @@ export interface UserFormData {
   password: string;
   role: OptionItem;
   isActive: boolean;
+  studentId: string;
 }
 
 interface Props {
@@ -94,6 +95,7 @@ const UserForm = memo(({ itemEdit, onSubmit }: Props) => {
         password: itemEdit.password || "",
         role: itemEdit.role ? { id: itemEdit.role.id, name: itemEdit.role.name } : undefined,
         isActive: itemEdit.isActive,
+        studentId: itemEdit.studentId
       });
     }
   }, [reset, itemEdit]);

@@ -8,6 +8,7 @@ import {useEffect, useMemo, useState} from "react";
 import classNames from 'classnames';
 import { usePathname } from 'next/navigation'
 import { useAppSelector } from "@/redux/hook";
+import { useTranslation } from "next-i18next";
 
 const sidebarItems_student = [
   {
@@ -27,7 +28,7 @@ const sidebarItems_student = [
   },
   {
     name: "Notifications",
-    href: routes.notification,
+    href: routes.notifications,
     icon: <NotificationsNoneOutlined />,
   },
   {
@@ -77,10 +78,11 @@ export default function Sidebar() {
 
   useEffect(() => {
     setActive(sidebarItems.reduce((acc, cur, index) => {
-      if (pathname == cur.href) acc = index
-      return acc
+      if (pathname.includes(cur.href)) acc = index
+      return acc;
     }, 0))
   }, [pathname])
+
   return <>
     <div className={classes.sidebarWrapper}>
       <button className={classes.sidebarButton} onClick={toggle}>{ sidebarOpen ? <ArrowBackIosOutlined/> : <ArrowForwardIosOutlined/>}</button>

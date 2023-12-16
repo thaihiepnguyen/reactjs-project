@@ -30,6 +30,7 @@ export default function Page() {
             teacherName={course.teacherName}
             teacherAvatar={course.teacherAvatar}
             lastModify={course.lastModify}
+            id={course.id}
           />
         })
       }

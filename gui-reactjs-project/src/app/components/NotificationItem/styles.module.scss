@@ -1,0 +1,21 @@
+.notificationItemContainer {
+  display: flex;
+  padding: 0.5rem;
+  .avatarContainer {
+    flex: 1;
+  }
+  .messageContainer {
+    flex: 5;
+    display: flex;
+    flex-direction: column;
+    .minutes {
+      color: #3578E5;
+      font-size: smaller;
+    }
+  }
+  &:hover {
+    background-color: whitesmoke;
+    cursor: pointer;
+    border-radius: 0.4rem;
+  }
+}

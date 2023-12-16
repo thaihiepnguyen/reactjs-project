@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { setUser } from "@/redux/reducers/user";
 import ParagraphSmall from "../text/ParagraphSmall";
 import { setLoading } from "@/redux/reducers/loading";
+import { useTranslation } from "next-i18next";
 
 export const VALIDATION = {
   phone: /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
@@ -25,9 +26,11 @@ export interface UserFormData {
   fullname: string;
   email: string;
   phone: string;
+  studentId: string;
 }
 
 const EditProfile = () => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.userReducer);
   const dispatch = useAppDispatch();
   const schema = useMemo(() => {
@@ -51,12 +54,18 @@ const EditProfile = () => {
     mode: "onChange",
   });
 
+  const isStudentIdEnabled = useMemo(() => {
+    return !user || !user.studentId; // Enable if user doesn't have a student ID
+  }, [user]);
+
   const onSubmit = (data: UserFormData) => {
     const form = new FormData();
     form.append("fullname", data.fullname);
     form.append("avatar", data.avatar);
     form.append("phone", data.phone);
     form.append("email", data.email);
+    form.append("studentId", data.studentId);
+
     dispatch(setLoading(true));
     UserService.UpdateProfile(form)
       .then((res) => {
@@ -92,6 +101,7 @@ const EditProfile = () => {
         phone: user?.phone,
         email: user?.email,
         avatar: `${user?.avatarUrl}`,
+        studentId: user?.studentId
       });
     }
   }, [user]);
@@ -127,7 +137,7 @@ const EditProfile = () => {
       <Grid container columnSpacing={1} rowSpacing={3} className={classes.customMargin}>
         <Grid item xs={12} sm={12}>
           <Inputs
-            title="Full name"
+            title={t("Full name")}
             name="fullname"
             type="text"
             placeholder="Enter your name"
@@ -148,7 +158,7 @@ const EditProfile = () => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <Inputs
-            title="Phone"
+            title={t("Phone")}
             name="phone"
             type="text"
             placeholder="Enter your phone"
@@ -156,7 +166,20 @@ const EditProfile = () => {
             errorMessage={errors.phone?.message}
           />
         </Grid>
-        <Button sx={{mt: 4, ml: 1}} type="submit" variant="contained" children={"Save change"} className={classes.btnSave} />
+        <Grid item xs={12} sm={6}>
+          <Inputs
+            title={t("Student ID")}
+            name="studentId"
+            type="text"
+            placeholder="Enter your student ID"
+            inputRef={register("studentId")}
+            errorMessage={errors.studentId?.message}
+            // disabled={!isStudentIdEnabled} // Enable/disable based on condition
+          />
+          <Grid>
+            <Button type="submit" variant="contained" children={t("Save change")} className={classes.btnSave} />
+          </Grid>
+        </Grid>
       </Grid>
     </form>
   );

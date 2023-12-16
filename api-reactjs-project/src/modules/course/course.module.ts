@@ -7,9 +7,8 @@ import { Participants } from "src/typeorm/entity/Participants";
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Courses, Participants])],
   controllers: [CourseController],
   providers: [CourseService],
-  exports: []
+  exports: [CourseService]
 })
 export class CourseModule {}

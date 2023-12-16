@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 import { setUser } from "@/redux/reducers/user";
 import { signIn } from "next-auth/react";
 import { setLoading } from '@/redux/reducers/loading';
+import { useTranslation , appWithTranslation } from 'next-i18next';
 
 interface LoginFormProps {}
 
@@ -27,6 +28,7 @@ interface ILoginFormData {
   role: string;
 }
 const LoginForm = memo((props: LoginFormProps) => {
+  const {t} = useTranslation();
   const router = useRouter()
   const dispatch = useAppDispatch();
 
@@ -82,7 +84,7 @@ const LoginForm = memo((props: LoginFormProps) => {
   return (
     <div className='form-container login-container'>
       <form className={classes.registerForm} onSubmit={handleSubmit(onSubmit)}>
-        <h1>Sign in</h1>
+        <h1>{t('sign in')}</h1>
         <div className={classes.socialContainer}>
           <div className={classes.socialButton} onClick={()=>signIn('google', {callbackUrl: '/?redirect=true'})}>
             <GoogleIcon />
@@ -91,24 +93,24 @@ const LoginForm = memo((props: LoginFormProps) => {
             <GithubIcon />
           </div>
         </div>
-        <span>or use your account</span>
+        <span>{t('or use your account')}</span>
         <Grid container columnSpacing={1} rowSpacing={2} className={classes.customMargin}>
           <Grid item xs={12} sm={12}>
             <Inputs
               title='Email'
               name='email'
               type='text'
-              placeholder='Enter your email'
+              placeholder={t('enter your email')}
               inputRef={register('email')}
               errorMessage={errors.email?.message}
             />
           </Grid>
           <Grid item xs={12} sm={12}>
             <Inputs
-              title='Password'
+              title={t('password')}
               name='password'
               type='password'
-              placeholder='Enter your password'
+              placeholder={t('enter your password')}
               inputRef={register('password')}
               errorMessage={errors.password?.message}
             />
@@ -116,13 +118,13 @@ const LoginForm = memo((props: LoginFormProps) => {
           <Grid item xs={12} sm={12}>
             <Typography sx={{ mb: 2 }} variant='body2' align='right' gutterBottom>
               <Link href={routes.forgotpassword} color='primary'>
-                Forgot Password?
+                {t('forgot password')}?
               </Link>
             </Typography>
           </Grid>
         </Grid>
 
-        <button className={classes.signupButton}>Sign In</button>
+        <button className={classes.signupButton}>{t('sign in')}</button>
       </form>
     </div>
   );

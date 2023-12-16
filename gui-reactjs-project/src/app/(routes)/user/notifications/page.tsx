@@ -1,6 +1,56 @@
+'use client';
+
+import classes from './styles.module.scss'
+import {useEffect, useState} from "react";
+import SocketService from "@/services/socketService";
+import NotificationItem from "@/app/components/NotificationItem";
+import axiosInstance from "@/app/routers/axios";
+import parse from 'html-react-parser';
 
 export default function Page() {
+  const socketService = SocketService.instance();
+  const [notifications, setNotifications] = useState([]);
+  const [notiDetail, setNotiDetail] = useState(0)
+  useEffect(() => {
+    async function getNotis() {
+      const response = await axiosInstance.get('/noti/student');
+      if (response.data.statusCode === 200) {
+        setNotifications([...notifications, ...response.data.data])
+      }
+    }
+    getNotis()
+  }, [])
+
+  socketService.listenCourses((message) => {
+    setNotifications([message, ...notifications])
+  })
+
   return <>
-    Notifications
+    <div className={classes.notificationContainer}>
+      <div className={classes.listNotification}>
+        <h2 style={{marginBottom: 16}}>{`Notifications`}</h2>
+        <div className={classes.list}>
+        {
+          notifications.map((item, index) => {
+            return <div key={index}>
+              <NotificationItem
+                index={index}
+                onClick={setNotiDetail}
+                title={item.title}
+                avatarUrl={item.avatarUrl}
+                userName={item.userName}
+                time={item.time}
+              />
+            </div>
+          })
+        }
+        </div>
+      </div>
+      <div className={classes.detailNotification}>
+        {
+          notifications.length && <span>{parse(notifications[notiDetail].message)}</span>
+        }
+      </div>
+    </div>
   </>
 }

@@ -13,13 +13,16 @@ import { getCookies, setCookie, deleteCookie, getCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation'
 import { signOut } from "next-auth/react"
 import Link from "next/link";
+import { useTranslation , appWithTranslation } from 'next-i18next';
+import SocketService from "@/services/socketService";
 
 interface NavbarToggleProps {
   avatar: string;
   userName: string;
 }
 export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
-  console.log(avatar)
+  const socketService = SocketService.instance()
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -32,6 +35,7 @@ export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
   };
 
   const logout = () => {
+    socketService.close()
     signOut();
     deleteCookie('token');
     deleteCookie('userId');
@@ -43,7 +47,7 @@ export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
 
   return (
     <div className={classes.navbarToggle}>
-      <span>Hi, {userName}</span>
+      <span>{t('welcome')}, {userName}</span>
       <div style={{ marginLeft: 10 }} onClick={handleClick}>
         {!avatar ? (
           <Avatar>H</Avatar>
@@ -93,7 +97,7 @@ export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
               <ListItemIcon>
                 <Person fontSize="small" />
               </ListItemIcon>
-              Profile
+              {t('profile')}
             </MenuItem>
 
           </Link>
@@ -104,7 +108,7 @@ export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
             <ListItemIcon>
               <Logout fontSize="small" />
             </ListItemIcon>
-            Logout
+            {t('logout')}
           </MenuItem>
         </Menu>
     </div>

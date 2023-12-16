@@ -1,0 +1,77 @@
+.container {
+  width: 80%;
+  margin: 0 auto;
+
+  .backgroundImgContainer {
+    width: 100%;
+    border-radius: 0.7rem;
+  }
+}
+.titleContainer {
+  position: relative;
+
+  .titleCourse{
+    color: white;
+    position: absolute;
+    bottom: 1rem;
+    margin: 0 1rem;
+  }
+}
+
+.mainContainer {
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+
+  .leftSection {
+    flex: 25%;
+
+    .codeCourse {
+      width: 100%;
+      padding: 0.5rem 1.2rem;
+      border: 1px lightgrey solid;
+      border-radius: 10px;
+      // align-items: center;
+      .boxClassCourseTitle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .deadline {
+      width: 100%;
+      padding: 1.5rem 1.2rem;
+      border: 1px lightgrey solid;
+      border-radius: 10px;
+    }
+  }
+}
+
+.code {
+  font-size: 20px;
+  color: rgb(194,100,1);
+  fill: rgb(194,100,1);
+}
+
+// Right section
+.rightSection {
+  flex: 80%;
+
+  .createNotificationDiv {
+    // width: 65%;
+    display: flex;
+    border: 1px lightgrey solid;
+    padding: 1.5rem 1.2rem;
+    border-radius: 10px;
+    justify-content: space-between;
+  }
+}
+
+.leftSection > * {
+  width: 100%;
+}
+
+.rightSection > * {
+  width: 100%;
+}

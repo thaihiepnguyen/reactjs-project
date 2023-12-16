@@ -1,7 +1,6 @@
 import {BadRequestException, HttpException, HttpStatus, Injectable} from "@nestjs/common";
-import {Repository} from "typeorm";
-import {InjectConnection, InjectRepository} from "@nestjs/typeorm";
-import {Connection} from "mysql2";
+import {Connection} from "typeorm";
+import {InjectConnection} from "@nestjs/typeorm";
 import {JwtService} from "@nestjs/jwt";
 import * as argon from 'argon2';
 import {MailerService} from "@nestjs-modules/mailer";
@@ -17,8 +16,6 @@ import { Users } from "src/typeorm/entity/Users";
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Users)
-    private readonly userRepository: Repository<Users>,
     @InjectConnection()
     private readonly connection: Connection,
     private readonly jwtService: JwtService,
@@ -50,7 +47,7 @@ export class AuthService {
       })
     ]);
 
-    await this.userRepository.update(
+    await this.connection.getRepository(Users).update(
       {id: payload.id},
       {refreshToken: await argon.hash(refreshToken)}
     );
@@ -59,7 +56,7 @@ export class AuthService {
   }
 
   public async getRole(userid: number): Promise<any> {
-    return await this.userRepository.createQueryBuilder("user").where("user.id = :id", { id: userid }).leftJoinAndSelect('user.role', 'role').getOne();
+    return await this.connection.getRepository(Users).createQueryBuilder("user").where("user.id = :id", { id: userid }).leftJoinAndSelect('user.role', 'role').getOne();
   }
 
   public async sendMail(toEmail, token, payload): Promise<any> {
@@ -103,7 +100,7 @@ export class AuthService {
       console.log(e);
       return false;
     } finally {
-      await this.userRepository.update(
+      await this.connection.getRepository(Users).update(
         {id: payload.id},
         {isActive: true}
       );
@@ -240,32 +237,5 @@ export class AuthService {
     .catch((error) => {
       throw new HttpException("Cannot validate token", 404)
     })
-
-  //   const user = await this.userService.findUserByEmail(email);
-  //   if (!user) {
-  //     return { message: 'User with this email does not exist' };
-  //   }
-  //   // console.log(user);
-    
-  //   // Update user's password and reset token
-  //   try {
-  //     const SALT = process.env.SALT || 10;
-  //     const encryptedPassword = await bcrypt.hash(newPassword, SALT);
-
-  //     const updatedUser = await this.userService.updateUserPassword(email, encryptedPassword);
-  //     // console.log(updatedUser);
-  //     if (!updatedUser) {
-  //       return { message: 'Failed to update password' };
-  //     }
-  
-  //     // Clear/reset the reset token and its expiration after successful password update
-  //     // await this.userService.clearResetToken(user.id);
-  
-  //     return { message: 'Password reset successfully!' };
-  //   } catch (error) {
-  //     console.error('Error resetting password:', error);
-  //     return { message: 'Failed to reset password' };
-  //   }
-  // }
   }
 }

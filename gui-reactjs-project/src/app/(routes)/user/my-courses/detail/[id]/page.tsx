@@ -1,22 +1,38 @@
 'use client'
-import React, {useState} from 'react';
-import classes from './style.module.scss';
+import React, {useEffect, useState} from 'react';
+import classes from './styles.module.scss';
 import MenuListComposition from '@/app/components/MenuListComposition/page';
 import { Button } from '@mui/material';
 import CreateNotificationForm from '@/app/components/CreateNotificationForm/page';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import axiosInstance from "@/app/routers/axios";
 
-export default function DetailCourse(){
+export default function Page({ params }: { params: { id: string } }){
   const [showTable, setShowTable] = useState(false);
+  const [course, setCourse] = useState({})
   const handleClickCreationDiv = () => {
     setShowTable(!showTable);
   }
 
+  useEffect(() => {
+    async function getCourseDetail(id) {
+      const response = await axiosInstance.get(`/courses/user/my-courses/detail/${id}`)
+      if (response.data.statusCode === 200) {
+        setCourse(response.data.data)
+      }
+    }
+
+    getCourseDetail(params.id)
+  }, []);
+
   return(
     <div className={classes.container}>
       <div className={classes.titleContainer}>
-        <img className={classes.backgroundImgContainer} aria-hidden="true" src="https://edtechframework.com/wp-content/uploads/2021/03/03-March-google-classroom-banner-rainbow-and-clouds-01.png" data-iml="5098.800000011921" />
-        <h1 className={classes.titleCourse}>ABC Classroom</h1>
+        <img className={classes.backgroundImgContainer} aria-hidden="true" src="https://gstatic.com/classroom/themes/img_learnlanguage.jpg" data-iml="5098.800000011921" />
+        <div className={classes.titleCourse}>
+          <h1>{course.title}</h1>
+          <p>{course.description}</p>
+        </div>
       </div>
       <br/><br/>
       <div className={classes.mainContainer}>
@@ -27,7 +43,7 @@ export default function DetailCourse(){
               <MenuListComposition />
             </div>
             <br/>
-            <h4 className={classes.code}>nupww3tx</h4>
+            <h4 className={classes.code}>{course.classCode}</h4>
           </div>
           <br/>
           <div className={classes.deadline}>
@@ -39,18 +55,18 @@ export default function DetailCourse(){
           </div>
         </div>
         <div className={classes.rightSection}>
-          {!showTable && 
+          {!showTable &&
             <div
               className={classes.createNotificationDiv}
               onClick={handleClickCreationDiv}
-              >
+            >
               <p>Create notification for the class</p>
               <AddCircleOutlineIcon />
             </div>
           }
-          {showTable && <CreateNotificationForm onHideForm={handleClickCreationDiv} /> }
+          {showTable && <CreateNotificationForm onHideForm={handleClickCreationDiv} id={params.id} /> }
         </div>
       </div>
     </div>
-    )
+  )
 }

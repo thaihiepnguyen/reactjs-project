@@ -9,6 +9,12 @@ export class Courses extends EntityBase{
   })
   isValid: boolean
 
+  @Column("tinyint", {
+    name: "is_active",
+    default: () => "'0'",
+  })
+  isActive: boolean
+
   @Column("varchar", {
     length: 255,
     name: "title"

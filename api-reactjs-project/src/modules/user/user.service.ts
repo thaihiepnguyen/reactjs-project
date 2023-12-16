@@ -1,7 +1,6 @@
 import {HttpException, Injectable} from "@nestjs/common";
 import {InjectConnection, InjectRepository} from "@nestjs/typeorm";
-import {InsertResult, QueryResult, Repository} from "typeorm";
-import {Connection} from "mysql2/index";
+import {Connection, InsertResult, QueryResult, Repository} from "typeorm";
 import { UpdateProfileUserDto } from "./user.dto";
 import { unlink } from "fs";
 import { Users } from "src/typeorm/entity/Users";
@@ -12,14 +11,12 @@ import * as bcrypt from "bcrypt";
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(Users)
-    private readonly userRepository: Repository<Users>,
     @InjectConnection()
     private readonly connection: Connection
   ) {}
 
   async findUserByEmail(email: string): Promise<Users | undefined> {
-    return await this.userRepository.findOne(
+    return await this.connection.getRepository(Users).findOne(
       {
         where: {
           email,
@@ -30,7 +27,7 @@ export class UserService {
   }
 
   async createUser(fullname: string, email: string, password: string): Promise<Users> {
-    const insertResult = await this.userRepository.createQueryBuilder()
+    const insertResult = await this.connection.getRepository(Users).createQueryBuilder()
       .insert()
       .into(Users)
       .values([
@@ -45,26 +42,26 @@ export class UserService {
   }
 
   async createOrUpdateUser(fullname: string, email: string, avatar: string): Promise<Users> {
-    let user = await this.userRepository.findOne({
+    let user = await this.connection.getRepository(Users).findOne({
       where: {email}
     })
     if (user) {
       if (!user.avatarUrl) {
-        await this.userRepository.update(user.id, {
+        await this.connection.getRepository(Users).update(user.id, {
           avatarUrl: avatar,
           isActive: true
         })
       }
       return user;
     } else {
-      return await this.userRepository.save({
+      return await this.connection.getRepository(Users).save({
         fullname, email, password: '', avatarUrl: avatar, isActive: true
       })
     }
   }
 
   async findUserById(id: number): Promise<Users | undefined> {
-    return await this.userRepository
+    return await this.connection.getRepository(Users)
       .createQueryBuilder("user")
       .where("user.id = :id", { id: id })
       .leftJoinAndSelect('user.role', 'role')
@@ -73,7 +70,7 @@ export class UserService {
 
   async updateUser(id:number, data: UpdateProfileUserDto) {
     id = id ? id : 0;
-    let user = await this.userRepository.findOne({
+    let user = await this.connection.getRepository(Users).findOne({
       where: {
         id: id,
         email: data.email
@@ -84,12 +81,13 @@ export class UserService {
       if (data.avatarUrl && user.avatarUrl) {
         unlink(user.avatarUrl, () => {});
       }
-      await this.userRepository.update(user.id, {
+      await this.connection.getRepository(Users).update(user.id, {
         avatarUrl: data.avatarUrl,
         fullname: data.fullname,
-        phone: data.phone
+        phone: data.phone,
+        studentId: data.studentId
       })
-      return await this.userRepository.findOne({
+      return await this.connection.getRepository(Users).findOne({
         where: {
           id: user.id, 
         }
@@ -100,14 +98,14 @@ export class UserService {
 
   async blockUnblockUser(id:number) {
     id = id ? id : 0;
-    let user = await this.userRepository.findOne({
+    let user = await this.connection.getRepository(Users).findOne({
       where: {
         id: id,
       }
     })
 
     if(user) {
-      await this.userRepository.update(user.id, {
+      await this.connection.getRepository(Users).update(user.id, {
         isValid: !user.isValid
       })
       return user.isValid ? false : true;
@@ -117,7 +115,7 @@ export class UserService {
   }
 
   async updateUserPassword(email: string, newPassword: string): Promise<Users | undefined> {
-    let user = await this.userRepository.findOne({
+    let user = await this.connection.getRepository(Users).findOne({
       where: {email}
     })
     // console.log(user);
@@ -125,7 +123,7 @@ export class UserService {
       // Handle case where the user does not exist
       return undefined;
     } else {
-      await this.userRepository.update((await user).id, {
+      await this.connection.getRepository(Users).update((await user).id, {
         password: newPassword
       });
       
@@ -137,7 +135,7 @@ export class UserService {
     const SALT = process.env.SALT || 10;
     const encryptedPassword = await bcrypt.hash(user.password, SALT);
 
-    const insertResult = await this.userRepository.createQueryBuilder()
+    const insertResult = await this.connection.getRepository(Users).createQueryBuilder()
       .insert()
       .into(Users)
       .values([

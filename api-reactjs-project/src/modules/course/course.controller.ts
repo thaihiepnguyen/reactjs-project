@@ -1,11 +1,12 @@
-import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
-import { Role } from "../auth/roles/role.enum";
-import { Roles } from "../auth/roles/roles.decorator";
-import { CourseService } from "./course.service";
-import { MetaDataAuth } from "../auth/auth.decorator";
+import {Body, Controller, Get, Param, ParseIntPipe, Post, Put, UseGuards} from "@nestjs/common";
+import {Role} from "../auth/roles/role.enum";
+import {Roles} from "../auth/roles/roles.decorator";
+import {CourseService} from "./course.service";
+import {MetaDataAuth} from "../auth/auth.decorator";
 import {TBaseDto} from "../../app.dto";
 import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 import {RolesGuard} from "../auth/roles/roles.guard";
+import { Courses } from "src/typeorm/entity/Courses";
 
 
 @Controller('courses')
@@ -25,9 +26,10 @@ export class CourseController {
 
   @Get('user/my-courses')
   async getMyCourses(@MetaDataAuth('userId') userId: number): Promise<TBaseDto<MyCoursesResponse[]>> {
+    const courses = await this.courseService.getMyCourses(userId)
     return {
       message: 'Get my courses successfully',
-      data: await this.courseService.getMyCourses(userId),
+      data: courses,
       statusCode: 200,
     };
   }
@@ -64,5 +66,34 @@ export class CourseController {
       data: null,
       statusCode: 201,
     };
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Teacher)
+  @Put('remove/:id')
+  async removeCourse(
+    @MetaDataAuth('userId') userId: number,
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<TBaseDto<null>> {
+    return this.courseService.removeCourse(id)
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Teacher)
+  @Put('un-enroll/:id')
+  async unenrollCourse(
+    @MetaDataAuth('userId') userId: number,
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<TBaseDto<null>> {
+    return this.courseService.unenrollCourse(userId, id)
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Student, Role.Teacher)
+  @Get('user/my-courses/detail/:id')
+  async getMyCourseDetail(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<TBaseDto<Courses>> {
+    return this.courseService.getMyCourseDetail(id)
   }
 }

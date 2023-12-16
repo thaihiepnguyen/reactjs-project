@@ -4,10 +4,12 @@ import Link from 'next/link';
 import classes from './styles.module.scss';
 import { AccessTimeFilledOutlined } from "@mui/icons-material";
 import { routes } from '@/app/routers/routes';
+import MenuCourses from "@/app/components/EnrolledCoursesItem/MenuCourses";
+import React from "react";
 
 
 export default function EnrolledCoursesItem(props) {
-  const {title, description, teacherName, teacherAvatar, lastModify } = props
+  const {title, description, teacherName, teacherAvatar, lastModify, id } = props
   return <>
     <div className={classes.classItem}>
       <div className={classes.className}>
@@ -15,6 +17,9 @@ export default function EnrolledCoursesItem(props) {
 
         </img>
         <div className={classes.titleContainer}>
+          <div className={classes.moreVer}>
+            <MenuCourses id={id}/>
+          </div>
           <div className={classes.classTitle}>
             <Link href={routes.myCourses} className={classes.classTitleText}>{title}</Link>
           </div>

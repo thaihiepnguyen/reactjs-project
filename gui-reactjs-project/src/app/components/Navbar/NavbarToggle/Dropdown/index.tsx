@@ -1,23 +1,25 @@
 import classes from './styles.module.scss';
 
-import {AccountCircle, ExitToApp, Help, NightsStay, Settings, ShoppingBasket} from "@mui/icons-material";
+import {AccountCircle, ExitToApp} from "@mui/icons-material";
 import Link from "next/link";
 import {routes} from "@/app/routers/routes";
-import { getCookies, setCookie, deleteCookie, getCookie } from 'cookies-next';
-import { redirect } from "next/navigation";
+import {deleteCookie} from 'cookies-next';
 import { useAppDispatch } from "@/redux/hook";
 import { setUser } from "@/redux/reducers/user";
+import SocketService from "@/services/socketService";
 
 
 const menusIcon = [
   <AccountCircle/>,
 ];
 export const Dropdown = () => {
+  const socketService = SocketService.instance()
   const dispatch = useAppDispatch();
   const menus = [
     {name: 'User Profile', link: `/user/profile`},
   ];
   const Logout = () => {
+    socketService.close()
     deleteCookie('token');
     deleteCookie('userId');
     deleteCookie('userName');

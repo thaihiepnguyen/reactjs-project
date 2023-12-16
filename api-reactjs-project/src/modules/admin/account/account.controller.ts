@@ -54,7 +54,7 @@ export class AccountController {
   }
 
   @Get('all')
-  async getAll(@Query('page', ParseIntPipe) page: number): Promise<TBaseDto<Users[]>> {
+  async getAll(@Query('page', ParseIntPipe) page: number): Promise<TBaseDto<any>> {
     return {
       statusCode: 200,
       data: await this.accountService.getAll(page),
@@ -134,5 +134,13 @@ export class AccountController {
       console.error('Error saving data:', error);
       throw new Error('Failed to save data');
     }
+  }
+
+  @Get('/search')
+  async search(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('q') query: string,
+  ): Promise<TBaseDto<any>> {
+    return this.accountService.search(page, query);
   }
 }

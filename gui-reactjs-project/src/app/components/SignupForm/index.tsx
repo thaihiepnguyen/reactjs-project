@@ -15,7 +15,7 @@ import { routes } from "@/app/routers/routes";
 import { signIn } from "next-auth/react";
 import { setLoading } from '@/redux/reducers/loading';
 import { useAppDispatch } from '@/redux/hook';
-
+import { useTranslation } from 'next-i18next';
 
 interface SignupFormProps {}
 
@@ -26,6 +26,7 @@ interface ISignupFormData {
   role: string;
 }
 const SignupForm = memo((props: SignupFormProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -92,7 +93,7 @@ const SignupForm = memo((props: SignupFormProps) => {
   return (
     <div className='form-container sign-up-container'>
       <form className={classes.registerForm} onSubmit={handleSubmit(onSubmit)}>
-        <h1>Create Account</h1>
+        <h1>{t('Create Account')}</h1>
         <div className={classes.socialContainer}>
           <div className={classes.socialButton} onClick={()=>signIn('google', {callbackUrl: '/?redirect=true'})}>
             <GoogleIcon />
@@ -101,14 +102,14 @@ const SignupForm = memo((props: SignupFormProps) => {
             <GithubIcon />
           </div>
         </div>
-        <span>or use your email for registration</span>
+        <span>{t('or use your email for registration')}</span>
         <Grid container columnSpacing={1} rowSpacing={2} className={classes.customMargin}>
           <Grid item xs={12} sm={12}>
             <Inputs
-              title='Full name'
+              title={t('full name')}
               name='fullname'
               type='text'
-              placeholder='Enter your name'
+              placeholder={t('enter your name')}
               inputRef={register('fullname')}
               errorMessage={errors.fullname?.message}
             />
@@ -118,33 +119,33 @@ const SignupForm = memo((props: SignupFormProps) => {
               title='Email'
               name='email'
               type='text'
-              placeholder='Enter your email'
+              placeholder={t('enter your email')}
               inputRef={register('email')}
               errorMessage={errors.email?.message}
             />
           </Grid>
           <Grid item xs={12} sm={12}>
             <Inputs
-              title='Password'
+              title={t('password')}
               name='password'
               type='password'
-              placeholder='Enter your password'
+              placeholder={t('enter your password')}
               inputRef={register('password')}
               errorMessage={errors.password?.message}
             />
           </Grid>
           <Grid item xs={12} sm={12}>
             <Typography variant='subtitle1' gutterBottom>
-              You are:
+              {t('you are')}:
             </Typography>
             <RadioGroup row>
-              <FormControlLabel value='student' control={<Radio {...register('role')} />} label='Student' />
-              <FormControlLabel value='teacher' control={<Radio {...register('role')} />} label='Teacher' />
+              <FormControlLabel value='student' control={<Radio {...register('role')} />} label={t('student')} />
+              <FormControlLabel value='teacher' control={<Radio {...register('role')} />} label={t('teacher')} />
             </RadioGroup>
           </Grid>
         </Grid>
 
-        <button className={classes.signupButton}>Sign Up</button>
+        <button className={classes.signupButton}>{t('sign up')}</button>
       </form>
     </div>
   );
