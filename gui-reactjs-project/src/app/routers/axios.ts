@@ -11,15 +11,29 @@ axiosInstance.interceptors.request.use(
   (config) => {
 
     let tokenStr =  getCookie('token')?.toString();
-    let token = {
-      accessToken: ""
-    };
+    let token = null;
+    
     if (tokenStr) {
       token = JSON.parse(tokenStr);
     }
+    const userId = getCookie('userId');
+    const userName = getCookie('userName');
+    const role = getCookie('role');
 
+    console.log(token)
     if (token) {
       config.headers['Authorization'] = `Bearer ${token.accessToken}`;
+    }
+
+    if (userId) {
+      config.headers['X-User-Id'] = userId;
+    }
+
+    if (userName) {
+      config.headers['X-User-Name'] = encodeURI(userName);
+    }
+    if (role) {
+      config.headers['X-Role'] = role;
     }
 
     return config;
