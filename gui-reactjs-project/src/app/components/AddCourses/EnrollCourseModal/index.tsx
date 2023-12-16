@@ -5,10 +5,12 @@ import {Button, TextField} from "@mui/material";
 import {useState} from "react";
 import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
+import { useAppDispatch } from "@/redux/hook";
+import { getEnrolledCourse } from "@/redux/reducers/courses";
 
 export default function EnrollCoursesModal(props) {
-  const { isOpen, closeModel } = props;
-  if (!isOpen) return null;
+  const { closeModel } = props;
+  const dispatch = useAppDispatch();
   const [courseData, setCourseData] = useState({
     classCode: '',
   });
@@ -31,7 +33,7 @@ export default function EnrollCoursesModal(props) {
         text: 'Congratulations!',
         icon: 'success',
       })
-      window.location.reload();
+      dispatch(getEnrolledCourse());
     } else {
       Swal.fire({
         title: response.data.message,

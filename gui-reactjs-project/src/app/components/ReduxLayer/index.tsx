@@ -6,10 +6,12 @@ import UserService from "@/services/user";
 import { setLoading } from "@/redux/reducers/loading";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { useSession } from "next-auth/react";
+import { getEnrolledCourse, getMyCourse } from "@/redux/reducers/courses";
 
 const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.userReducer);
+  const { enrolledCourses, myCourses } = useAppSelector((state) => state.courseReducer);
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -42,6 +44,15 @@ const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
       }
     }
   }, [session]);
+
+  useEffect(() => {
+    if (!enrolledCourses) {
+      dispatch(getEnrolledCourse());
+    }
+    if (!myCourses) {
+      dispatch(getMyCourse());
+    }
+  }, [enrolledCourses, myCourses]);
 
   return <>{children}</>;
 };
