@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
@@ -265,68 +265,65 @@ export class CourseService {
     };
   }
 
-  async getMyCourseDetail(id: number, userId): Promise<TBaseDto<any>> {
+  async getMyCourseDetail(id: number, userId: number): Promise<TBaseDto<any>> {
+    // the userId is a teacher's id
     const course = await this.connection.getRepository(Courses).findOne({
       where: {
         id
       },
     });
+    if (!course) {
+      new ForbiddenException('This course not found!');
+      return;
+    }
+
     const participants = await this.connection.getRepository(Participants).find({
       where: {
-        courseId: course?.id
+        courseId: course.id
       },
       select: {
         studentId: true
       }
-    })
+    });
+    if (!participants || !participants.length) {
+      new ForbiddenException('Maybe you have not joined this course!');
+      return;
+    }
 
-    if (!course) {
-      return {
-        message: 'Course not found',
-        statusCode: 404,
-        data: null,
-      };
-    }
     if (!course.isActive) {
-      return {
-        message: 'This course is blocked by admin',
-        statusCode: 403,
-        data: null,
-      };
+      new ForbiddenException('This course is blocked by admin!');
+      return;
     }
- 
-    const participantIds = participants?.map(participant => participant.studentId);
- 
-    if (course?.teacherIds?.includes(userId) || participantIds?.includes(userId)) {
-      const teacherIds = course?.teacherIds?.split(", ")?.map(idStr => +idStr);
-    
-      const teacherList = await this.connection.getRepository(Users).find({
+
+    if (!course.teacherIds.includes('' + userId)) {
+      new ForbiddenException("Maybe you aren't a teacher of this course!");
+      return;
+    }
+
+    const teacherIds = course.teacherIds?.split(", ")?.map(idStr => +idStr);
+    const studentIds = participants.map(item => item.studentId);
+
+    const [teacherList, studentList] = await Promise.all([
+      this.connection.getRepository(Users).find({
         where: {
           id: In(teacherIds)
         }
-      })
-
-      const studentList = await this.connection.getRepository(Users).find({
+      }),
+      this.connection.getRepository(Users).find({
         where: {
-          id: In(participantIds)
+          id: In(studentIds)
         }
       })
+    ])
 
-      return {
-        message: 'success',
-        statusCode: 200,
-        data: {
-          ...course,
-          teacherList: teacherList,
-          studentList: studentList
-        },
-      };
-    } else {
-      return {
-        message: 'Course not found',
-        statusCode: 404,
-        data: null,
-      };
-    }
+    return {
+      message: 'success',
+      statusCode: 200,
+      data: {
+        ...course,
+        teacherList: teacherList,
+        studentList: studentList
+      },
+    };
   }
 }

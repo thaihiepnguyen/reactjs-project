@@ -10,7 +10,7 @@ import { Router } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
-export default function MyCoursesItem(props) {
+export default function MyCoursesItem(props: any) {
   const { title, description, lastModify, id, isActive } = props;
   const router = useRouter();
   function handleClick(e: any) {
@@ -29,16 +29,16 @@ export default function MyCoursesItem(props) {
 
   return (
     <>
-      <div className={classes.classItem} onClick={() => router.push(routes.courseDetail + id)}>
+      <Link className={classes.classItem} href={routes.courseDetail + id} onClick={(e) => handleClick(e)}>
         <div className={classes.className}>
           <div className={classes.titleContainer}>
             <div className={classes.moreVer}>
               <MenuCourses id={id} />
             </div>
             <div className={classes.classTitle}>
-              <Link href={routes.courseDetail + id} onClick={(e) => handleClick(e)} className={classes.classTitleText}>
+              <div className={classes.classTitleText}>
                 {title}
-              </Link>
+              </div>
             </div>
             <div className={classes.classDescription}>
               <span className={classes.classDescriptionText}>{description}</span>
@@ -52,7 +52,7 @@ export default function MyCoursesItem(props) {
             <span className={classes.classDateText}>Last update at {lastModify}</span>
           </div>
         </div>
-      </div>
+      </Link>
     </>
   );
 }
