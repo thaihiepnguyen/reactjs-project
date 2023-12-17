@@ -51,7 +51,7 @@ export class CourseListService {
       list: listDetail,
       currentPage: page,
       totalItem: count,
-      totalPage: Math.floor(count / PAGING_LIMIT) === count / PAGING_LIMIT ? count / PAGING_LIMIT : Math.floor(count / PAGING_LIMIT) + 1,
+      totalPage: Math.ceil(count / PAGING_LIMIT),
       size: list.length
     };
   }
@@ -102,8 +102,7 @@ export class CourseListService {
         list: list,
         currentPage: page,
         totalItem: matchedCourses.length,
-        totalPage: Math.floor(matchedCourses.length / PAGING_LIMIT) === matchedCourses.length / PAGING_LIMIT 
-        ? matchedCourses.length / PAGING_LIMIT : Math.floor(matchedCourses.length / PAGING_LIMIT) + 1,
+        totalPag: Math.ceil(matchedCourses.length / PAGING_LIMIT),
         size: list.length
       }
     };
