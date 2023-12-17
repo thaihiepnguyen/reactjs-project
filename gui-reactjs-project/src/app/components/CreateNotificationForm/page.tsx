@@ -4,6 +4,7 @@ import classes from './style.module.scss';
 import { Button, Checkbox, Stack, TextField } from '@mui/material';
 import { Create } from '@mui/icons-material';
 import axiosInstance from "@/app/routers/axios";
+import Swal from 'sweetalert2';
 
 export default function CreateNotificationForm({onHideForm, id}){
     const [notificationData, setNotifictionData] = useState({
@@ -21,10 +22,25 @@ export default function CreateNotificationForm({onHideForm, id}){
 
     const handleSubmit = async (event) => {
       event.preventDefault();
-      const response = await axiosInstance.post('noti/teacher/push/courses', {
-        ...notificationData,
-        id
-      });
+
+      try {
+        await axiosInstance.post('noti/teacher/push/courses', {
+          ...notificationData,
+          id
+        });
+        await Swal.fire({
+          title: 'Pushed a notification successfully!',
+          text: 'Congratulations!',
+          icon: 'success',
+        });
+      } catch (e) {
+        console.log(e);
+        await Swal.fire({
+          title: 'Pushed a notification failed!',
+          text: 'Congratulations!',
+          icon: 'error',
+        });
+      }
     }
 
     return (

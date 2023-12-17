@@ -273,8 +273,7 @@ export class CourseService {
       },
     });
     if (!course) {
-      new ForbiddenException('This course not found!');
-      return;
+      throw new ForbiddenException('This course not found!');
     }
 
     const participants = await this.connection.getRepository(Participants).find({
@@ -286,19 +285,16 @@ export class CourseService {
       }
     });
     if (!participants || !participants.length) {
-      new ForbiddenException('Maybe you have not joined this course!');
-      return;
+      throw new ForbiddenException('Maybe you have not joined this course!');
     }
 
     if (!course.isActive) {
-      new ForbiddenException('This course is blocked by admin!');
-      return;
+      throw new ForbiddenException('This course is blocked by admin!');
     }
 
-    if (!course.teacherIds.includes('' + userId)) {
-      new ForbiddenException("Maybe you aren't a teacher of this course!");
-      return;
-    }
+    // if (!course.teacherIds.includes('' + userId)) {
+    //   throw new ForbiddenException("Maybe you aren't a teacher of this course!");
+    // }
 
     const teacherIds = course.teacherIds?.split(", ")?.map(idStr => +idStr);
     const studentIds = participants.map(item => item.studentId);

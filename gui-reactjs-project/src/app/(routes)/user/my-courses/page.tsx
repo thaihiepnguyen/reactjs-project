@@ -9,8 +9,6 @@ import { useAppSelector } from "@/redux/hook";
 
 export default function Page() {
   const { myCourses: courses } = useAppSelector((state) => state.courseReducer);
-  console.log('=====================')
-  console.log(courses);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   return (
     <>
