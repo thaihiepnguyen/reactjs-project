@@ -102,7 +102,7 @@ export class CourseListService {
         list: list,
         currentPage: page,
         totalItem: matchedCourses.length,
-        totalPag: Math.ceil(matchedCourses.length / PAGING_LIMIT),
+        totalPage: Math.ceil(matchedCourses.length / PAGING_LIMIT),
         size: list.length
       }
     };
@@ -120,7 +120,6 @@ export class CourseListService {
       }, {
         isActive: isActive
       })
-      // console.log(courseId + " " + isActive );
     }
     catch(e) {
       console.log(e);
