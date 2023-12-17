@@ -44,5 +44,9 @@
     "Enrolled Courses": "Các khóa học đã đăng ký",
     "Notifications": "Thông báo",
     "Edit Profile": "Chỉnh sửa thông tin",
-    "Settings": "Cài đặt"
+    "Settings": "Cài đặt",
+    "Users": "Tài khoản người dùng",
+    "Student Ids Mapping": "Ánh xạ ID sinh viên",
+    "Import Excel": "Nhập file excel",
+    "Manual Mapping": "Nhập thủ công"
 }

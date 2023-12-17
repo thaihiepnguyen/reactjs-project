@@ -44,5 +44,9 @@
     "Enrolled Courses": "Enrolled Courses",
     "Notifications": "Notifications",
     "Edit Profile": "Edit Profile",
-    "Settings": "Settings"
+    "Settings": "Settings",
+    "Users": "Users",
+    "Student Ids Mapping": "Student Ids Mapping",
+    "Import Excel": "Import Excel",
+    "Manual Mapping": "Manual Mapping"
 }
