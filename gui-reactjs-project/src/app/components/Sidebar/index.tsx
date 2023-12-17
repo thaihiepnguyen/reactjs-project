@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation'
 import { useAppSelector } from "@/redux/hook";
 import { useTranslation } from "next-i18next";
 
-const getTranslatedAdminSidebarItems = (t) => [
+const getTranslatedAdminSidebarItems = (t: any) => [
   {
     name: t("Users"),
     href: routes.admin_user,
@@ -23,7 +23,7 @@ const getTranslatedAdminSidebarItems = (t) => [
   },
 ];
 
-const getTranslatedStudentSidebarItems = (t) => [
+const getTranslatedStudentSidebarItems = (t: any) => [
   {
     name: t("Home"),
     href: routes.home,
@@ -82,7 +82,7 @@ export default function Sidebar() {
     setActive(sidebarItems.reduce((acc, cur, index) => {
       if (pathname.includes(cur.href)) acc = index
       return acc;
-    }, 0))
+    }, -1))
   }, [pathname])
 
   return <>
