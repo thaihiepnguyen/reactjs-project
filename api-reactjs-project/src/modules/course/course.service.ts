@@ -273,7 +273,9 @@ export class CourseService {
       },
     });
     if (!course) {
-      throw new ForbiddenException('This course not found!');
+      throw new ForbiddenException({
+        message: 'This course not found!'
+      });
     }
 
     const participants = await this.connection.getRepository(Participants).find({
@@ -285,11 +287,15 @@ export class CourseService {
       }
     });
     if (!participants || !participants.length) {
-      throw new ForbiddenException('Maybe you have not joined this course!');
+      throw new ForbiddenException({
+        message: 'Maybe you have not joined this course!'
+      });
     }
 
     if (!course.isActive) {
-      throw new ForbiddenException('This course is blocked by admin!');
+      throw new ForbiddenException({
+        message: 'This course is blocked by admin!'
+      });
     }
 
     // if (!course.teacherIds.includes('' + userId)) {
