@@ -13,7 +13,7 @@ import { useAppSelector } from "@/redux/hook";
 
 export default function MyCoursesItem(props) {
   const { title, description, lastModify, id, isActive, teacherIds } = props;
-  const {user} = useAppSelector((state) => state.userReducer)
+  const { user } = useAppSelector((state) => state.userReducer);
   const router = useRouter();
   function handleClick(e: any) {
     if (!isActive) {
@@ -38,8 +38,8 @@ export default function MyCoursesItem(props) {
               <MenuCourses id={id} isOwn={teacherIds?.indexOf(user?.id) === 0} />
             </div>
             <div className={classes.classTitle}>
-              <div className={classes.classTitleText}>
-                {title}
+              <div className={classes.classTitleText} onClick={() => router.push(`/course/${id}`)}>
+                <>{title}</>
               </div>
             </div>
             <div className={classes.classDescription}>
@@ -54,7 +54,7 @@ export default function MyCoursesItem(props) {
             <span className={classes.classDateText}>Last update at {lastModify}</span>
           </div>
         </div>
-      </Link>
+      </div>
     </>
   );
 }
