@@ -52,20 +52,14 @@ export class CourseController {
   async enrollCourse(
     @MetaDataAuth('userId') userId: number,
     @Body('classCode') classCode: string,
-  ): Promise<TBaseDto<null>> {
-    const enrolled = await this.courseService.enrollCourse(userId, classCode)
-    if (!enrolled) {
-      return {
-        message: 'Enroll a course failed',
-        data: null,
-        statusCode: 400,
-      };
-    }
+  ): Promise<TBaseDto<any>> {
+    const enrolledData = await this.courseService.enrollCourse(userId, classCode)
+
     return {
-      message: 'Enroll a course successfully',
-      data: null,
-      statusCode: 201,
-    };
+      message: enrolledData.msg,
+      data: enrolledData?.data,
+      statusCode: enrolledData?.status === true ? 201 : 400,
+    }; 
   }
 
   @UseGuards(RolesGuard)

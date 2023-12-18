@@ -139,8 +139,8 @@ export default function Page({ params }: { params: { id: string } }) {
             <Divider textAlign="right">
               <Heading3>Teachers</Heading3>
             </Divider>
-            {course?.teacherList?.map((teacher: User) => (
-              <div className={classes.infoWrapper}>
+            {course?.teacherList?.map((teacher: User, teacherIdx: number) => (
+              <div className={classes.infoWrapper} key={teacherIdx}>
                 <div className={classes.personalImage}>
                   <Avatar>{teacher?.avatarUrl ? <img src={teacher.avatarUrl} alt=""></img> : "T"}</Avatar>
                 </div>
@@ -157,8 +157,8 @@ export default function Page({ params }: { params: { id: string } }) {
             <Divider textAlign="right">
               <Heading3>Students</Heading3>
             </Divider>
-            {course?.studentList?.map((student: User) => (
-              <div className={classes.infoWrapper}>
+            {course?.studentList?.map((student: User, studentIdx:number) => (
+              <div className={classes.infoWrapper} key={studentIdx}>
                 <div className={classes.personalImage}>
                   <Avatar>{student?.avatarUrl ? <img src={student.avatarUrl} alt=""></img> : "T"}</Avatar>
                 </div>

@@ -191,7 +191,7 @@ export class CourseService {
     });
   }
 
-  async enrollCourse(userId: number, classCode: string): Promise<boolean> {
+  async enrollCourse(userId: number, classCode: string): Promise<any> {
     const course = await this.connection.getRepository(Courses).findOne({
       where: {
         classCode,
@@ -199,7 +199,10 @@ export class CourseService {
     });
 
     if (!course || !course.isValid || !course.isActive) {
-      return false;
+      return {
+        status: false,
+        msg: "Course not found"
+      };
     }
 
     try {
@@ -215,9 +218,29 @@ export class CourseService {
               teacherIds: newIds,
             },
           );
+        } else {
+          return {
+            status: false,
+            msg: "You have already enrolled this course",
+            data: course.id,
+          };
         }
       }
       if (userRole.role.name === 'student') {
+        const alreadyJoin = await this.connection.getRepository(Participants).findOne({
+          where: {
+            courseId: course.id,
+            studentId: userId
+          }
+        })
+
+        if (alreadyJoin) {
+          return {
+            status: false,
+            msg: "You have already enrolled this course",
+            data: course.id,
+          };
+        }
         await this.connection
           .getRepository(Participants)
           .createQueryBuilder()
@@ -232,10 +255,18 @@ export class CourseService {
           .execute();
       }
     } catch (e) {
-      return false;
+      return {
+        status: false,
+        msg: e.message,
+        data: null,
+      };
     }
 
-    return true;
+    return {
+      status: true,
+      msg: "Enrolled course successfully",
+      data: course.id,
+    };
   }
 
   async removeCourse(userId:number, id: number): Promise<TBaseDto<null>> {
@@ -306,13 +337,17 @@ export class CourseService {
 
     const participants = await this.connection.getRepository(Participants).find({
       where: {
-        courseId: course.id
+        courseId: course.id,
       },
       select: {
         studentId: true
       }
     });
-    if (!participants || !participants.length) {
+
+    const studentIds = participants.map(item => item.studentId);
+    const teacherIds = course.teacherIds?.split(", ")?.map(idStr => +idStr);
+
+    if (!teacherIds.includes(userId) && !studentIds.includes(userId)) {
       throw new ForbiddenException({
         message: 'Maybe you have not joined this course!'
       });
@@ -328,8 +363,6 @@ export class CourseService {
     //   throw new ForbiddenException("Maybe you aren't a teacher of this course!");
     // }
 
-    const teacherIds = course.teacherIds?.split(", ")?.map(idStr => +idStr);
-    const studentIds = participants.map(item => item.studentId);
 
     const [teacherList, studentList] = await Promise.all([
       this.connection.getRepository(Users).find({
