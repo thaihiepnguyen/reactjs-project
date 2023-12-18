@@ -13,7 +13,6 @@ import { setLoading } from "@/redux/reducers/loading";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
 import Heading3 from "@/app/components/text/Heading3";
 import ParagraphSmall from "@/app/components/text/ParagraphSmall";
 import Heading4 from "@/app/components/text/Heading4";
@@ -53,7 +52,7 @@ export default function Page({ params }: { params: { id: string } }) {
         })
         .catch((err) => {
           Swal.fire({
-            title: "Course Not Found",
+            title: err.response.data.message,
             icon: "error",
           }).then(() => {
             router.back();

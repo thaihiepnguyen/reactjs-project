@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
@@ -291,77 +291,67 @@ export class CourseService {
     };
   }
 
-  async getMyCourseDetail(id: number, userId): Promise<TBaseDto<any>> {
+  async getMyCourseDetail(id: number, userId: number): Promise<TBaseDto<any>> {
+    // the userId is a teacher's id
     const course = await this.connection.getRepository(Courses).findOne({
       where: {
         id,
       },
     });
-    const participants = await this.connection
-      .getRepository(Participants)
-      .find({
-        where: {
-          courseId: course?.id,
-        },
-        select: {
-          studentId: true,
-        },
-      });
-
     if (!course) {
-      return {
-        message: 'Course not found',
-        statusCode: 404,
-        data: null,
-      };
+      throw new ForbiddenException({
+        message: 'This course not found!'
+      });
     }
+
+    const participants = await this.connection.getRepository(Participants).find({
+      where: {
+        courseId: course.id
+      },
+      select: {
+        studentId: true
+      }
+    });
+    if (!participants || !participants.length) {
+      throw new ForbiddenException({
+        message: 'Maybe you have not joined this course!'
+      });
+    }
+
     if (!course.isActive) {
-      return {
-        message: 'This course is blocked by admin',
-        statusCode: 403,
-        data: null,
-      };
+      throw new ForbiddenException({
+        message: 'This course is blocked by admin!'
+      });
     }
 
-    const participantIds = participants?.map(
-      (participant) => participant.studentId,
-    );
+    // if (!course.teacherIds.includes('' + userId)) {
+    //   throw new ForbiddenException("Maybe you aren't a teacher of this course!");
+    // }
 
-    if (
-      course?.teacherIds?.includes(userId) ||
-      participantIds?.includes(userId)
-    ) {
-      const teacherIds = course?.teacherIds
-        ?.split(', ')
-        ?.map((idStr) => +idStr);
+    const teacherIds = course.teacherIds?.split(", ")?.map(idStr => +idStr);
+    const studentIds = participants.map(item => item.studentId);
 
-      const teacherList = await this.connection.getRepository(Users).find({
+    const [teacherList, studentList] = await Promise.all([
+      this.connection.getRepository(Users).find({
         where: {
-          id: In(teacherIds),
-        },
-      });
-
-      const studentList = await this.connection.getRepository(Users).find({
+          id: In(teacherIds)
+        }
+      }),
+      this.connection.getRepository(Users).find({
         where: {
-          id: In(participantIds),
-        },
-      });
+          id: In(studentIds)
+        }
+      })
+    ])
 
-      return {
-        message: 'success',
-        statusCode: 200,
-        data: {
-          ...course,
-          teacherList: teacherList,
-          studentList: studentList,
-        },
-      };
-    } else {
-      return {
-        message: 'Course not found',
-        statusCode: 404,
-        data: null,
-      };
-    }
+    return {
+      message: 'success',
+      statusCode: 200,
+      data: {
+        ...course,
+        teacherList: teacherList,
+        studentList: studentList
+      },
+    };
   }
 }

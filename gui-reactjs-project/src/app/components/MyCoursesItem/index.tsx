@@ -38,9 +38,9 @@ export default function MyCoursesItem(props) {
               <MenuCourses id={id} isOwn={teacherIds?.indexOf(user?.id) === 0} />
             </div>
             <div className={classes.classTitle}>
-              <Link href={routes.courseDetail + id} onClick={(e) => handleClick(e)} className={classes.classTitleText}>
+              <div className={classes.classTitleText}>
                 {title}
-              </Link>
+              </div>
             </div>
             <div className={classes.classDescription}>
               <span className={classes.classDescriptionText}>{description}</span>
@@ -54,7 +54,7 @@ export default function MyCoursesItem(props) {
             <span className={classes.classDateText}>Last update at {lastModify}</span>
           </div>
         </div>
-      </div>
+      </Link>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
   Tab} from "@mui/material";
 import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
+import { useTranslation } from "next-i18next";
 
 export default function MappingPage() {
   const [items, setItems] = useState([]);
@@ -16,6 +17,7 @@ export default function MappingPage() {
   const [newEmail, setNewEmail] = useState("");
   const [selectedTab, setSelectedTab] = useState(0);
   const [showSaveButtonMappingTable, setShowSaveButtonMappingTable] = useState(false);
+  const { t } = useTranslation();
 
   const readExcel = (file: Blob) => {
     const promise = new Promise((resolve, reject) => {
@@ -138,8 +140,8 @@ export default function MappingPage() {
   return (
     <div>
        <Tabs value={selectedTab} onChange={handleTabChange}>
-        <Tab label="Import Excel" />
-        <Tab label="Manual Mapping" />
+        <Tab label={t("Import Excel")} />
+        <Tab label={t("Manual Mapping")} />
       </Tabs>
       {selectedTab === 0 && (
         <div style={{width: '100%'}}>

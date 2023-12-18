@@ -2,8 +2,7 @@
 
 import MyCoursesItem from "../../../components/MyCoursesItem";
 import classes from "./styles.module.scss";
-import { useEffect, useState } from "react";
-import axiosInstance from "@/app/routers/axios";
+import { useState } from "react";
 import AddCourses from "@/app/components/AddCourses";
 import AddCoursesModal from "@/app/components/AddCourses/AddCoursesModal";
 import { useAppSelector } from "@/redux/hook";

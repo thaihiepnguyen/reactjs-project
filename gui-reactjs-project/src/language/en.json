@@ -38,5 +38,15 @@
     "Full name": "Full name",
     "Phone": "Phone",
     "Student ID": "Student ID",
-    "Save change": "Save change"
+    "Save change": "Save change",
+    "Home": "Home",
+    "My Courses": "My Courses",
+    "Enrolled Courses": "Enrolled Courses",
+    "Notifications": "Notifications",
+    "Edit Profile": "Edit Profile",
+    "Settings": "Settings",
+    "Users": "Users",
+    "Student Ids Mapping": "Student Ids Mapping",
+    "Import Excel": "Import Excel",
+    "Manual Mapping": "Manual Mapping"
 }

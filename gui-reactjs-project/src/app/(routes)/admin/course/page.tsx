@@ -115,30 +115,15 @@ const List = memo(() => {
 
   const handleStatusToggle = (course: Course) => {
     const updatedList = data?.list.map((c) =>
-      c.id === course.id ? { ...c, isValid: !c.isValid } : c
+      c.id === course.id ? { ...c, isActive: c.isActive === 1 ? 0 : 1  } : c
     );
-  
-    // setData((prevData) => ({
-    //   ...(prevData || {}), 
-    //   list: updatedList || [],
-    // }));
-  
-    // Assuming you have an API call to update the status of the course
-    // AdminService.updateCourseStatus(course.id, !course.isValid)
-    //   .then((updatedCourse) => {
-    //     // Handle successful update if needed
-    //     // For example, if you need to update the state with the response from the backend:
-    //     const updatedList = data?.list.map((c) =>
-    //       c.id === updatedCourse.id ? updatedCourse : c
-    //     );
-    //     setData((prevData) => ({
-    //       ...prevData,
-    //       list: updatedList,
-    //     }));
-    //   })
-    //   .catch((error) => {
-    //     // Handle error
-    //   });
+    
+    setData((prevData) => ({
+      ...prevData,
+      list: updatedList,
+    }));
+
+    AdminService.putActive(course.id, !course.isActive);
   };
 
   return (
@@ -179,10 +164,10 @@ const List = memo(() => {
                       <TableCell style={{display: 'flex', justifyContent: 'center', alignItems:'center'}}>
                         <Button
                           variant="contained"
-                          color={course.isActive ? "primary" : "secondary"}
+                          color={course.isActive ? "secondary" : "primary"}
                           onClick={() => handleStatusToggle(course)}
                         >
-                          {course.isActive ? "Active" : "Inactive"}
+                          {course.isActive? "Inactive" : "Active"}
                         </Button>
                       </TableCell>
                     </TableRow>

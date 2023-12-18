@@ -10,71 +10,71 @@ import { usePathname } from 'next/navigation'
 import { useAppSelector } from "@/redux/hook";
 import { useTranslation } from "next-i18next";
 
-const sidebarItems_student = [
+const getTranslatedAdminSidebarItems = (t: any) => [
   {
-    name: "Home",
-    href: routes.home,
-    icon: <HomeOutlined />,
-  },
-  {
-    name: 'Enrolled Courses',
-    href: routes.enrolledCourses,
-    icon: <MenuBookOutlined />
-  },
-  {
-    name: "Notifications",
-    href: routes.notifications,
-    icon: <NotificationsNoneOutlined />,
-  },
-  {
-    name: "Edit Profile",
-    href: routes.profile,
-    icon: <AccountCircleOutlined />,
-  },
-  {
-    name: "Settings",
-    href: "/settings",
-    icon: <SettingsOutlined />,
-  },
-];
-
-const sidebarItems_teacher = [
-  {
-    name: "Home",
-    href: routes.home,
-    icon: <HomeOutlined />,
-  },
-  {
-    name: "My Courses",
-    href: routes.myCourses,
-    icon: <SchoolOutlined />,
-  },
-  {
-    name: "Notifications",
-    href: routes.notifications,
-    icon: <NotificationsNoneOutlined />,
-  },
-  {
-    name: "Edit Profile",
-    href: routes.profile,
-    icon: <AccountCircleOutlined />,
-  },
-  {
-    name: "Settings",
-    href: "/settings",
-    icon: <SettingsOutlined />,
-  },
-];
-
-const sidebarItems_admin = [
-  {
-    name: "Users",
+    name: t("Users"),
     href: routes.admin_user,
     icon: <AccountCircleOutlined />,
   },
   {
-    name: "Student Ids Mapping",
+    name: t("Student Ids Mapping"),
     href: routes.admin_mapping,
+    icon: <SettingsOutlined />,
+  },
+];
+
+const getTranslatedTeachernSidebarItems = (t: any) => [
+  {
+    name: t("Home"),
+    href: routes.home,
+    icon: <HomeOutlined />,
+  },
+  {
+    name: t("My Courses"),
+    href: routes.myCourses,
+    icon: <SchoolOutlined />,
+  },
+  {
+    name: t("Notifications"),
+    href: routes.notifications,
+    icon: <NotificationsNoneOutlined />,
+  },
+  {
+    name: t("Edit Profile"),
+    href: routes.profile,
+    icon: <AccountCircleOutlined />,
+  },
+  {
+    name: t("Settings"),
+    href: "/settings",
+    icon: <SettingsOutlined />,
+  },
+];
+
+const getTranslatedStudentSidebarItems = (t: any) => [
+  {
+    name: t("Home"),
+    href: routes.home,
+    icon: <HomeOutlined />,
+  },
+  {
+    name: t('Enrolled Courses'),
+    href: routes.enrolledCourses,
+    icon: <MenuBookOutlined />
+  },
+  {
+    name: t("Notifications"),
+    href: routes.notifications,
+    icon: <NotificationsNoneOutlined />,
+  },
+  {
+    name: t("Edit Profile"),
+    href: routes.profile,
+    icon: <AccountCircleOutlined />,
+  },
+  {
+    name: t("Settings"),
+    href: "/settings",
     icon: <SettingsOutlined />,
   },
 ];
@@ -86,24 +86,26 @@ export default function Sidebar() {
   const [active, setActive] = useState<number>(0);
   const toggle = () => setSidebarOpen((prev) => !prev);
 
+  const { t } = useTranslation();
+
   const sidebarItems = useMemo(()=>{
     switch (user?.role?.name) {
       case 'admin':
-        return sidebarItems_admin;
+        return getTranslatedAdminSidebarItems(t);
       case'student':
-        return sidebarItems_student;
+        return getTranslatedStudentSidebarItems(t);
       case'teacher':
-        return sidebarItems_teacher;
+        return getTranslatedTeachernSidebarItems(t);
       default:
         return [];
     }
-  }, [user])
+  }, [user, t])
 
   useEffect(() => {
     setActive(sidebarItems.reduce((acc, cur, index) => {
       if (pathname.includes(cur.href)) acc = index
       return acc;
-    }, 0))
+    }, -1))
   }, [pathname])
 
   return <>

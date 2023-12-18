@@ -77,6 +77,10 @@
     border-radius: 10px;
     justify-content: space-between;
   }
+
+  .createNotificationDiv:hover {
+    cursor: pointer;
+  }
 }
 
 .leftSection > * {
