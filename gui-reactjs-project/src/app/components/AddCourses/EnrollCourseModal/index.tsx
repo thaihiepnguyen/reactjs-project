@@ -6,7 +6,7 @@ import {useState} from "react";
 import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
 import { useAppDispatch } from "@/redux/hook";
-import { getEnrolledCourse } from "@/redux/reducers/courses";
+import { getEnrolledCourse, getMyCourse } from "@/redux/reducers/courses";
 
 export default function EnrollCoursesModal(props) {
   const { closeModel } = props;
@@ -34,6 +34,7 @@ export default function EnrollCoursesModal(props) {
         icon: 'success',
       })
       dispatch(getEnrolledCourse());
+      dispatch(getMyCourse());
     } else {
       Swal.fire({
         title: response.data.message,

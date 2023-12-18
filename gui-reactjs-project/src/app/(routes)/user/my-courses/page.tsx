@@ -9,14 +9,18 @@ import AddCoursesModal from "@/app/components/AddCourses/AddCoursesModal";
 import { useAppSelector } from "@/redux/hook";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import EnrollCoursesModal from "@/app/components/AddCourses/EnrollCourseModal";
 
 export default function Page() {
   const { myCourses: courses } = useAppSelector((state) => state.courseReducer);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [joinCourseModalOpen, setJoinCourseModalOpen] = useState<boolean>(false);
   const router = useRouter();
   return (
     <>
       {isModalOpen ? <AddCoursesModal closeModel={() => setIsModalOpen(false)} /> : null}
+      {joinCourseModalOpen ? <EnrollCoursesModal closeModel={() => setJoinCourseModalOpen(false)} /> : null}
+
       <div className={classes.classContainer}>
         {courses?.length ? (
           <>
@@ -29,6 +33,7 @@ export default function Page() {
                   lastModify={course.lastModify}
                   id={course.id}
                   isActive={course.isActive}
+                  teacherIds={course.teacherIds}
                 />
               );
             })}
@@ -36,6 +41,7 @@ export default function Page() {
         ) : null}
 
         <AddCourses text={"Add a course"} openModel={() => setIsModalOpen(true)} />
+        <AddCourses text={"Join a course as teacher"} openModel={() => setJoinCourseModalOpen(true)} />
       </div>
     </>
   );

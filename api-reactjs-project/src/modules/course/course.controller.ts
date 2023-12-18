@@ -75,7 +75,7 @@ export class CourseController {
     @MetaDataAuth('userId') userId: number,
     @Param('id', ParseIntPipe) id: number
   ): Promise<TBaseDto<null>> {
-    return this.courseService.removeCourse(id)
+    return this.courseService.removeCourse(userId, id)
   }
 
   @UseGuards(RolesGuard)

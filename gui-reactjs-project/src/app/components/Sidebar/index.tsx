@@ -17,14 +17,37 @@ const sidebarItems_student = [
     icon: <HomeOutlined />,
   },
   {
-    name: "My Courses",
-    href: routes.myCourses,
-    icon: <SchoolOutlined />,
-  },
-  {
     name: 'Enrolled Courses',
     href: routes.enrolledCourses,
     icon: <MenuBookOutlined />
+  },
+  {
+    name: "Notifications",
+    href: routes.notifications,
+    icon: <NotificationsNoneOutlined />,
+  },
+  {
+    name: "Edit Profile",
+    href: routes.profile,
+    icon: <AccountCircleOutlined />,
+  },
+  {
+    name: "Settings",
+    href: "/settings",
+    icon: <SettingsOutlined />,
+  },
+];
+
+const sidebarItems_teacher = [
+  {
+    name: "Home",
+    href: routes.home,
+    icon: <HomeOutlined />,
+  },
+  {
+    name: "My Courses",
+    href: routes.myCourses,
+    icon: <SchoolOutlined />,
   },
   {
     name: "Notifications",
@@ -70,7 +93,7 @@ export default function Sidebar() {
       case'student':
         return sidebarItems_student;
       case'teacher':
-        return sidebarItems_student;
+        return sidebarItems_teacher;
       default:
         return [];
     }

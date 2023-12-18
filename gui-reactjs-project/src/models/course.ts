@@ -11,6 +11,7 @@ export interface Course {
     lastModify?: any;
     teacherName?: string;
     teacherAvatar?: string;
+    teacherIds?: string;
   }
   
   export interface Role {

@@ -22,5 +22,6 @@ import { RoleService } from "../role/role.service";
     }), PassportModule],
   controllers: [AuthController],
   providers: [AuthService, UserService, LocalStrategy, RoleService],
+  exports: [AuthService]
 })
 export class AuthModule {}

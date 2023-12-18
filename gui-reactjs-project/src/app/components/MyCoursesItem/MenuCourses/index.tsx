@@ -6,17 +6,16 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
 import { useAppDispatch } from '@/redux/hook';
-import { getEnrolledCourse } from '@/redux/reducers/courses';
+import { getEnrolledCourse, getMyCourse } from '@/redux/reducers/courses';
 
-const options = [
-  'Remove course',
-];
+
 
 const ITEM_HEIGHT = 30;
 
-export default function MenuCourses({id}) {
+export default function MenuCourses({id, isOwn}) {
   const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [options, setOption] = React.useState<string[]>([]);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
@@ -29,6 +28,14 @@ export default function MenuCourses({id}) {
     setAnchorEl(null);
   };
 
+  React.useEffect(() => {
+    if (isOwn) {
+      setOption(["Remove course"])
+    } else {
+      setOption(["Leave course"])
+    }
+  }, [isOwn])
+
   const removeCourse = async () => {
     setAnchorEl(null);
     const response = await axiosInstance.put(`courses/remove/${id}`)
@@ -39,6 +46,7 @@ export default function MenuCourses({id}) {
         icon: 'success',
       })
       dispatch(getEnrolledCourse());
+      dispatch(getMyCourse());
     }
   }
 

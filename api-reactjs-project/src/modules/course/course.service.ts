@@ -7,12 +7,14 @@ import { Connection, In, Like, Repository } from 'typeorm';
 import { EnrolledCoursesResponse, MyCoursesResponse } from './course.typing';
 import { v4 as uuidv4 } from 'uuid';
 import { TBaseDto } from '../../app.dto';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class CourseService {
   constructor(
     @InjectConnection()
     private readonly connection: Connection,
+    private authService: AuthService,
   ) {}
 
   async getEnrolledCourses(userId: number): Promise<EnrolledCoursesResponse[]> {
@@ -183,40 +185,52 @@ export class CourseService {
         description: item.description,
         lastModify: this._formatDate(item.updatedAt),
         isActive: item.isActive,
-        id: item.id
-      }
+        id: item.id,
+        teacherIds: item.teacherIds
+      };
     });
   }
 
-  async enrollCourse(userId: number, classCode: string): Promise<boolean> { 
+  async enrollCourse(userId: number, classCode: string): Promise<boolean> {
     const course = await this.connection.getRepository(Courses).findOne({
-      select: {
-        id: true,
-        isActive: true,
-        isValid: true
-      },
       where: {
-        classCode
-      }
+        classCode,
+      },
     });
 
     if (!course || !course.isValid || !course.isActive) {
-      return false
+      return false;
     }
 
     try {
-      await this.connection
-        .getRepository(Participants)
-        .createQueryBuilder()
-        .insert()
-        .into(Participants)
-        .values([
-          {
-            studentId: userId,
-            courseId: course.id,
-          },
-        ])
-        .execute();
+      const userRole = await this.authService.getRole(userId);
+      if (userRole.role.name === 'teacher') {
+        if (!course.teacherIds.includes(`${userId}`)) {
+          const newIds = course.teacherIds + `, ${userId}`;
+          await this.connection.getRepository(Courses).update(
+            {
+              id: course.id,
+            },
+            {
+              teacherIds: newIds,
+            },
+          );
+        }
+      }
+      if (userRole.role.name === 'student') {
+        await this.connection
+          .getRepository(Participants)
+          .createQueryBuilder()
+          .insert()
+          .into(Participants)
+          .values([
+            {
+              studentId: userId,
+              courseId: course.id,
+            },
+          ])
+          .execute();
+      }
     } catch (e) {
       return false;
     }
@@ -224,11 +238,23 @@ export class CourseService {
     return true;
   }
 
-  async removeCourse(id: number): Promise<TBaseDto<null>> {
+  async removeCourse(userId:number, id: number): Promise<TBaseDto<null>> {
     try {
-      await this.connection.getRepository(Courses).update(id, {
-        isValid: false,
-      });
+      const course = await this.connection.getRepository(Courses).findOne({
+        where: {
+          id: id
+        }
+      })
+      if (course && course.teacherIds.indexOf(`${userId}`) === 0) {
+        await this.connection.getRepository(Courses).update(id, {
+          isValid: false,
+        });
+      } else {
+        const newIds = course?.teacherIds?.replace(`, ${userId}`,'')
+        await this.connection.getRepository(Courses).update(id, {
+          teacherIds: newIds,
+        });
+      }
     } catch (e) {
       console.log(e);
       return {
@@ -268,17 +294,19 @@ export class CourseService {
   async getMyCourseDetail(id: number, userId): Promise<TBaseDto<any>> {
     const course = await this.connection.getRepository(Courses).findOne({
       where: {
-        id
+        id,
       },
     });
-    const participants = await this.connection.getRepository(Participants).find({
-      where: {
-        courseId: course?.id
-      },
-      select: {
-        studentId: true
-      }
-    })
+    const participants = await this.connection
+      .getRepository(Participants)
+      .find({
+        where: {
+          courseId: course?.id,
+        },
+        select: {
+          studentId: true,
+        },
+      });
 
     if (!course) {
       return {
@@ -294,23 +322,30 @@ export class CourseService {
         data: null,
       };
     }
- 
-    const participantIds = participants?.map(participant => participant.studentId);
- 
-    if (course?.teacherIds?.includes(userId) || participantIds?.includes(userId)) {
-      const teacherIds = course?.teacherIds?.split(", ")?.map(idStr => +idStr);
-    
+
+    const participantIds = participants?.map(
+      (participant) => participant.studentId,
+    );
+
+    if (
+      course?.teacherIds?.includes(userId) ||
+      participantIds?.includes(userId)
+    ) {
+      const teacherIds = course?.teacherIds
+        ?.split(', ')
+        ?.map((idStr) => +idStr);
+
       const teacherList = await this.connection.getRepository(Users).find({
         where: {
-          id: In(teacherIds)
-        }
-      })
+          id: In(teacherIds),
+        },
+      });
 
       const studentList = await this.connection.getRepository(Users).find({
         where: {
-          id: In(participantIds)
-        }
-      })
+          id: In(participantIds),
+        },
+      });
 
       return {
         message: 'success',
@@ -318,7 +353,7 @@ export class CourseService {
         data: {
           ...course,
           teacherList: teacherList,
-          studentList: studentList
+          studentList: studentList,
         },
       };
     } else {

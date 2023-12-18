@@ -9,9 +9,11 @@ import MenuCourses from "@/app/components/MyCoursesItem/MenuCourses";
 import { Router } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
+import { useAppSelector } from "@/redux/hook";
 
 export default function MyCoursesItem(props) {
-  const { title, description, lastModify, id, isActive } = props;
+  const { title, description, lastModify, id, isActive, teacherIds } = props;
+  const {user} = useAppSelector((state) => state.userReducer)
   const router = useRouter();
   function handleClick(e: any) {
     if (!isActive) {
@@ -29,11 +31,11 @@ export default function MyCoursesItem(props) {
 
   return (
     <>
-      <div className={classes.classItem} onClick={() => router.push(routes.courseDetail + id)}>
+      <div className={classes.classItem}>
         <div className={classes.className}>
           <div className={classes.titleContainer}>
             <div className={classes.moreVer}>
-              <MenuCourses id={id} />
+              <MenuCourses id={id} isOwn={teacherIds?.indexOf(user?.id) === 0} />
             </div>
             <div className={classes.classTitle}>
               <Link href={routes.courseDetail + id} onClick={(e) => handleClick(e)} className={classes.classTitleText}>

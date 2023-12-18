@@ -46,13 +46,15 @@ const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
   }, [session]);
 
   useEffect(() => {
-    if (!enrolledCourses) {
-      dispatch(getEnrolledCourse());
+    if (user) {
+      if (!enrolledCourses) {
+        dispatch(getEnrolledCourse());
+      }
+      if (!myCourses) {
+        dispatch(getMyCourse());
+      }
     }
-    if (!myCourses) {
-      dispatch(getMyCourse());
-    }
-  }, [enrolledCourses, myCourses]);
+  }, [user, enrolledCourses, myCourses]);
 
   return <>{children}</>;
 };
