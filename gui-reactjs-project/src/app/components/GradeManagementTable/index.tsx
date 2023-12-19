@@ -67,6 +67,8 @@ const DraggableTable = () => {
     else {
       setIsEditingAll(false);
       setErrorMessage('');
+
+      // call API here
     }
   }
 
@@ -107,20 +109,15 @@ const DraggableTable = () => {
   const handleDeleteRow = (itemId) => {
     const updatedItems = items.filter((item) => item.id !== itemId);
     setItems(updatedItems);
-    // if (isEditingAll) {
-    //   calculateTotalScale();
-    //   if (totalScale < 100) {
-    //     setErrorMessage('Total scale must be 100%');
-    //   } else {
-    //     setErrorMessage('');
-    //   }
-    // }
   };  
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <br/>
-      { !isEditingAll ? 
+    <div style={{padding: '1rem'}}>
+    <DragDropContext 
+      onDragEnd={handleDragEnd}
+      >
+      {
+      !isEditingAll ? 
         (<Button 
           variant="contained" 
           color={isEditingAll ? "secondary" : "primary"} 
@@ -129,8 +126,8 @@ const DraggableTable = () => {
           Edit
         </Button>) : (
         <Button 
-          variant="contained" 
-          color={isEditingAll ? "secondary" : "primary"} 
+          variant="contained"
+          style={{backgroundColor: 'green'}}
           onClick={handleSave}
           >
           Save
@@ -138,26 +135,34 @@ const DraggableTable = () => {
         )
       }
       <br/><br/>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-      <br/>
+      {errorMessage && (
+        <>
+          <p style={{ color: 'red' }}>{errorMessage}</p>
+        </>
+      )}
+      
       {isEditingAll && (
-        <div style={{display: 'flex', gap: '0.8rem'}}>
-          <Input
-            type="text"
-            placeholder="Grade name"
-            value={newItemData.name}
-            onChange={(e) => handleInputChangeNewRow(e, 'name')}
-          />
-          <Input
-            type="text"
-            placeholder="Scale"
-            value={newItemData.scale}
-            onChange={(e) => handleInputChangeNewRow(e, 'scale')}
-          />
-          <Button variant="contained" color="primary" onClick={handleAddRow}>
-            Add
-          </Button>
-        </div>
+        <>
+          <br/>
+          <div style={{display: 'flex', gap: '0.8rem'}}>
+            <Input
+              type="text"
+              placeholder="Grade name"
+              value={newItemData.name}
+              onChange={(e) => handleInputChangeNewRow(e, 'name')}
+            />
+            <Input
+              type="text"
+              placeholder="Scale"
+              value={newItemData.scale}
+              onChange={(e) => handleInputChangeNewRow(e, 'scale')}
+            />
+            <Button variant="contained" color="primary" onClick={handleAddRow}>
+              Add
+            </Button>
+          </div>
+          <br/>
+        </>
       )}
 
       <Droppable droppableId="droppable">
@@ -170,20 +175,12 @@ const DraggableTable = () => {
             <TableHeader headers={tableHeaders} />
             <tbody>
               {items.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id} index={index}>
+                <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
                   {(provided) => (
                     <TableRow
-                      // hover
-                      // tabIndex={-1}
-                      key={item.id}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      style={{
-                        ...provided.draggableProps.style,
-                        marginBottom: '8px', // Add spacing between rows
-                        // backgroundColor: provided.draggableProps.style.background,
-                      }}
                     >
                       <TableCell style={{ padding: '1rem', width: '50%' }}>
                         {item.isEditing || isEditingAll ? (
@@ -197,7 +194,7 @@ const DraggableTable = () => {
                           item.name
                         )}
                       </TableCell>
-                      <TableCell style={{ padding: '1rem', width: '20%' }}>
+                      <TableCell style={{ padding: '1rem', width: '15%' }}>
                         {item.isEditing || isEditingAll ? (
                           <Input
                             type="text"
@@ -209,7 +206,7 @@ const DraggableTable = () => {
                           item.scale
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell style={{ padding: '1rem', width: '20%' }}>
                         {isEditingAll && 
                           (<Button onClick={() => handleDeleteRow(item.id)}><DeleteIcon style={{color: 'red'}}/></Button>)
                         }
@@ -224,6 +221,7 @@ const DraggableTable = () => {
         )}
       </Droppable>
     </DragDropContext>
+    </div>
   );
 };
 
