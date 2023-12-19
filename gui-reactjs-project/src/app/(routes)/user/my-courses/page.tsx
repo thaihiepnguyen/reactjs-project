@@ -7,7 +7,6 @@ import AddCourses from "@/app/components/AddCourses";
 import AddCoursesModal from "@/app/components/AddCourses/AddCoursesModal";
 import { useAppSelector } from "@/redux/hook";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import EnrollCoursesModal from "@/app/components/AddCourses/EnrollCourseModal";
 
 export default function Page() {
