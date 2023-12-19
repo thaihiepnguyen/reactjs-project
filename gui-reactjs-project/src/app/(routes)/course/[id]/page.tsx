@@ -223,7 +223,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     <Box display="flex" alignItems={"center"}>
                       <PeopleAltOutlined sx={{ marginRight: "13.5px" }} />
                       <ParagraphSmall $fontWeight="400" $colorName="--gray-80" translation-key="project_header_menu_share_option">
-                        Share
+                        Invite
                       </ParagraphSmall>
                     </Box>
                   </MenuItem>
