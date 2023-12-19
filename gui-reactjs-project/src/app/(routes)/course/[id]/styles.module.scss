@@ -102,3 +102,21 @@
     object-fit: cover;
   }
 }
+
+.iconMore {
+  margin-left: auto;
+  color: #767676;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  border-radius: 50%;
+}
+.iconMore:hover {
+  border: 1px solid #f4f4f4;
+  background: #f4f4f4;
+}

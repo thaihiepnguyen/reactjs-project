@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import classes from "./styles.module.scss";
 import MenuListComposition from "@/app/components/MenuListComposition/page";
-import { Avatar, Button, Divider } from "@mui/material";
+import { Avatar, Button, ClickAwayListener, Divider, Grow, IconButton, MenuItem, MenuList, Paper, Popper } from "@mui/material";
 import CreateNotificationForm from "@/app/components/CreateNotificationForm/page";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import axiosInstance from "@/app/routers/axios";
@@ -17,6 +17,7 @@ import Heading3 from "@/app/components/text/Heading3";
 import ParagraphSmall from "@/app/components/text/ParagraphSmall";
 import Heading4 from "@/app/components/text/Heading4";
 import { User } from "@/models/user";
+import { MoreHoriz, PeopleAltOutlined } from "@mui/icons-material";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -41,6 +42,10 @@ export default function Page({ params }: { params: { id: string } }) {
   const [value, setValue] = React.useState(0);
   const [showTable, setShowTable] = useState(false);
   const [course, setCourse] = useState<any>({});
+  const [openMenuShare, setOpenMenuShare] = React.useState(false);
+  const [isOpenModalShare, setIsOpenModalShare] = useState<boolean>(false);
+
+  const anchorRef = React.useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function getCourseDetail(id: string) {
@@ -79,6 +84,23 @@ export default function Page({ params }: { params: { id: string } }) {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const handleToggle = () => {
+    setOpenMenuShare((prevOpen) => !prevOpen);
+  };
+
+  const handleCloseMenuShare = (event: Event | React.SyntheticEvent) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+      return;
+    }
+
+    setOpenMenuShare(false);
+  };
+
+  const onShowModalShare = () => {
+    setIsOpenModalShare(true);
+  };
+
   return (
     <Box className={classes.root}>
       <Box className={classes.menu} sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -135,8 +157,13 @@ export default function Page({ params }: { params: { id: string } }) {
         </CustomTabPanel>
 
         <CustomTabPanel value={value} index={1}>
+          {user?.role?.name === "teacher" ? (
+            <IconButton className={classes.iconMore} onClick={handleToggle} ref={anchorRef}>
+              <MoreHoriz />
+            </IconButton>
+          ) : null}
           <div className={classes.list}>
-            <Divider >
+            <Divider>
               <Heading3>Teachers</Heading3>
             </Divider>
             {course?.teacherList?.map((teacher: User, teacherIdx: number) => (
@@ -153,11 +180,11 @@ export default function Page({ params }: { params: { id: string } }) {
               </div>
             ))}
           </div>
-          <Box className={classes.list} sx={{mt: 4}}>
-            <Divider >
+          <Box className={classes.list} sx={{ mt: 4 }}>
+            <Divider>
               <Heading3>Students</Heading3>
             </Divider>
-            {course?.studentList?.map((student: User, studentIdx:number) => (
+            {course?.studentList?.map((student: User, studentIdx: number) => (
               <div className={classes.infoWrapper} key={studentIdx}>
                 <div className={classes.personalImage}>
                   <Avatar>{student?.avatarUrl ? <img src={student.avatarUrl} alt=""></img> : "T"}</Avatar>
@@ -173,6 +200,39 @@ export default function Page({ params }: { params: { id: string } }) {
           </Box>
         </CustomTabPanel>
       </div>
+      <Popper
+        open={openMenuShare}
+        anchorEl={anchorRef.current}
+        role={undefined}
+        placement="bottom-start"
+        transition
+        disablePortal
+        className={classes.customMenuShare}
+      >
+        {({ TransitionProps, placement }) => (
+          <Grow
+            {...TransitionProps}
+            style={{
+              transformOrigin: placement === "bottom-start" ? "left top" : "left bottom",
+            }}
+          >
+            <Paper>
+              <ClickAwayListener onClickAway={handleCloseMenuShare}>
+                <MenuList autoFocusItem={openMenuShare} id="composition-menu" aria-labelledby="composition-button">
+                  <MenuItem onClick={onShowModalShare}>
+                    <Box display="flex" alignItems={"center"}>
+                      <PeopleAltOutlined sx={{ marginRight: "13.5px" }} />
+                      <ParagraphSmall $fontWeight="400" $colorName="--gray-80" translation-key="project_header_menu_share_option">
+                        Share
+                      </ParagraphSmall>
+                    </Box>
+                  </MenuItem>
+                </MenuList>
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
     </Box>
   );
 }
