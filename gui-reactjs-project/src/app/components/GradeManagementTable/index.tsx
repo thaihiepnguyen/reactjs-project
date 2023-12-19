@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TableCell from '@mui/material/TableCell/TableCell';
 import { Button, Input, Table, TableBody, TableOwnProps, TableRow, TableRowOwnProps } from '@mui/material';
@@ -13,16 +13,26 @@ const tableHeaders: TableHeaderLabel[] = [
 ];
 
 const initialItems = [
-  { id: '0', name: 'Item 1', scale: '100%', isEditing: false },
-  { id: '1', name: 'Item 2', scale: '100%', isEditing: false },
-  { id: '2', name: 'Item 3', scale: '100%', isEditing: false },
-  // Add more items as needed
+  { id: '0', name: 'Lab', scale: '30', isEditing: false },
+  { id: '1', name: 'Midterm', scale: '30', isEditing: false },
+  { id: '2', name: 'Final', scale: '40', isEditing: false },
 ];
 
 const DraggableTable = () => {
   const [items, setItems] = useState(initialItems);
   const [isEditingAll, setIsEditingAll] = useState(false);
   const [newItemData, setNewItemData] = useState({ id: '', name: '', scale: '', isEditing: false });
+  const [totalScale, setTotalScale] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const calculateTotalScale = (itemsToCalculate) => {
+    let total = 0;
+    itemsToCalculate.forEach((item) => {
+      total += parseInt(item.scale);
+    });
+    setTotalScale(total);
+    return total;
+  };
 
   const handleDragEnd = (result) => {
     if (!result.destination) {
@@ -44,9 +54,21 @@ const DraggableTable = () => {
   };
 
   const handleEditAllClick = () => {
-    setItems(items.map((item) => ({ ...item, isEditing: !isEditingAll })));
-    setIsEditingAll(!isEditingAll);
+    setIsEditingAll(true);
   };
+
+  const handleSave = () => {
+    setItems(items.map((item) => ({ ...item, isEditing: !isEditingAll })));
+    const total = calculateTotalScale(items);
+    if (total !== 100) {
+      setIsEditingAll(true);
+      setErrorMessage('Your total scale is ' + total + '%. The total scale must be 100% so you can not save');
+    }
+    else {
+      setIsEditingAll(false);
+      setErrorMessage('');
+    }
+  }
 
   const handleInputChange = (e, itemId, field) => {
     const { value } = e.target;
@@ -85,16 +107,39 @@ const DraggableTable = () => {
   const handleDeleteRow = (itemId) => {
     const updatedItems = items.filter((item) => item.id !== itemId);
     setItems(updatedItems);
+    // if (isEditingAll) {
+    //   calculateTotalScale();
+    //   if (totalScale < 100) {
+    //     setErrorMessage('Total scale must be 100%');
+    //   } else {
+    //     setErrorMessage('');
+    //   }
+    // }
   };  
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <br/>
-      <Button variant="contained" color="primary" onClick={handleEditAllClick}>
-        {isEditingAll ? 'Save' : 'Edit'}
-      </Button>
+      { !isEditingAll ? 
+        (<Button 
+          variant="contained" 
+          color={isEditingAll ? "secondary" : "primary"} 
+          onClick={handleEditAllClick}
+          >
+          Edit
+        </Button>) : (
+        <Button 
+          variant="contained" 
+          color={isEditingAll ? "secondary" : "primary"} 
+          onClick={handleSave}
+          >
+          Save
+        </Button>
+        )
+      }
       <br/><br/>
-      
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+      <br/>
       {isEditingAll && (
         <div style={{display: 'flex', gap: '0.8rem'}}>
           <Input
@@ -183,7 +228,3 @@ const DraggableTable = () => {
 };
 
 export default DraggableTable;
-function useEffect(arg0: () => void, arg1: { id: string; name: string; scale: string; isEditing: boolean; }[][]) {
-  throw new Error('Function not implemented.');
-}
-
