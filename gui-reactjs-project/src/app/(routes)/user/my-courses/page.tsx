@@ -17,7 +17,7 @@ export default function Page() {
   const router = useRouter();
   return (
     <>
-      {isModalOpen ? <AddCoursesModal closeModel={() => setIsModalOpen(false)} /> : null}
+      {isModalOpen ? <AddCoursesModal openJoinModel={() => setJoinCourseModalOpen(true)} closeModel={() => setIsModalOpen(false)} /> : null}
       {joinCourseModalOpen ? <EnrollCoursesModal closeModel={() => setJoinCourseModalOpen(false)} /> : null}
 
       <div className={classes.classContainer}>
@@ -40,7 +40,6 @@ export default function Page() {
         ) : null}
 
         <AddCourses text={"Add a course"} openModel={() => setIsModalOpen(true)} />
-        <AddCourses text={"Join a course as teacher"} openModel={() => setJoinCourseModalOpen(true)} />
       </div>
     </>
   );

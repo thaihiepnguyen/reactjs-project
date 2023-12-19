@@ -9,8 +9,8 @@ import Swal from "sweetalert2";
 import { useAppDispatch } from "@/redux/hook";
 import { getMyCourse } from "@/redux/reducers/courses";
 
-export default function AddCoursesModal(props) {
-  const { closeModel } = props;
+export default function AddCoursesModal(props: any) {
+  const { closeModel, openJoinModel } = props;
   const dispatch = useAppDispatch();
 
   const [courseData, setCourseData] = useState({
@@ -19,7 +19,7 @@ export default function AddCoursesModal(props) {
     classCode: '',
   });
   
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     const { id, value } = event.target;
     setCourseData((prevData) => ({
       ...prevData,
@@ -27,7 +27,7 @@ export default function AddCoursesModal(props) {
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     let response
     try {
@@ -63,7 +63,7 @@ export default function AddCoursesModal(props) {
         onSubmit={handleSubmit}
         autoComplete="off"
       >
-        <h3 style={{ padding: 10 }}>Create a course</h3>
+        <h3 style={{ padding: 10 }}>Add a course</h3>
         <div>
           <TextField
             required
@@ -94,7 +94,13 @@ export default function AddCoursesModal(props) {
         </div>
         <div style={{ marginTop: 24 }}>
           <Button type="submit" variant="outlined">
-            Create
+            Add
+          </Button>
+          <Button onClick={() => {
+            closeModel();
+            openJoinModel();
+            }} variant="outlined" style={{marginLeft: 10}}>
+            Join as a tutor
           </Button>
         </div>
       </form>
