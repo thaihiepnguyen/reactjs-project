@@ -63,7 +63,16 @@ export default function AddCoursesModal(props: any) {
         onSubmit={handleSubmit}
         autoComplete="off"
       >
-        <h3 style={{ padding: 10 }}>Add a course</h3>
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+          <h3 style={{ padding: 10 }}>Add a course</h3>
+          <Button onClick={() => {
+              closeModel();
+              openJoinModel();
+              }} variant="outlined" color="success" style={{marginLeft: 10}}>
+              Join as a tutor
+          </Button>
+        </div>
+
         <div>
           <TextField
             required
@@ -95,12 +104,6 @@ export default function AddCoursesModal(props: any) {
         <div style={{ marginTop: 24 }}>
           <Button type="submit" variant="outlined">
             Add
-          </Button>
-          <Button onClick={() => {
-            closeModel();
-            openJoinModel();
-            }} variant="outlined" style={{marginLeft: 10}}>
-            Join as a tutor
           </Button>
         </div>
       </form>
