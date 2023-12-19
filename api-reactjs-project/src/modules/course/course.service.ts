@@ -387,4 +387,8 @@ export class CourseService {
       },
     };
   }
+
+  public async isCourseExist(id: number): Promise<boolean> {
+    return await this.connection.getRepository(Courses).exist({ where: { id: id }})
+  }
 }
