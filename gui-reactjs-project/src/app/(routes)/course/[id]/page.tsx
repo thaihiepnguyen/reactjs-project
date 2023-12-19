@@ -136,7 +136,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
         <CustomTabPanel value={value} index={1}>
           <div className={classes.list}>
-            <Divider textAlign="right">
+            <Divider >
               <Heading3>Teachers</Heading3>
             </Divider>
             {course?.teacherList?.map((teacher: User, teacherIdx: number) => (
@@ -154,7 +154,7 @@ export default function Page({ params }: { params: { id: string } }) {
             ))}
           </div>
           <Box className={classes.list} sx={{mt: 4}}>
-            <Divider textAlign="right">
+            <Divider >
               <Heading3>Students</Heading3>
             </Divider>
             {course?.studentList?.map((student: User, studentIdx:number) => (
