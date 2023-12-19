@@ -12,7 +12,7 @@ const Heading4 = styled(Typography)<Props>`
     font-weight: ${props => props.$fontWeight || 600};
     font-size: 18x;
     line-height: 32px;
-    color: ${props => `var(${props.$colorName || '--ghost-white'})`};
+    color: ${props => props.$colorName || 'black'};
     @media only screen and (max-width: 767px) {
         font-size: 14px;
     }

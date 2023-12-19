@@ -18,6 +18,7 @@ import ParagraphSmall from "@/app/components/text/ParagraphSmall";
 import Heading4 from "@/app/components/text/Heading4";
 import { User } from "@/models/user";
 import { MoreHoriz, PeopleAltOutlined } from "@mui/icons-material";
+import PopupInviteCourse from "@/app/components/PopupInviteCourse";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -99,6 +100,10 @@ export default function Page({ params }: { params: { id: string } }) {
 
   const onShowModalShare = () => {
     setIsOpenModalShare(true);
+  };
+
+  const onCloseShowModalShareProject = () => {
+    setIsOpenModalShare(false);
   };
 
   return (
@@ -233,6 +238,7 @@ export default function Page({ params }: { params: { id: string } }) {
           </Grow>
         )}
       </Popper>
+      <PopupInviteCourse isOpen={isOpenModalShare} onCancel={onCloseShowModalShareProject} />
     </Box>
   );
 }
