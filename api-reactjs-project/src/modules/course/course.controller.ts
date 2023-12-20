@@ -6,7 +6,6 @@ import {MetaDataAuth} from "../auth/auth.decorator";
 import {TBaseDto} from "../../app.dto";
 import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 import {RolesGuard} from "../auth/roles/roles.guard";
-import { Courses } from "src/typeorm/entity/Courses";
 
 
 @Controller('courses')

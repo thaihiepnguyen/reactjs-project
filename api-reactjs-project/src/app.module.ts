@@ -6,6 +6,12 @@ import {ConfigModule} from "@nestjs/config";
 import * as process from "process";
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CourseController } from './modules/course/course.controller';
+import { ScoreController } from './modules/score/score.controller';
+import { AccountController } from './modules/admin/account/account.controller';
+import { CourseListController } from './modules/admin/course/course-list.controller';
+import { UserController } from './modules/user/user.controller';
+import { NotificationController } from './modules/notification/notification.controller';
 
 @Module({})
 export class AppModule implements NestModule {
@@ -46,7 +52,12 @@ export class AppModule implements NestModule {
     consumer
       .apply(AuthMiddleware)
       .forRoutes(
-        'user/profile'
+        UserController,
+        CourseController,
+        ScoreController,
+        NotificationController,
+        AccountController,
+        CourseListController
       )
   }
 }
