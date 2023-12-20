@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TableCell from '@mui/material/TableCell/TableCell';
-import { Button, Input, Table, TableBody, TableOwnProps, TableRow, TableRowOwnProps } from '@mui/material';
+import { Button, Checkbox, Input, Table, TableBody, TableOwnProps, TableRow, TableRowOwnProps } from '@mui/material';
 import { TableHeaderLabel } from '@/models/general';
 import TableHeader from '../Table/TableHead';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,12 +11,13 @@ import * as XLSX from 'xlsx';
 const tableHeaders: TableHeaderLabel[] = [
   { name: "grade_name", label: "Grade name", sortable: true },
   { name: "scale", label: "Scale", sortable: true },
+  { name: "is_published", label: "Published", sortable: true },
 ];
 
 const initialItems = [
-  { id: '0', name: 'Lab', scale: '30', isEditing: false },
-  { id: '1', name: 'Midterm', scale: '30', isEditing: false },
-  { id: '2', name: 'Final', scale: '40', isEditing: false },
+  { id: '0', name: 'Lab', scale: '30', isEditing: false, isPublished: false },
+  { id: '1', name: 'Midterm', scale: '30', isEditing: false, isPublished: false },
+  { id: '2', name: 'Final', scale: '40', isEditing: false, isPublished: false },
 ];
 
 const DraggableTable = () => {
@@ -135,6 +136,16 @@ const DraggableTable = () => {
     XLSX.writeFile(workbook, 'grade_template.xlsx');
   };
 
+  const handleCheckboxChange = (e, itemId) => {
+    const updatedItems = items.map((item) => {
+      if (item.id === itemId) {
+        return { ...item, isPublished: e.target.checked };
+      }
+      return item;
+    });
+
+    setItems(updatedItems);
+  };
 
   return (
     <div style={{padding: '1rem'}}>
@@ -195,7 +206,7 @@ const DraggableTable = () => {
           <Table
             {...provided.droppableProps}
             ref={provided.innerRef}
-            style={{ width: '25rem', borderCollapse: 'collapse' }}
+            style={{ width: '30rem', borderCollapse: 'collapse' }}
           > 
             <TableHeader headers={tableHeaders} />
             <tbody>
@@ -231,9 +242,16 @@ const DraggableTable = () => {
                           item.scale
                         )}
                       </TableCell>
-                      <TableCell style={{ padding: '1rem', width: '20%' }}>
-                        {isEditingAll && 
-                          (<Button onClick={() => handleDeleteRow(item.id)}><DeleteIcon style={{color: 'red'}}/></Button>)
+                      <TableCell style={{ padding: '1rem', width: '10%' }}>
+                        {isEditingAll ?
+                          (<Checkbox checked={item.isPublished}  onChange={(e) => handleCheckboxChange(e, item.id)}/>) : 
+                          (<Checkbox checked={item.isPublished} disabled />)
+                        }
+                      </TableCell>
+                      <TableCell style={{ padding: '1rem', width: '10%' }}>
+                        {isEditingAll ? 
+                          (<Button onClick={() => handleDeleteRow(item.id)}><DeleteIcon style={{color: 'red'}}/></Button>) :
+                          ''
                         }
                       </TableCell>
                     </TableRow>
