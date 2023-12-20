@@ -6,6 +6,7 @@ import { Button, Input, Table, TableBody, TableOwnProps, TableRow, TableRowOwnPr
 import { TableHeaderLabel } from '@/models/general';
 import TableHeader from '../Table/TableHead';
 import DeleteIcon from '@mui/icons-material/Delete';
+import * as XLSX from 'xlsx'; 
 
 const tableHeaders: TableHeaderLabel[] = [
   { name: "grade_name", label: "Grade name", sortable: true },
@@ -60,7 +61,10 @@ const DraggableTable = () => {
   const handleSave = () => {
     setItems(items.map((item) => ({ ...item, isEditing: !isEditingAll })));
     const total = calculateTotalScale(items);
-    if (total !== 100) {
+    if (Number.isNaN(total)) {
+      setErrorMessage('The scale must be a number!');
+    }
+    else if (total !== 100) {
       setIsEditingAll(true);
       setErrorMessage('Your total scale is ' + total + '%. The total scale must be 100% so you can not save');
     }
@@ -110,6 +114,27 @@ const DraggableTable = () => {
     const updatedItems = items.filter((item) => item.id !== itemId);
     setItems(updatedItems);
   };  
+
+  // Export file excel
+  const handleExportToExcel = () => {
+    if (items.length === 0) {
+      return;
+    }
+
+    let gradesList = ['Student ID'];
+    items.forEach((item) => {
+      const nameValue = item.name; // get the name of the grade: lab, midterm, final, ...
+      gradesList.push(nameValue);
+    });
+
+    const worksheet = XLSX.utils.aoa_to_sheet([gradesList]); // Create the first row with all the name of the grades list
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'grades template');
+
+    XLSX.writeFile(workbook, 'grade_template.xlsx');
+  };
+
 
   return (
     <div style={{padding: '1rem'}}>
@@ -220,6 +245,9 @@ const DraggableTable = () => {
           </Table>
         )}
       </Droppable>
+      {!isEditingAll ? (<Button variant="contained" color="primary" onClick={handleExportToExcel}>
+        Export to Excel
+      </Button>) : ''}
     </DragDropContext>
     </div>
   );
