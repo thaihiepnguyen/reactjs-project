@@ -3,7 +3,7 @@ import GradeManagementTable from "./components/GradeManagementTable";
 export default function Page() {
 
   return (
-      // <LandingPage />
-      <GradeManagementTable />
+      <LandingPage />
+      // <GradeManagementTable />
   );
 }
