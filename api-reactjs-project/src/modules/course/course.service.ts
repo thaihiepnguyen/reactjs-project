@@ -391,4 +391,13 @@ export class CourseService {
   public async isCourseExist(id: number): Promise<boolean> {
     return await this.connection.getRepository(Courses).exist({ where: { id: id }})
   }
+
+  public async isTeacherInCourse(id: number, teacherId: number) {
+    return await this.connection.getRepository(Courses).exist({
+      where: {
+        id: id,
+        teacherIds: Like(`%${teacherId}%`)
+      }
+    })
+  }
 }
