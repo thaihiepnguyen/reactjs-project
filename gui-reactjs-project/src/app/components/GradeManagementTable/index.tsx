@@ -264,7 +264,7 @@ const DraggableTable = () => {
         )}
       </Droppable>
       {!isEditingAll ? (<Button variant="contained" color="primary" onClick={handleExportToExcel}>
-        Export to Excel
+        Download Transcript
       </Button>) : ''}
     </DragDropContext>
     </div>
