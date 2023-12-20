@@ -230,7 +230,7 @@ const DraggableTable = () => {
                           item.name
                         )}
                       </TableCell>
-                      <TableCell style={{ padding: '1rem', width: '15%' }}>
+                      <TableCell style={{ padding: '1rem', width: '20%' }}>
                         {item.isEditing || isEditingAll ? (
                           <Input
                             type="text"
@@ -242,7 +242,7 @@ const DraggableTable = () => {
                           item.scale
                         )}
                       </TableCell>
-                      <TableCell style={{ padding: '1rem', width: '10%' }}>
+                      <TableCell style={{ padding: '1rem', width: '18%' }}>
                         {isEditingAll ?
                           (<Checkbox checked={item.isPublished}  onChange={(e) => handleCheckboxChange(e, item.id)}/>) : 
                           (<Checkbox checked={item.isPublished} disabled />)
