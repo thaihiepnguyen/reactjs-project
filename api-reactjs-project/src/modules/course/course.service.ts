@@ -400,4 +400,49 @@ export class CourseService {
       }
     })
   }
+
+  public async banStudent(teacherId: number, studentId: number, courseId: number): Promise<TBaseDto<null>> {
+    // Step 1: courseId belongs to teacherId
+    if (!this.isTeacherInCourse(courseId, teacherId)) {
+      return {
+        message: 'the teacher must be in this course',
+        statusCode: 400,
+      }
+    }
+    // Step 3: studentId has been in courseId or not 
+    const isStudentExisted = await this.connection.getRepository(Participants).exist({
+      where: {
+        courseId,
+        studentId
+      }
+    });
+
+    if (!isStudentExisted) {
+      return {
+        message: 'student is not in this course yet',
+        statusCode: 400,
+      };
+    }
+
+    // Step 2: remove recode from participant
+
+    try {
+      await this.connection.getRepository(Participants)
+      .createQueryBuilder()
+      .delete()
+      .from(Participants)
+      .where("courseId = :courseId", { courseId })
+      .andWhere("studentId = :studentId", { studentId })
+      .execute();
+      return {
+        message: 'success',
+        statusCode: 200
+      }
+    } catch(e) {
+      return {
+        message: e,
+        statusCode: 400
+      }
+    }
+  }
 }

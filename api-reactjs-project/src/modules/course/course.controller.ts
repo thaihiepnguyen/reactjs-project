@@ -72,7 +72,7 @@ export class CourseController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(Role.Teacher)
+  @Roles(Role.Student)
   @Put('un-enroll/:id')
   async unenrollCourse(
     @MetaDataAuth('userId') userId: number,
@@ -89,5 +89,14 @@ export class CourseController {
     @Param('id', ParseIntPipe) id: number
   ): Promise<TBaseDto<any>> {
     return this.courseService.getMyCourseDetail(id, userId)
+  }
+
+  @Put('ban-student/:id/from/:courseId')
+  async banStudent(
+    @MetaDataAuth('userId') userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('courseId', ParseIntPipe) courseId: number
+  ): Promise<TBaseDto<null>> {
+    return this.courseService.banStudent(userId, id, courseId);
   }
 }
