@@ -251,9 +251,21 @@ export class ScoreService {
       acc = [...acc, ...curScores];
       return acc;
     }, [])
-
-    await this.connection.getRepository(Scores).query(sql, valueParams);
-    return;
+    try {
+      await this.connection.getRepository(Scores).query(sql, valueParams);
+    } catch(e) {
+      return {
+        message: e,
+        statusCode: 200,
+        data: null
+      };
+    }
+    
+    return {
+      message: 'success',
+      statusCode: 200,
+      data: null
+    };
   }
 
   private async _indexGrade(courseId: number) {
