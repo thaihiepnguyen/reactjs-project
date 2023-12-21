@@ -73,4 +73,12 @@ export class ScoreController {
       }
     }
   }
+ 
+  @Post('/update-score/:courseId')
+  async updateScore(
+    @Param('courseId') courseId: number,
+    @Body() scoreData: any[],
+  ): Promise<TBaseDto<null>> {
+    return await this.scoreService.updateScore(courseId, scoreData);
+  }
 }

@@ -184,13 +184,26 @@ export class ScoreService {
         }
       });
 
+      const sortedGrades = await runner.manager.getRepository(GradeCompositions).find({
+        select: {
+          name: true,
+          scale: true,
+        },
+        where: {
+          courseId: id,
+        },
+        order: {
+          order: 'ASC',
+        },
+      });
+
       return {
         message: 'success',
         statusCode: 200,
         data: {
           rows: students as Row[],
-          columns: ['id', 'Tên', ...grades.map(item => (item.name))],
-          scales: [...grades.map(item => (item.scale))],
+          columns: ['id', 'Tên', ...sortedGrades.map(item => (item.name))],
+          scales: [...sortedGrades.map(item => (item.scale))],
           fileName: `00${id}.xls`
         }
       }
@@ -285,5 +298,38 @@ export class ScoreService {
       acc[cur.name] = cur.id;
       return acc;
     }, {});
+  }
+
+  async updateScore(courseId: number, scoreData: any[]): Promise<TBaseDto<null>> {
+    try {
+      for (const item of scoreData ) {
+        const gradeComposition = await this.connection.getRepository(GradeCompositions).findOne({ 
+          where: { 
+            courseId: courseId,
+            name: item.name,
+          } 
+        });
+
+        if (gradeComposition) {
+          await this.connection.getRepository(GradeCompositions).update(gradeComposition.id, {
+            name: item.name,
+            scale: item.scale,
+            order: item.id 
+          });
+        }
+      }
+
+      return {
+        message: 'Column order updated successfully',
+        statusCode: 200,
+        data: null
+      };
+    } catch (error) {
+      return {
+        message: 'Failed to update column order',
+        statusCode: 500,
+        data: null
+      };
+    }
   }
 }
