@@ -188,7 +188,7 @@ export class ScoreService {
         statusCode: 200,
         data: {
           rows: students as Row[],
-          columns: grades.map(item => (item.name)),
+          columns: ['id', 'Tên', ...grades.map(item => (item.name))],
           fileName: `00${id}.xls`
         }
       }
