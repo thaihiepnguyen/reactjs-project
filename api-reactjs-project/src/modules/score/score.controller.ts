@@ -62,9 +62,9 @@ export class ScoreController {
       }
     })
   }))
-  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<TBaseDto<null>> {
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @MetaDataAuth('userId') userId: number): Promise<TBaseDto<null>> {
     if (file) {
-      return this.scoreService.saveScores(file);
+      return this.scoreService.saveScores(file, userId);
     } else {
       return {
         message: 'upload file failed!',

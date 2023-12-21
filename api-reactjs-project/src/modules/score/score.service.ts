@@ -12,7 +12,7 @@ import { Scores } from "src/typeorm/entity/Scores";
 import { ColumnsResponse, Row } from "./score.typing";
 import * as xlsx from 'xlsx';
 
-
+const N_COLUMNS_IGNORE = 2
 @Injectable()
 export class ScoreService {
   constructor(
@@ -200,21 +200,76 @@ export class ScoreService {
     }
   }
 
-  async saveScores(file: Express.Multer.File): Promise<TBaseDto<null>>  {
+  async saveScores(file: Express.Multer.File, userId: number): Promise<TBaseDto<null>>  {
     const workbook = xlsx.readFile(`uploads/score/${file.filename}`);
 
+    // Step 1: load data from sheets
     let data = [];
     const sheets = workbook.SheetNames;
       
     for(let i = 0; i < sheets.length; i++) { 
       const temp = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[i]]) 
-      temp.forEach((res) => { 
-          data.push(res) 
+      temp.forEach((res) => {
+        data.push(res) 
       });
     }
+    // validate data
+
+    // Step 2: save data to db
+    
+    const valueColumns = Object.keys(data[0]).filter(item => (item != 'id' && item != 'Tên'));
     
     const courseId = +file.filename.split('.')[0];
 
-    return
+    const nColumns = Object.keys(data[0]).length - N_COLUMNS_IGNORE;
+    const nStudents = data.length;
+    let params = '(?, ?, ?, ?)';
+    for (let i = 0; i < nColumns - 1; i++) {
+      params = params.concat(', ', params);
+    }
+
+    for (let i = 0; i < nStudents - 1; i++) {
+      params = params.concat(', ', params);
+    }
+
+    const index = await this._indexGrade(courseId);
+
+    const sql = `
+      INSERT INTO scores (grade_id, student_id, teacher_id, score)
+      VALUES
+      ${params}
+      ON DUPLICATE
+        KEY UPDATE
+          score = VALUES(score);
+    `
+    
+    const valueParams = data.reduce((acc, cur) => {
+      let curScores = [];
+      valueColumns.forEach(item => {
+        curScores = [...curScores, index[item], cur.id, userId, cur[item]];
+      })
+      acc = [...acc, ...curScores];
+      return acc;
+    }, [])
+
+    await this.connection.getRepository(Scores).query(sql, valueParams);
+    return;
+  }
+
+  private async _indexGrade(courseId: number) {
+    const grade = await this.connection.getRepository(GradeCompositions).find({
+      select: {
+        id: true,
+        name: true,
+      },
+      where: {
+        courseId
+      }
+    });
+
+    return grade.reduce((acc, cur) => {
+      acc[cur.name] = cur.id;
+      return acc;
+    }, {});
   }
 }
