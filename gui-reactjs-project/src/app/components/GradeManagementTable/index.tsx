@@ -9,7 +9,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import * as XLSX from 'xlsx'; 
 import axiosInstance from '@/app/routers/axios';
 import { CommonProps } from '@mui/material/OverridableComponent';
-import { CommonProps } from '@mui/material/OverridableComponent';
 
 const tableHeaders: TableHeaderLabel[] = [
   { name: "grade_name", label: "Grade name", sortable: true },
@@ -17,20 +16,18 @@ const tableHeaders: TableHeaderLabel[] = [
   { name: "is_published", label: "Published", sortable: true },
 ];
 
-// const initialItems = [
-//   { id: '0', name: 'Lab', scale: '30', isEditing: false, isPublished: false },
-//   { id: '1', name: 'Midterm', scale: '30', isEditing: false, isPublished: false },
-//   { id: '2', name: 'Final', scale: '40', isEditing: false, isPublished: false },
-// ];
-
 const GradeManagementTable = ( {courseId} ) => {
   const [items, setItems] = useState([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
   const [newItemData, setNewItemData] = useState({ id: '', name: '', scale: '', isEditing: false });
-  const [totalScale, setTotalScale] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
+  const [gradeNameList, setGradeNameList] = useState([]);
+  const [gradeScaleList, setGradeScaleList] = useState([]);
+  const [headerExcelFile, setHeaderExcelFile] = useState([]);
+  const [filename, setFileName] = useState('');
+  const [studentList, setStudentList] = useState([]);
 
-  const convertArrayToItems = (gradeNameList: any[], gradeScaleList: { [x: string]: any; }) => {
+  const convertDataToTable = (gradeNameList: any[], gradeScaleList: { [x: string]: any; }) => {
     const items = gradeNameList.map((itemName: any, index: string | number) => {
       const scale = gradeScaleList[index]; 
       return {
@@ -51,9 +48,26 @@ const GradeManagementTable = ( {courseId} ) => {
       const response = await axiosInstance.get(`/score/columns/${courseId}`);
       if (response.data) {
         const { data } = response.data;
+        
+        // Get student list
+        setStudentList(data.rows);
+        
+        // Get the header columns
+        setHeaderExcelFile(data.columns);
+        
+        // Get file excel name 
+        setFileName(data.fileName);
+
+        // Get grade name list of the course
         const gradeNameList = data.columns.slice(2);
+        setGradeNameList(gradeNameList);
+
+        // Get grade scale list of the course
         const gradeScaleList = data.scales;
-        setItems(convertArrayToItems(gradeNameList, gradeScaleList));
+        setGradeScaleList(gradeScaleList);
+
+        // Covert to UI
+        setItems(convertDataToTable(gradeNameList, gradeScaleList));
       } else {
         throw new Error('Failed to fetch data');
       }
@@ -63,20 +77,19 @@ const GradeManagementTable = ( {courseId} ) => {
   };
 
   useEffect(() => {
-    // Fetch data when the component mounts
     fetchDataForGradeManagementTable();
-  }, [courseId]); // Trigger fetch data when the ID changes
-
+  }, [courseId]);
+  
   const calculateTotalScale = (itemsToCalculate: any[]) => {
     let total = 0;
     itemsToCalculate.forEach((item: { scale: string; }) => {
       total += parseInt(item.scale);
     });
-    setTotalScale(total);
+
     return total;
   };
 
-  const handleDragEnd = (result: { destination: { index: number; }; source: { index: number; }; }) => {
+  const handleDragEnd = async (result: { destination: { index: number; }; source: { index: number; }; }) => {
     if (!result.destination) {
       return;
     } 
@@ -85,7 +98,30 @@ const GradeManagementTable = ( {courseId} ) => {
     const [reorderedItem] = reorderedItems.splice(result.source.index, 1);
     reorderedItems.splice(result.destination.index, 0, reorderedItem);
 
+    // Reorder the items
     setItems(reorderedItems);
+
+    // Sett new header for the xls file
+    const headers = ['ID', 'Tên', ...reorderedItems.map((obj) => obj.name)];
+    setHeaderExcelFile(headers);
+
+    // Reorder the items
+    const reorderedItemsWithNewIDs = reorderedItems.map((item, index) => ({
+      ...item,
+      id: `${index}`, // Reassign IDs based on the new order
+    }));
+    
+    // Save new order index to DB
+    try {
+      const response = await axiosInstance.post(`/score/update-score/${courseId}`, (courseId, reorderedItemsWithNewIDs));
+      if (response.data) {
+        console.log(response.data);
+      } else {
+        throw new Error('Failed to fetch data');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
   };
 
   const handleEditAllClick = () => {
@@ -154,19 +190,14 @@ const GradeManagementTable = ( {courseId} ) => {
     if (items.length === 0) {
       return;
     }
-
-    let gradesList = ['Student ID'];
-    items.forEach((item) => {
-      const nameValue = item.name; // get the name of the grade: lab, midterm, final, ...
-      gradesList.push(nameValue);
-    });
-
-    const worksheet = XLSX.utils.aoa_to_sheet([gradesList]); // Create the first row with all the name of the grades list
-
+    // Convert the array of objects to an array of arrays
+    const dataArray = studentList.map((item) => [item.id, item.fullname]);
+    dataArray.unshift(headerExcelFile);
+    const worksheet = XLSX.utils.aoa_to_sheet(dataArray);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'grades template');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'sheet 1');
 
-    XLSX.writeFile(workbook, 'grade_template.xlsx');
+    XLSX.writeFile(workbook, filename);
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, itemId: any) => {

@@ -208,7 +208,7 @@ export default function Page({ params }: { params: { id: string } }) {
         </CustomTabPanel>
 
         <CustomTabPanel value={value} index={2}>
-            <GradeManagementTable courseId={5}/>
+            <GradeManagementTable courseId={params.id}/>
         </CustomTabPanel>
       </div>
       <Popper
