@@ -165,6 +165,7 @@ export class ScoreService {
         runner.manager.getRepository(GradeCompositions).find({
           select: {
             name: true,
+            scale: true
           },
           where: {
             courseId: id,
@@ -189,6 +190,7 @@ export class ScoreService {
         data: {
           rows: students as Row[],
           columns: ['id', 'Tên', ...grades.map(item => (item.name))],
+          scales: [...grades.map(item => (item.scale))],
           fileName: `00${id}.xls`
         }
       }

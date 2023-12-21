@@ -6,5 +6,6 @@ export interface Row {
 export interface ColumnsResponse {
   rows: Row[],
   columns: string[],
+  scales: number[],
   fileName: string
 }
