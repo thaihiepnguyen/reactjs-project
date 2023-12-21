@@ -19,6 +19,7 @@ import Heading4 from "@/app/components/text/Heading4";
 import { User } from "@/models/user";
 import { MoreHoriz, PeopleAltOutlined } from "@mui/icons-material";
 import PopupInviteCourse from "@/app/components/PopupInviteCourse";
+import GradeManagementTable from "@/app/components/GradeManagementTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -112,6 +113,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
           <Tab label="Dashboard" {...a11yProps(0)} />
           <Tab label="Classmate" {...a11yProps(1)} />
+          <Tab label="Grade Composition" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <div className={classes.container}>
@@ -203,6 +205,10 @@ export default function Page({ params }: { params: { id: string } }) {
               </div>
             ))}
           </Box>
+        </CustomTabPanel>
+
+        <CustomTabPanel value={value} index={2}>
+            <GradeManagementTable courseId={5}/>
         </CustomTabPanel>
       </div>
       <Popper

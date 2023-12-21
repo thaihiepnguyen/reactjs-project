@@ -7,6 +7,9 @@ import { TableHeaderLabel } from '@/models/general';
 import TableHeader from '../Table/TableHead';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as XLSX from 'xlsx'; 
+import axiosInstance from '@/app/routers/axios';
+import { CommonProps } from '@mui/material/OverridableComponent';
+import { CommonProps } from '@mui/material/OverridableComponent';
 
 const tableHeaders: TableHeaderLabel[] = [
   { name: "grade_name", label: "Grade name", sortable: true },
@@ -14,45 +17,75 @@ const tableHeaders: TableHeaderLabel[] = [
   { name: "is_published", label: "Published", sortable: true },
 ];
 
-const initialItems = [
-  { id: '0', name: 'Lab', scale: '30', isEditing: false, isPublished: false },
-  { id: '1', name: 'Midterm', scale: '30', isEditing: false, isPublished: false },
-  { id: '2', name: 'Final', scale: '40', isEditing: false, isPublished: false },
-];
+// const initialItems = [
+//   { id: '0', name: 'Lab', scale: '30', isEditing: false, isPublished: false },
+//   { id: '1', name: 'Midterm', scale: '30', isEditing: false, isPublished: false },
+//   { id: '2', name: 'Final', scale: '40', isEditing: false, isPublished: false },
+// ];
 
-const DraggableTable = () => {
-  const [items, setItems] = useState(initialItems);
+const GradeManagementTable = ( {courseId} ) => {
+  const [items, setItems] = useState([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
   const [newItemData, setNewItemData] = useState({ id: '', name: '', scale: '', isEditing: false });
   const [totalScale, setTotalScale] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const calculateTotalScale = (itemsToCalculate) => {
+  const convertArrayToItems = (gradeNameList: any[], gradeScaleList: { [x: string]: any; }) => {
+    const items = gradeNameList.map((itemName: any, index: string | number) => {
+      const scale = gradeScaleList[index]; 
+      return {
+        id: `${index}`,
+        name: itemName,
+        scale: scale,
+        isEditing: false,
+        isPublished: false,
+      };
+    });
+  
+    return items;
+  };
+
+  // Function to fetch data from the API based on the provided ID
+  const fetchDataForGradeManagementTable = async () => {
+    try {
+      const response = await axiosInstance.get(`/score/columns/${courseId}`);
+      if (response.data) {
+        const { data } = response.data;
+        const gradeNameList = data.columns.slice(2);
+        const gradeScaleList = data.scales;
+        setItems(convertArrayToItems(gradeNameList, gradeScaleList));
+      } else {
+        throw new Error('Failed to fetch data');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch data when the component mounts
+    fetchDataForGradeManagementTable();
+  }, [courseId]); // Trigger fetch data when the ID changes
+
+  const calculateTotalScale = (itemsToCalculate: any[]) => {
     let total = 0;
-    itemsToCalculate.forEach((item) => {
+    itemsToCalculate.forEach((item: { scale: string; }) => {
       total += parseInt(item.scale);
     });
     setTotalScale(total);
     return total;
   };
 
-  const handleDragEnd = (result) => {
+  const handleDragEnd = (result: { destination: { index: number; }; source: { index: number; }; }) => {
     if (!result.destination) {
       return;
-    }
+    } 
 
     const reorderedItems = Array.from(items);
     const [reorderedItem] = reorderedItems.splice(result.source.index, 1);
     reorderedItems.splice(result.destination.index, 0, reorderedItem);
 
-    // setItems(reorderedItems.map((item, index) => {
-    //   if (result.destination.index === index) {
-    //     return initialItems.find((initItem) => initItem.id === item.id);
-    //   }
-    //   return item;
-    // }));
     setItems(reorderedItems);
-    // console.log(reorderedItems);
   };
 
   const handleEditAllClick = () => {
@@ -77,7 +110,7 @@ const DraggableTable = () => {
     }
   }
 
-  const handleInputChange = (e, itemId, field) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, itemId: any, field: string) => {
     const { value } = e.target;
     setItems(items.map((item) => {
       if (item.id === itemId) {
@@ -87,7 +120,7 @@ const DraggableTable = () => {
     }));
   };
 
-  const handleInputBlur = (itemId) => {
+  const handleInputBlur = (itemId: any) => {
     setItems(items.map((item) => {
       if (item.id === itemId) {
         return { ...item, isEditing: false };
@@ -103,7 +136,7 @@ const DraggableTable = () => {
     setNewItemData({ id: '', name: '', scale: '', isEditing: false });
   };
 
-  const handleInputChangeNewRow = (e, field) => {
+  const handleInputChangeNewRow = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
     const { value } = e.target;
     setNewItemData((prevData) => ({
       ...prevData,
@@ -111,7 +144,7 @@ const DraggableTable = () => {
     }));
   };
 
-  const handleDeleteRow = (itemId) => {
+  const handleDeleteRow = (itemId: any) => {
     const updatedItems = items.filter((item) => item.id !== itemId);
     setItems(updatedItems);
   };  
@@ -136,7 +169,7 @@ const DraggableTable = () => {
     XLSX.writeFile(workbook, 'grade_template.xlsx');
   };
 
-  const handleCheckboxChange = (e, itemId) => {
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, itemId: any) => {
     const updatedItems = items.map((item) => {
       if (item.id === itemId) {
         return { ...item, isPublished: e.target.checked };
@@ -202,7 +235,7 @@ const DraggableTable = () => {
       )}
 
       <Droppable droppableId="droppable">
-        {(provided) => (
+        {(provided: { droppableProps: React.JSX.IntrinsicAttributes & { component: React.ElementType<any>; } & TableOwnProps & CommonProps & Omit<any, "size" | "style" | "padding" | "children" | "className" | "classes" | "sx" | "stickyHeader">; innerRef: any; placeholder: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | Iterable<React.ReactNode> | null | undefined; }) => (
           <Table
             {...provided.droppableProps}
             ref={provided.innerRef}
@@ -212,7 +245,7 @@ const DraggableTable = () => {
             <tbody>
               {items.map((item, index) => (
                 <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
-                  {(provided) => (
+                  {(provided: { innerRef: any; draggableProps: React.JSX.IntrinsicAttributes & { component: React.ElementType<any>; } & TableRowOwnProps & CommonProps & Omit<any, "style" | "children" | "className" | "classes" | "sx" | "selected" | "hover">; dragHandleProps: React.JSX.IntrinsicAttributes & { component: React.ElementType<any>; } & TableRowOwnProps & CommonProps & Omit<any, "style" | "children" | "className" | "classes" | "sx" | "selected" | "hover">; }) => (
                     <TableRow
                       ref={provided.innerRef}
                       {...provided.draggableProps}
@@ -271,4 +304,4 @@ const DraggableTable = () => {
   );
 };
 
-export default DraggableTable;
+export default GradeManagementTable;
