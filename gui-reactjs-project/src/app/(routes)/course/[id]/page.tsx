@@ -20,6 +20,7 @@ import { User } from "@/models/user";
 import { MoreHoriz, PeopleAltOutlined } from "@mui/icons-material";
 import PopupInviteCourse from "@/app/components/PopupInviteCourse";
 import GradeManagementTable from "@/app/components/GradeManagementTable";
+import MoreHorizContainer from "@/app/components/MoreHorizContainer";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -50,28 +51,30 @@ export default function Page({ params }: { params: { id: string } }) {
   const anchorRef = React.useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    function getCourseDetail(id: string) {
-      dispatch(setLoading(true));
-      axiosInstance
-        .get(`/courses/user/my-courses/detail/${id}`)
-        .then((response) => {
-          setCourse(response.data.data);
-        })
-        .catch((err) => {
-          Swal.fire({
-            title: err.response.data.message,
-            icon: "error",
-          }).then(() => {
-            router.back();
-          });
-        })
-        .finally(() => {
-          dispatch(setLoading(false));
-        });
-    }
-
+    
     getCourseDetail(params.id);
   }, []);
+
+  function getCourseDetail(id: string) {
+    dispatch(setLoading(true));
+    axiosInstance
+      .get(`/courses/user/my-courses/detail/${id}`)
+      .then((response) => {
+        setCourse(response.data.data);
+      })
+      .catch((err) => {
+        Swal.fire({
+          title: err.response.data.message,
+          icon: "error",
+        }).then(() => {
+          router.back();
+        });
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
+  }
+
 
   function a11yProps(index: number) {
     return {
@@ -192,16 +195,23 @@ export default function Page({ params }: { params: { id: string } }) {
               <Heading3>Students</Heading3>
             </Divider>
             {course?.studentList?.map((student: User, studentIdx: number) => (
-              <div className={classes.infoWrapper} key={studentIdx}>
-                <div className={classes.personalImage}>
-                  <Avatar>{student?.avatarUrl ? <img src={student.avatarUrl} alt=""></img> : "T"}</Avatar>
+              <div className={classes.wrapper}>
+                <div className={classes.infoWrapper} key={studentIdx}>
+                  <div className={classes.personalImage}>
+                    <Avatar>{student?.avatarUrl ? <img src={student.avatarUrl} alt=""></img> : "T"}</Avatar>
+                  </div>
+                  <div className={classes.personalInfo}>
+                    <Heading4 $colorName="--eerie-black" className={classes.name}>
+                      {student?.id === user?.id ? "You" : student?.fullname}
+                    </Heading4>
+                    <ParagraphSmall>{student?.email}</ParagraphSmall>
+                  </div>
                 </div>
-                <div className={classes.personalInfo}>
-                  <Heading4 $colorName="--eerie-black" className={classes.name}>
-                    {student?.id === user?.id ? "You" : student?.fullname}
-                  </Heading4>
-                  <ParagraphSmall>{student?.email}</ParagraphSmall>
-                </div>
+                {user?.role?.name === "teacher" ? (
+                  <div>
+                    <MoreHorizContainer studentId={student?.id} courseId={params.id} onBanStudent={() => getCourseDetail(params.id)}/>
+                  </div>
+                ) : null}
               </div>
             ))}
           </Box>

@@ -91,6 +91,11 @@
   width: 100%;
 }
 
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .infoWrapper {
   display: flex;
   align-items: center;
@@ -102,6 +107,7 @@
     object-fit: cover;
   }
 }
+
 
 .iconMore {
   color: #767676;

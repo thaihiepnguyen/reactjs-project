@@ -410,6 +410,7 @@ export class CourseService {
       }
     }
     // Step 3: studentId has been in courseId or not 
+    console.log(studentId);
     const isStudentExisted = await this.connection.getRepository(Participants).exist({
       where: {
         courseId,

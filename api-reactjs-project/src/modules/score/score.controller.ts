@@ -27,7 +27,7 @@ export class ScoreController {
     if (totalScales !== 100) {
       // total of scale must be 100
       return {
-        message: 'Total score percentage must be 100 per cent',
+        message: 'Total score percentage must be 100 percents',
         statusCode: 400
       };
     }
