@@ -23,7 +23,7 @@ export class Scores extends EntityBase{
   })
   teacherId: number;
 
-  @Column("int", {
+  @Column("float", {
     name: "score",
     default: () => "'0'",
   })
