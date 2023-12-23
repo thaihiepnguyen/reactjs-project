@@ -199,7 +199,7 @@ const GradeTable = () => {
               <InputSearch
                 sx={{ px: 1 }}
                 placeholder={props?.columnDef?.title}
-                type="text"
+                type={props?.columnDef?.type ? "number" : "text"}
                 value={props.value}
                 onChange={(e) => props.onChange(e.target.value)}
               />
