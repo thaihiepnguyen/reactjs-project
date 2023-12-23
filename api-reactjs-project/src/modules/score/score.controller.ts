@@ -1,12 +1,11 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { ScoreService } from "./score.service";
-import { AddScoreDto, CreateColumnDto } from "./score.dto";
+import { AddScoreByStudentCodeDto, AddScoreDto, CreateColumnDto } from "./score.dto";
 import { TBaseDto } from "src/app.dto";
 import { MetaDataAuth } from "../auth/auth.decorator";
 import { ColumnsResponse } from "./score.typing";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
-import * as xlsx from 'xlsx';
 
 @Controller('/score')
 export class ScoreController {
@@ -42,12 +41,23 @@ export class ScoreController {
   ): Promise<TBaseDto<null>> {
     const { gradeId, studentId, score} = addScoreDto;
 
-    return await this.scoreService.addScore(gradeId, studentId, userId, score);
+    return await this.scoreService.addScoreByStudentId(gradeId, studentId, userId, score);
+  }
+
+  @Post('/add/by-student-code/:id')
+  async addScoreByStudentCode(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() addScoreByStudentCode: AddScoreByStudentCodeDto,
+    @MetaDataAuth('userId') userId: number 
+  ): Promise<TBaseDto<null>> {
+    const { studentCode, scores } = addScoreByStudentCode;
+
+    return await this.scoreService.addScoreByStudentCode(studentCode, userId, scores, id);
   }
 
   @Get('/columns/:id')
   async getColumns(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @MetaDataAuth('userId') userId: number
   ): Promise<TBaseDto<ColumnsResponse>> {
     return await this.scoreService.getColumns(id, userId);
@@ -74,11 +84,13 @@ export class ScoreController {
     }
   }
  
-  @Post('/update-score/:courseId')
+  @Post('/update-score/:id')
   async updateScore(
-    @Param('courseId') courseId: number,
-    @Body() scoreData: any[],
+    @Param('id', ParseIntPipe) id: number,
+    @Body() addScoreByStudentCodes: AddScoreByStudentCodeDto[],
+    @MetaDataAuth('userId') userId: number 
   ): Promise<TBaseDto<null>> {
-    return await this.scoreService.updateScore(courseId, scoreData);
+    console.log(addScoreByStudentCodes);
+    return await this.scoreService.updateScoresByStudentCode(userId, addScoreByStudentCodes, id);
   }
 }

@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { TBaseDto } from 'src/app.dto';
 import { GradeCompositions } from 'src/typeorm/entity/GradeCompositions';
-import { Connection, In, Like } from 'typeorm';
+import { Connection, In, IsNull, Like, Not } from 'typeorm';
 import { CourseService } from '../course/course.service';
-import { ColumnDto, CreateColumnDto } from './score.dto';
+import { AddScoreByStudentCodeDto, ColumnDto, CreateColumnDto, TScore } from './score.dto';
 import { Users } from 'src/typeorm/entity/Users';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
@@ -13,6 +13,8 @@ import { ColumnsResponse, Row } from './score.typing';
 import * as xlsx from 'xlsx';
 
 const N_COLUMNS_IGNORE = 2;
+const COLUMN_ID = 'studentId';
+const COLUMN_FULLNAME = 'fullname';
 @Injectable()
 export class ScoreService {
   constructor(
@@ -72,7 +74,18 @@ export class ScoreService {
     }
   }
 
-  async addScore(
+    /*
+   * WARNING: THIS FUNCTION CURRENTLY IS NOT OK!
+   * Add a score based on student id. 
+   *
+   * @param gradeId
+   * @param studentId
+   * @param teacherId
+   * @param score
+   *
+   * Return null
+   */
+  async addScoreByStudentId(
     gradeId: number,
     studentId: number,
     teacherId: number,
@@ -127,13 +140,90 @@ export class ScoreService {
           data: null,
         };
 
+      const { studentId: studentCode } = await runner.manager.getRepository(Users).findOne({ select: { studentId: true }, where: {id: studentId}});
       // insert
       await runner.manager.getRepository(Scores).insert({
         gradeId,
-        studentId,
+        studentId: studentCode,
         teacherId,
         score,
       });
+    } finally {
+      await runner.release();
+    }
+  }
+    /*
+   * Add a score based on student code (MSSV). 
+   *
+   * @param gradeId
+   * @param studentId
+   * @param teacherId
+   * @param score
+   *
+   * Return null
+   */
+  async addScoreByStudentCode(
+    studentCode: string,
+    teacherId: number,
+    scores: TScore,
+    courseId: number
+    ): Promise<TBaseDto<null>> {
+    const runner = this.connection.createQueryRunner();
+    try {
+      // Step 1: The teacher is correct
+      const isTeacherCorrect = await this.courseService.isTeacherInCourse(courseId, teacherId);
+      if (!isTeacherCorrect) {
+        return {
+          message: 'The teacher id is invalid',
+          statusCode: 400,
+          data: null,
+        };
+      }
+      // Step 2: validate scores
+      if (!scores || !Object.keys(scores).length) {
+        return {
+          message: 'The scores are invalid',
+          statusCode: 400,
+          data: null,
+        };
+      }
+
+      // insert on duplicate
+      let params = '(?, ?, ?, ?)';
+      for (let i = 0; i < Object.keys(scores).length - 1; i++) {
+        params = params.concat(', ', params);
+      }
+
+      const index = await this._indexGrade(courseId);
+
+      const sql = `
+        INSERT INTO scores (grade_id, student_id, teacher_id, score)
+        VALUES
+        ${params}
+        ON DUPLICATE
+          KEY UPDATE
+            score = VALUES(score);
+      `;
+
+      // warning: if the column which posted is not match to db, the default score is 0.
+      const valueParams = Object.keys(scores).reduce((acc, cur) => {
+        acc = [...acc, index[cur] || 0, studentCode, teacherId, scores[cur]];
+        return acc;
+      }, []);
+
+      await runner.connection.getRepository(Scores).query(sql, valueParams);
+      return {
+        message: 'success',
+        statusCode: 200,
+        data: null,
+      }
+    } catch (e) {
+      console.log(e);
+      return {
+        message: 'Internal Error!',
+        statusCode: 400,
+        data: null,
+      }
     } finally {
       await runner.release();
     }
@@ -154,7 +244,7 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
 
     try {
-      // step 1: the teacher must be in this id
+      // step 1: The teacher must be in this id
       const isTeacherInCourse = await this.courseService.isTeacherInCourse(
         id,
         teacherId,
@@ -167,7 +257,7 @@ export class ScoreService {
         };
       }
 
-      // step 2: get student ids and columns
+      // step 2: Get student ids and columns
 
       const [studentIds, grades] = await Promise.all([
         runner.manager.getRepository(Participants).find({
@@ -186,42 +276,31 @@ export class ScoreService {
           where: {
             courseId: id,
           },
+          order: {
+            order: 'ASC',
+          },
         }),
       ]);
 
-      // step 3: Get the names of the students
+      // step 3: Get names and studentId of the students
       const students = await runner.manager.getRepository(Users).find({
         select: {
-          id: true,
+          studentId: true,
           fullname: true,
         },
         where: {
           id: In(studentIds.map((item) => item.studentId)),
+          studentId: Not(IsNull())
         },
       });
-
-      const sortedGrades = await runner.manager
-        .getRepository(GradeCompositions)
-        .find({
-          select: {
-            name: true,
-            scale: true,
-          },
-          where: {
-            courseId: id,
-          },
-          order: {
-            order: 'ASC',
-          },
-        });
 
       return {
         message: 'success',
         statusCode: 200,
         data: {
           rows: students as Row[],
-          columns: ['id', 'Tên', ...sortedGrades.map((item) => item.name)],
-          scales: [...sortedGrades.map((item) => item.scale)],
+          columns: [COLUMN_ID, COLUMN_FULLNAME, ...grades.map((item) => item.name)],
+          scales: grades.map((item) => item.scale),
           fileName: `00${id}.xls`,
         },
       };
@@ -255,7 +334,7 @@ export class ScoreService {
     // Step 2: save data to db
 
     const valueColumns = Object.keys(data[0]).filter(
-      (item) => item != 'id' && item != 'Tên',
+      (item) => item != COLUMN_ID && item != COLUMN_FULLNAME,
     );
 
     const courseId = +file.filename.split('.')[0];
@@ -285,7 +364,7 @@ export class ScoreService {
     const valueParams = data.reduce((acc, cur) => {
       let curScores = [];
       valueColumns.forEach((item) => {
-        curScores = [...curScores, index[item], cur.id, userId, cur[item]];
+        curScores = [...curScores, index[item] || 0, cur.id, userId, cur[item]];
       });
       acc = [...acc, ...curScores];
       return acc;
@@ -324,40 +403,75 @@ export class ScoreService {
     }, {});
   }
 
-  async updateScore(
+  async updateScoresByStudentCode(
+    teacherId: number,
+    addScoreByStudentCodes: AddScoreByStudentCodeDto[],
     courseId: number,
-    scoreData: any[],
   ): Promise<TBaseDto<null>> {
-    const transaction = await this.connection.createQueryRunner();
-    await transaction.startTransaction();
-
+    const runner = this.connection.createQueryRunner();
     try {
-      await transaction.manager
-        .getRepository(GradeCompositions)
-        .delete({ courseId: courseId });
-      for (const item of scoreData) {
-        await transaction.manager.getRepository(GradeCompositions).save({
-          courseId: courseId,
-          name: item.name,
-          scale: item.scale,
-          order: item.id,
-        });
+      // Step 1: The teacher is correct
+      const isTeacherCorrect = await this.courseService.isTeacherInCourse(courseId, teacherId);
+      if (!isTeacherCorrect) {
+        return {
+          message: 'The teacher id is invalid',
+          statusCode: 400,
+          data: null,
+        };
       }
-      await transaction.commitTransaction();
+      // Step 2: validate scores
+      if (!addScoreByStudentCodes || !addScoreByStudentCodes.length) {
+        return {
+          message: 'The scores are invalid',
+          statusCode: 400,
+          data: null,
+        };
+      }
+
+      // insert on duplicate
+      const N_COLUMNS = Object.keys(addScoreByStudentCodes[0].scores).length;
+      let params = '(?, ?, ?, ?)';
+      for (let i = 0; i < addScoreByStudentCodes.length * N_COLUMNS - 1; i++) {
+        params += ', (?, ?, ?, ?)'
+      }
+
+      const index = await this._indexGrade(courseId);
+
+      const sql = `
+        INSERT INTO scores (grade_id, student_id, teacher_id, score)
+        VALUES
+        ${params}
+        ON DUPLICATE
+          KEY UPDATE
+            score = VALUES(score);
+      `;
+
+      // warning: if the column which posted is not match to db, the default score is 0.
+      const valueParams = addScoreByStudentCodes.reduce((acc, cur) => {
+        let curScores = [];
+        Object.keys(addScoreByStudentCodes[0].scores).forEach((item) => {
+          curScores = [...curScores, index[item] || 0, cur.studentCode, teacherId, cur.scores[item]];
+        });
+        acc = [...acc, ...curScores];
+        return acc;
+      }, []);
+      console.log(sql, valueParams);
+
+      await runner.connection.getRepository(Scores).query(sql, valueParams);
       return {
-        message: 'Column order updated successfully',
+        message: 'success',
         statusCode: 200,
         data: null,
-      };
-    } catch (error) {
-      await transaction.rollbackTransaction();
+      }
+    } catch (e) {
+      console.log(e);
       return {
-        message: 'Failed to update column order',
-        statusCode: 500, 
+        message: 'Internal Error!',
+        statusCode: 400,
         data: null,
-      };
+      }
     } finally {
-      await transaction.release();
+      await runner.release();
     }
   }
 }
