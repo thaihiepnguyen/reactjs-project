@@ -16,8 +16,11 @@ const tableHeaders: TableHeaderLabel[] = [
   { name: "is_published", label: "Published", sortable: true },
 ];
 
-const GradeManagementTable = ( {courseId} ) => {
-  const [items, setItems] = useState([]);
+interface Props {
+  courseId: string;
+}
+const GradeManagementTable = ( {courseId}: Props ) => {
+  const [items, setItems] = useState<any[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
   const [newItemData, setNewItemData] = useState({ id: '', name: '', scale: '', isEditing: false });
   const [errorMessage, setErrorMessage] = useState('');
@@ -25,7 +28,7 @@ const GradeManagementTable = ( {courseId} ) => {
   const [gradeScaleList, setGradeScaleList] = useState([]);
   const [headerExcelFile, setHeaderExcelFile] = useState([]);
   const [filename, setFileName] = useState('');
-  const [studentList, setStudentList] = useState([]);
+  const [studentList, setStudentList] = useState<any[]>([]);
 
   const convertDataToTable = (gradeNameList: any[], gradeScaleList: { [x: string]: any; }) => {
     const items = gradeNameList.map((itemName: any, index: string | number) => {
@@ -113,7 +116,7 @@ const GradeManagementTable = ( {courseId} ) => {
     
     // Save new order index to DB
     try {
-      const response = await axiosInstance.post(`/score/update-score/${courseId}`, (courseId, reorderedItemsWithNewIDs));
+      const response = await axiosInstance.post(`/score/update-score/${courseId}`, (reorderedItemsWithNewIDs));
       if (response.data) {
         console.log(response.data);
       } else {

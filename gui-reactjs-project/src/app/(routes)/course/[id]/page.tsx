@@ -21,6 +21,7 @@ import { MoreHoriz, PeopleAltOutlined } from "@mui/icons-material";
 import PopupInviteCourse from "@/app/components/PopupInviteCourse";
 import GradeManagementTable from "@/app/components/GradeManagementTable";
 import MoreHorizContainer from "@/app/components/MoreHorizContainer";
+import GradeTable from "@/app/components/GradeTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -113,10 +114,11 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <Box className={classes.root}>
       <Box className={classes.menu} sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" className={classes.tabWrapper}>
           <Tab label="Dashboard" {...a11yProps(0)} />
           <Tab label="Classmate" {...a11yProps(1)} />
           <Tab label="Grade Composition" {...a11yProps(2)} />
+          <Tab label="Score" {...a11yProps(3)} />
         </Tabs>
       </Box>
       <div className={classes.container}>
@@ -219,6 +221,10 @@ export default function Page({ params }: { params: { id: string } }) {
 
         <CustomTabPanel value={value} index={2}>
             <GradeManagementTable courseId={params.id}/>
+        </CustomTabPanel>
+
+        <CustomTabPanel value={value} index={3}>
+            <GradeTable/>
         </CustomTabPanel>
       </div>
       <Popper
