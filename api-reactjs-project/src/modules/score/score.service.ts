@@ -205,7 +205,7 @@ export class ScoreService {
             score = VALUES(score);
       `;
 
-      // warning: if the column which posted is not match to db, the default score is 0.
+      // warning: if the column which posted doesn't match to db, the default score is 0.
       const valueParams = Object.keys(scores).reduce((acc, cur) => {
         acc = [...acc, index[cur] || 0, studentCode, teacherId, scores[cur]];
         return acc;
@@ -455,7 +455,6 @@ export class ScoreService {
         acc = [...acc, ...curScores];
         return acc;
       }, []);
-      console.log(sql, valueParams);
 
       await runner.connection.getRepository(Scores).query(sql, valueParams);
       return {

@@ -90,7 +90,6 @@ export class ScoreController {
     @Body() addScoreByStudentCodes: AddScoreByStudentCodeDto[],
     @MetaDataAuth('userId') userId: number 
   ): Promise<TBaseDto<null>> {
-    console.log(addScoreByStudentCodes);
     return await this.scoreService.updateScoresByStudentCode(userId, addScoreByStudentCodes, id);
   }
 }
