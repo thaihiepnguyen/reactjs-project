@@ -13,11 +13,14 @@
     padding-right: 1rem;
   }
   .list {
-    overflow-y: scroll;
     height: 90%;
+    overflow: auto;
   }
   .detailNotification {
     padding: 20px;
     flex: 3;
+    h5 {
+      margin: 8px 0;
+    }
   }
 }

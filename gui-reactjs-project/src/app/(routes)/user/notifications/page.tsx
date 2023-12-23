@@ -48,7 +48,9 @@ export default function Page() {
       </div>
       <div className={classes.detailNotification}>
         {
-          notifications.length && <span>{parse(notifications[notiDetail].message)}</span>
+          notifications.length && <div dangerouslySetInnerHTML={{
+            __html: notifications[notiDetail].message
+          }}></div>
         }
       </div>
     </div>
