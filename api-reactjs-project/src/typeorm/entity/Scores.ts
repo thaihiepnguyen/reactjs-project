@@ -10,12 +10,6 @@ export class Scores extends EntityBase{
   })
   gradeId: number;
 
-  @Column("tinyint", {
-    name: "is_final",
-    default: () => "'0'",
-  })
-  isFinal: boolean
-
   @Column("int", {
     name: "student_id",
     default: () => "'0'",

@@ -18,92 +18,13 @@ interface GradeTableProps {
   courseId: string;
 }
 
-const sampleScore = [
-  {
-    id: 1,
-    studentId: "20127533",
-    Lab1: 10,
-    Lab2: 10,
-    Midterm: 10,
-    Final: 10,
-  },
-  {
-    id: 2,
-    studentId: "20127533",
-    Lab1: 10,
-    Lab2: 10,
-    Midterm: 10,
-    Final: 10,
-  },
-  {
-    id: 3,
-    studentId: "20127533",
-    Lab1: 10,
-    Lab2: 10,
-    Midterm: 10,
-    Final: 10,
-  },
-];
 const GradeTable = memo(({ courseId }: GradeTableProps) => {
   const [scoreData, setScoreData] = useState<any>(null);
-
+console.log(scoreData)
   const [showGradeSetup, setShowGradeSetup] = useState<boolean>(false);
-  const [columns, setColumns] = useState([
-    {
-      title: "Student ID",
-      field: "studentId",
-    },
-    {
-      title: "Full name",
-      field: "fullname",
-    },
-    {
-      title: "Lab 1",
-      field: "Lab 1",
-      type: "numeric",
-    },
-    {
-      title: "Lab 2",
-      field: "Lab 2",
-      type: "numeric",
-    },
-    {
-      title: "Lab 3",
-      field: "Lab 3",
-      type: "numeric",
-    },
-    {
-      title: "Midterm",
-      field: "Midterm",
-      type: "numeric",
-    },
-    {
-      title: "Final",
-      field: "Final",
-      type: "numeric",
-    },
-  ]);
+  const [columns, setColumns] = useState([]);
 
-  const [data, setData] = useState([
-    {
-      studentId: "20127533",
-      fullname: "Lê Đăng Khoa",
-      "Lab 1": 10,
-      "Lab 2": 9,
-      "Lab 3": 8,
-      Midterm: 7,
-      Final: 6,
-    },
-    {
-      studentId: "20127599",
-      fullname: "Lê Đăng",
-      "Lab 1": 6,
-      "Lab 2": 9,
-      "Lab 3": 4,
-      Midterm: 5,
-      Final: 8,
-    },
-  ]);
+  const [data, setData] = useState([]);
 
   const fetchDataForGradeManagementTable = async () => {
     try {
@@ -111,6 +32,23 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
       if (response.data) {
         const { data } = response.data;
         setScoreData(data);
+        if (data?.columns?.length) {
+          setColumns(data?.columns?.map((col:any, index: number) => ({
+            title: `${col} (${index >= 2 ? data?.scales?.[index-2] + "%"  : ""})`,
+            field: col,
+            type: index >= 2 ? "numeric" : "string",
+          })))
+        }
+
+        if (data?.rows?.length) {
+         
+          setColumns(data?.columns?.map((col:any, index: number) => ({
+            title: `${col} ${index >= 2 ? "(" + data?.scales?.[index-2] + "%)"  : ""}`,
+            field: col,
+            type: index >= 2 ? "numeric" : "string",
+          })))
+        }
+
       } else {
         Swal.fire({
           title: "Oops! Something went wrong",
@@ -151,9 +89,9 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
           data={data}
           components={{
             EditField: (props) => {
-              console.log(props);
               return (
                 <InputSearch
+                  width="100%"
                   sx={{ px: 1 }}
                   placeholder={props?.columnDef?.title}
                   type={props?.columnDef?.type ? "number" : "text"}
