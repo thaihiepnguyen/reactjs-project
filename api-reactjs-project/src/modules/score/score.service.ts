@@ -171,7 +171,7 @@ export class ScoreService {
 
       const [studentIds, grades] = await Promise.all([
         runner.manager.getRepository(Participants).find({
-          select: { 
+          select: {
             studentId: true,
           },
           where: {

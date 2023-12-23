@@ -31,6 +31,8 @@ import InputTag from "../InputTag";
 import ParagraphSmall from "../text/ParagraphSmall";
 import CustomBtn, { BtnType } from "../buttons/Button";
 import ErrorMessage from "../text/ErrorMessage";
+import { useAppDispatch } from "@/redux/hook";
+import { setLoading } from "@/redux/reducers/loading";
 
 const tableHeaders: TableHeaderLabel[] = [
   { name: "grade_name", label: "Grade name", sortable: true },
@@ -44,13 +46,14 @@ interface Props {
   onCancel: () => void;
 }
 const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
+  const dispatch = useAppDispatch();
   const [items, setItems] = useState<any[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
   const [newItemData, setNewItemData] = useState({ id: "", name: "", scale: "", isEditing: false });
   const [errorMessage, setErrorMessage] = useState("");
-  const [gradeNameList, setGradeNameList] = useState([]);
-  const [gradeScaleList, setGradeScaleList] = useState([]);
-  const [headerExcelFile, setHeaderExcelFile] = useState([]);
+  const [gradeNameList, setGradeNameList] = useState<any>([]);
+  const [gradeScaleList, setGradeScaleList] = useState<any>([]);
+  const [headerExcelFile, setHeaderExcelFile] = useState<any>([]);
   const [filename, setFileName] = useState("");
   const [studentList, setStudentList] = useState<any[]>([]);
 
@@ -140,7 +143,9 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
 
     // Save new order index to DB
     try {
+      dispatch(setLoading(true));
       const response = await axiosInstance.post(`/score/update-score/${courseId}`, reorderedItemsWithNewIDs);
+      dispatch(setLoading(false));
       if (response.data) {
         console.log(response.data);
       } else {
@@ -155,7 +160,7 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
     setIsEditingAll(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setItems(items.map((item) => ({ ...item, isEditing: !isEditingAll })));
     const total = calculateTotalScale(items);
     if (Number.isNaN(total)) {
@@ -167,7 +172,31 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
       setIsEditingAll(false);
       setErrorMessage("");
 
-      // call API here
+      const reorderedItems = Array.from(items);
+      // Sett new header for the xls file
+      const headers = ["ID", "Tên", ...reorderedItems.map((obj) => obj.name)];
+      setHeaderExcelFile(headers);
+
+      // Reorder the items
+      const reorderedItemsWithNewIDs = reorderedItems.map((item, index) => ({
+        ...item,
+        id: `${index}`, // Reassign IDs based on the new order
+      }));
+
+      // Save new order index to DB
+      try {
+        dispatch(setLoading(true));
+        const response = await axiosInstance.post(`/score/update-score/${courseId}`, reorderedItemsWithNewIDs);
+        dispatch(setLoading(false));
+
+        if (response.data) {
+          console.log(response.data);
+        } else {
+          throw new Error("Failed to fetch data");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
   };
 
@@ -198,7 +227,7 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
     );
   };
 
-  const handleAddRow = () => {
+  const handleAddRow = async () => {
     const newItemId = String(items.length);
     const newItem = { ...newItemData, id: newItemId };
     setItems((prevItems) => [...prevItems, newItem]);
@@ -367,7 +396,12 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
               )}
             </Droppable>
             {!isEditingAll ? (
-              <CustomBtn sx={{mt: "16px !important"}} btnType={BtnType.Primary} onClick={handleExportToExcel} className={classes.saveBtn}>
+              <CustomBtn
+                sx={{ mt: "16px !important" }}
+                btnType={BtnType.Primary}
+                onClick={handleExportToExcel}
+                className={classes.saveBtn}
+              >
                 Download Transcript
               </CustomBtn>
             ) : (
