@@ -1,18 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { InjectConnection } from "@nestjs/typeorm";
-import { TBaseDto } from "src/app.dto";
-import { GradeCompositions } from "src/typeorm/entity/GradeCompositions";
-import { Connection, In, Like } from "typeorm";
-import { CourseService } from "../course/course.service";
-import { ColumnDto, CreateColumnDto } from "./score.dto";
-import { Users } from "src/typeorm/entity/Users";
-import { Courses } from "src/typeorm/entity/Courses";
-import { Participants } from "src/typeorm/entity/Participants";
-import { Scores } from "src/typeorm/entity/Scores";
-import { ColumnsResponse, Row } from "./score.typing";
+import { Injectable } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/typeorm';
+import { TBaseDto } from 'src/app.dto';
+import { GradeCompositions } from 'src/typeorm/entity/GradeCompositions';
+import { Connection, In, Like } from 'typeorm';
+import { CourseService } from '../course/course.service';
+import { ColumnDto, CreateColumnDto } from './score.dto';
+import { Users } from 'src/typeorm/entity/Users';
+import { Courses } from 'src/typeorm/entity/Courses';
+import { Participants } from 'src/typeorm/entity/Participants';
+import { Scores } from 'src/typeorm/entity/Scores';
+import { ColumnsResponse, Row } from './score.typing';
 import * as xlsx from 'xlsx';
 
-const N_COLUMNS_IGNORE = 2
+const N_COLUMNS_IGNORE = 2;
 @Injectable()
 export class ScoreService {
   constructor(
@@ -22,137 +22,153 @@ export class ScoreService {
   ) {}
 
   /*
-  * Create score's columns of a course
-  *
-  * @param courseId
-  * @param columns
-  * 
-  * Return null
-  */
-  async createColumns(courseId: number, columns: ColumnDto[]): Promise<TBaseDto<null>> {
+   * Create score's columns of a course
+   *
+   * @param courseId
+   * @param columns
+   *
+   * Return null
+   */
+  async createColumns(
+    courseId: number,
+    columns: ColumnDto[],
+  ): Promise<TBaseDto<null>> {
     if (!this.courseService.isCourseExist(courseId)) {
       return {
         message: 'The course is not existed',
         statusCode: 400,
-        data: null
+        data: null,
       };
     }
 
     try {
-      await this.connection.getRepository(GradeCompositions).createQueryBuilder()
-      .insert()
-      .into(GradeCompositions)
-      .values(columns.map(item => {
-        return {
-          courseId: courseId,
-          name: item.name,
-          scale: item.scale
-        }
-      }))
-      .execute();
+      await this.connection
+        .getRepository(GradeCompositions)
+        .createQueryBuilder()
+        .insert()
+        .into(GradeCompositions)
+        .values(
+          columns.map((item) => {
+            return {
+              courseId: courseId,
+              name: item.name,
+              scale: item.scale,
+            };
+          }),
+        )
+        .execute();
 
       return {
         message: 'success',
         statusCode: 200,
-        data: null
-      }
+        data: null,
+      };
     } catch (e) {
       return {
         message: e,
         statusCode: 400,
-        data: null
-      }
+        data: null,
+      };
     }
   }
 
-  async addScore(gradeId: number, studentId: number, teacherId: number, score: number)
-    : Promise<TBaseDto<null>> {
+  async addScore(
+    gradeId: number,
+    studentId: number,
+    teacherId: number,
+    score: number,
+  ): Promise<TBaseDto<null>> {
     const runner = this.connection.createQueryRunner();
 
     try {
       // validate
-      const grade = await runner.manager.getRepository(GradeCompositions).findOne(
-        { 
+      const grade = await runner.manager
+        .getRepository(GradeCompositions)
+        .findOne({
           where: { id: gradeId },
           select: {
             courseId: true,
-          }
-        },
-      );
+          },
+        });
       if (!grade || !Object.keys(grade).length) {
         return {
           message: 'Maybe the grade id is not existed',
           statusCode: 400,
-          data: null
-        }
+          data: null,
+        };
       }
       const { courseId } = grade;
-  
+
       const [isTeacherCorrect, isStudentCorrect] = await Promise.all([
-        runner.manager.getRepository(Courses).exist({ 
+        runner.manager.getRepository(Courses).exist({
           where: {
             id: courseId,
             teacherIds: Like(`%${teacherId}`),
-          }
-          }),
+          },
+        }),
         runner.manager.getRepository(Participants).exist({
           where: {
             courseId: courseId,
-            studentId: studentId
-          }
-        })
+            studentId: studentId,
+          },
+        }),
       ]);
-      if (!isTeacherCorrect) return {
-        message: 'Maybe the teacher id is incorrect',
-        statusCode: 400,
-        data: null
-      };
-  
-      if (!isStudentCorrect) return {
-        message: 'Maybe the student id is incorrect',
-        statusCode: 400,
-        data: null
-      };
+      if (!isTeacherCorrect)
+        return {
+          message: 'Maybe the teacher id is incorrect',
+          statusCode: 400,
+          data: null,
+        };
 
-      // insert 
+      if (!isStudentCorrect)
+        return {
+          message: 'Maybe the student id is incorrect',
+          statusCode: 400,
+          data: null,
+        };
+
+      // insert
       await runner.manager.getRepository(Scores).insert({
-          gradeId,
-          studentId,
-          teacherId,
-          score
-        }
-      )
-    }
-    finally {
+        gradeId,
+        studentId,
+        teacherId,
+        score,
+      });
+    } finally {
       await runner.release();
     }
   }
 
   /*
-  * Get information of grade composition to generate default excel file.
-  *
-  * @param id is a course id
-  * @param teacherId
-  * 
-  * Return rows as studentIds, columns as score's columns and fileName
-  */
-  async getColumns(id: number, teacherId: number): Promise<TBaseDto<ColumnsResponse>> {
-    
+   * Get information of grade composition to generate default excel file.
+   *
+   * @param id is a course id
+   * @param teacherId
+   *
+   * Return rows as studentIds, columns as score's columns and fileName
+   */
+  async getColumns(
+    id: number,
+    teacherId: number,
+  ): Promise<TBaseDto<ColumnsResponse>> {
     const runner = this.connection.createQueryRunner();
 
     try {
-      // step 1: the teacher must be in this id 
-      const isTeacherInCourse = await this.courseService.isTeacherInCourse(id, teacherId);
+      // step 1: the teacher must be in this id
+      const isTeacherInCourse = await this.courseService.isTeacherInCourse(
+        id,
+        teacherId,
+      );
       if (!isTeacherInCourse) {
         return {
           message: 'the teacher id must be in this id',
           statusCode: 400,
-          data: null
-        }
+          data: null,
+        };
       }
-  
+
       // step 2: get student ids and columns
-  
+
       const [studentIds, grades] = await Promise.all([
         runner.manager.getRepository(Participants).find({
           select: {
@@ -160,17 +176,17 @@ export class ScoreService {
           },
           where: {
             courseId: id,
-          }
+          },
         }),
         runner.manager.getRepository(GradeCompositions).find({
           select: {
             name: true,
-            scale: true
+            scale: true,
           },
           where: {
             courseId: id,
-          }
-        })
+          },
+        }),
       ]);
 
       // step 3: Get the names of the students
@@ -180,60 +196,68 @@ export class ScoreService {
           fullname: true,
         },
         where: {
-          id: In(studentIds.map(item => (item.studentId))),
-        }
+          id: In(studentIds.map((item) => item.studentId)),
+        },
       });
 
-      const sortedGrades = await runner.manager.getRepository(GradeCompositions).find({
-        select: {
-          name: true,
-          scale: true,
-        },
-        where: {
-          courseId: id,
-        },
-        order: {
-          order: 'ASC',
-        },
-      });
+      const sortedGrades = await runner.manager
+        .getRepository(GradeCompositions)
+        .find({
+          select: {
+            name: true,
+            scale: true,
+          },
+          where: {
+            courseId: id,
+          },
+          order: {
+            order: 'ASC',
+          },
+        });
 
       return {
         message: 'success',
         statusCode: 200,
         data: {
           rows: students as Row[],
-          columns: ['id', 'Tên', ...sortedGrades.map(item => (item.name))],
-          scales: [...sortedGrades.map(item => (item.scale))],
-          fileName: `00${id}.xls`
-        }
-      }
+          columns: ['id', 'Tên', ...sortedGrades.map((item) => item.name)],
+          scales: [...sortedGrades.map((item) => item.scale)],
+          fileName: `00${id}.xls`,
+        },
+      };
     } catch (e) {
       console.log(e);
-    }
-    finally {
+    } finally {
       await runner.release();
     }
   }
 
-  async saveScores(file: Express.Multer.File, userId: number): Promise<TBaseDto<null>>  {
+  async saveScores(
+    file: Express.Multer.File,
+    userId: number,
+  ): Promise<TBaseDto<null>> {
     const workbook = xlsx.readFile(`uploads/score/${file.filename}`);
 
     // Step 1: load data from sheets
     let data = [];
     const sheets = workbook.SheetNames;
-      
-    for(let i = 0; i < sheets.length; i++) { 
-      const temp = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[i]]) 
+
+    for (let i = 0; i < sheets.length; i++) {
+      const temp = xlsx.utils.sheet_to_json(
+        workbook.Sheets[workbook.SheetNames[i]],
+      );
       temp.forEach((res) => {
-        data.push(res) 
+        data.push(res);
       });
     }
     // validate data
 
     // Step 2: save data to db
-    
-    const valueColumns = Object.keys(data[0]).filter(item => (item != 'id' && item != 'Tên'));
-    
+
+    const valueColumns = Object.keys(data[0]).filter(
+      (item) => item != 'id' && item != 'Tên',
+    );
+
     const courseId = +file.filename.split('.')[0];
 
     const nColumns = Object.keys(data[0]).length - N_COLUMNS_IGNORE;
@@ -256,30 +280,30 @@ export class ScoreService {
       ON DUPLICATE
         KEY UPDATE
           score = VALUES(score);
-    `
-    
+    `;
+
     const valueParams = data.reduce((acc, cur) => {
       let curScores = [];
-      valueColumns.forEach(item => {
+      valueColumns.forEach((item) => {
         curScores = [...curScores, index[item], cur.id, userId, cur[item]];
-      })
+      });
       acc = [...acc, ...curScores];
       return acc;
-    }, [])
+    }, []);
     try {
       await this.connection.getRepository(Scores).query(sql, valueParams);
-    } catch(e) {
+    } catch (e) {
       return {
         message: e,
         statusCode: 200,
-        data: null
+        data: null,
       };
     }
-    
+
     return {
       message: 'success',
       statusCode: 200,
-      data: null
+      data: null,
     };
   }
 
@@ -290,8 +314,8 @@ export class ScoreService {
         name: true,
       },
       where: {
-        courseId
-      }
+        courseId,
+      },
     });
 
     return grade.reduce((acc, cur) => {
@@ -300,36 +324,40 @@ export class ScoreService {
     }, {});
   }
 
-  async updateScore(courseId: number, scoreData: any[]): Promise<TBaseDto<null>> {
+  async updateScore(
+    courseId: number,
+    scoreData: any[],
+  ): Promise<TBaseDto<null>> {
+    const transaction = await this.connection.createQueryRunner();
+    await transaction.startTransaction();
+
     try {
-      for (const item of scoreData ) {
-        const gradeComposition = await this.connection.getRepository(GradeCompositions).findOne({ 
-          where: { 
-            courseId: courseId,
-            name: item.name,
-          } 
+      await transaction.manager
+        .getRepository(GradeCompositions)
+        .delete({ courseId: courseId });
+      for (const item of scoreData) {
+        await transaction.manager.getRepository(GradeCompositions).save({
+          courseId: courseId,
+          name: item.name,
+          scale: item.scale,
+          order: item.id,
         });
-
-        if (gradeComposition) {
-          await this.connection.getRepository(GradeCompositions).update(gradeComposition.id, {
-            name: item.name,
-            scale: item.scale,
-            order: item.id 
-          });
-        }
       }
-
+      await transaction.commitTransaction();
       return {
         message: 'Column order updated successfully',
         statusCode: 200,
-        data: null
+        data: null,
       };
     } catch (error) {
+      await transaction.rollbackTransaction();
       return {
         message: 'Failed to update column order',
-        statusCode: 500,
-        data: null
+        statusCode: 500, 
+        data: null,
       };
+    } finally {
+      await transaction.release();
     }
   }
 }
