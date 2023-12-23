@@ -302,26 +302,7 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
             )}
 
             <Droppable droppableId="droppablessss">
-              {(provided: {
-                droppableProps: React.JSX.IntrinsicAttributes & { component: React.ElementType<any> } & TableOwnProps &
-                  CommonProps &
-                  Omit<
-                    any,
-                    "size" | "style" | "padding" | "children" | "className" | "classes" | "sx" | "stickyHeader"
-                  >;
-                innerRef: any;
-                placeholder:
-                  | string
-                  | number
-                  | boolean
-                  | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-                  | Iterable<React.ReactNode>
-                  | React.ReactPortal
-                  | React.PromiseLikeOfReactNode
-                  | Iterable<React.ReactNode>
-                  | null
-                  | undefined;
-              }) => (
+              {(provided) => (
                 <Table
                   {...provided.droppableProps}
                   ref={provided.innerRef}
@@ -331,19 +312,7 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
                   <tbody>
                     {items.map((item, index) => (
                       <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
-                        {(provided: {
-                          innerRef: any;
-                          draggableProps: React.JSX.IntrinsicAttributes & {
-                            component: React.ElementType<any>;
-                          } & TableRowOwnProps &
-                            CommonProps &
-                            Omit<any, "style" | "children" | "className" | "classes" | "sx" | "selected" | "hover">;
-                          dragHandleProps: React.JSX.IntrinsicAttributes & {
-                            component: React.ElementType<any>;
-                          } & TableRowOwnProps &
-                            CommonProps &
-                            Omit<any, "style" | "children" | "className" | "classes" | "sx" | "selected" | "hover">;
-                        }) => (
+                        {(provided) => (
                           <TableRow ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                             <TableCell style={{ padding: "1rem", width: "50%" }}>
                               {item.isEditing || isEditingAll ? (
