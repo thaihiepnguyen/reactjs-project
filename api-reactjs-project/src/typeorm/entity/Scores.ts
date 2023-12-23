@@ -10,11 +10,12 @@ export class Scores extends EntityBase{
   })
   gradeId: number;
 
-  @Column("int", {
+  @Column("varchar", {
+    length: 50,
     name: "student_id",
-    default: () => "'0'",
+    default: () => "''",
   })
-  studentId: number;
+  studentId: string;
 
   @Column("int", {
     name: "teacher_id",

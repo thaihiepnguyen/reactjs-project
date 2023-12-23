@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsNumber, IsObject } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsNumberString, IsObject } from "class-validator";
 
 export class ColumnDto {
   @IsNotEmpty()
@@ -25,4 +25,16 @@ export class AddScoreDto {
 
   @IsNumber()
   score: number
+}
+
+export class AddScoreByStudentCodeDto {
+  @IsNumberString()
+  studentCode: string
+
+  @IsObject()
+  scores: TScore;
+}
+
+export interface TScore {
+  [name: string]: number
 }
