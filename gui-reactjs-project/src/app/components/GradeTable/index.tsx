@@ -202,6 +202,10 @@ const GradeTable = () => {
                 type={props?.columnDef?.type ? "number" : "text"}
                 value={props.value}
                 onChange={(e) => props.onChange(e.target.value)}
+                inputProps={{
+                  min: 0,
+                  max: 10
+                }}
               />
             );
           },
