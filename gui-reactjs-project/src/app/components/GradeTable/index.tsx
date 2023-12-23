@@ -6,11 +6,13 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { DragIndicator, MoreHoriz } from "@mui/icons-material";
 import clsx from "clsx";
 import ParagraphSmall from "../text/ParagraphSmall";
-import { memo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import MaterialTable, { Column } from "material-table";
 import { tableIcons } from "../TableIcon";
 import InputSearch from "../input/InputSearch";
 import GradeManagementTable from "../GradeManagementTable";
+import Swal from "sweetalert2";
+import axiosInstance from "@/app/routers/axios";
 
 interface GradeTableProps {
   courseId: string;
@@ -43,6 +45,8 @@ const sampleScore = [
   },
 ];
 const GradeTable = memo(({ courseId }: GradeTableProps) => {
+  const [scoreData, setScoreData] = useState<any>(null);
+
   const [showGradeSetup, setShowGradeSetup] = useState<boolean>(false);
   const [columns, setColumns] = useState([
     {
@@ -101,6 +105,30 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
     },
   ]);
 
+  const fetchDataForGradeManagementTable = async () => {
+    try {
+      const response = await axiosInstance.get(`/score/columns/${courseId}`);
+      if (response.data) {
+        const { data } = response.data;
+        setScoreData(data);
+      } else {
+        Swal.fire({
+          title: "Oops! Something went wrong",
+          icon: "error",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Oops! Something went wrong",
+        icon: "error",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchDataForGradeManagementTable();
+  }, [courseId]);
+
   const onShowGradeSetup = () => {
     setShowGradeSetup(true);
   };
@@ -111,10 +139,10 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
 
   return (
     <>
-      <IconButton className={classes.iconMore}  onClick={onShowGradeSetup}>
+      <IconButton className={classes.iconMore} onClick={onShowGradeSetup}>
         <MoreHoriz />
       </IconButton>
-      
+
       <div className={classes.rootTable}>
         <MaterialTable
           title="Students Score"
@@ -187,7 +215,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
           }}
         />
       </div>
-      <GradeManagementTable courseId={courseId} isOpen={showGradeSetup} onCancel={onCloseGradeSetup} />
+      <GradeManagementTable courseId={courseId} isOpen={showGradeSetup} onCancel={onCloseGradeSetup} scoreData={scoreData} />
     </>
   );
 });

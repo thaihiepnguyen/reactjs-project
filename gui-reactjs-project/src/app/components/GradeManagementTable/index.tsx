@@ -44,8 +44,9 @@ interface Props {
   courseId: string;
   isOpen: boolean;
   onCancel: () => void;
+  scoreData: any;
 }
-const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
+const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) => {
   const dispatch = useAppDispatch();
   const [items, setItems] = useState<any[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
@@ -73,42 +74,30 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
   };
 
   // Function to fetch data from the API based on the provided ID
-  const fetchDataForGradeManagementTable = async () => {
-    try {
-      const response = await axiosInstance.get(`/score/columns/${courseId}`);
-      if (response.data) {
-        const { data } = response.data;
-
-        // Get student list
-        setStudentList(data.rows);
-
-        // Get the header columns
-        setHeaderExcelFile(data.columns);
-
-        // Get file excel name
-        setFileName(data.fileName);
-
-        // Get grade name list of the course
-        const gradeNameList = data.columns.slice(2);
-        setGradeNameList(gradeNameList);
-
-        // Get grade scale list of the course
-        const gradeScaleList = data.scales;
-        setGradeScaleList(gradeScaleList);
-
-        // Covert to UI
-        setItems(convertDataToTable(gradeNameList, gradeScaleList));
-      } else {
-        throw new Error("Failed to fetch data");
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
 
   useEffect(() => {
-    fetchDataForGradeManagementTable();
-  }, [courseId]);
+    if (scoreData) {
+      // Get student list
+      setStudentList(scoreData.rows);
+
+      // Get the header columns
+      setHeaderExcelFile(scoreData.columns);
+
+      // Get file excel name
+      setFileName(scoreData.fileName);
+
+      // Get grade name list of the course
+      const gradeNameList = scoreData.columns.slice(2);
+      setGradeNameList(gradeNameList);
+
+      // Get grade scale list of the course
+      const gradeScaleList = scoreData.scales;
+      setGradeScaleList(gradeScaleList);
+
+      // Covert to UI
+      setItems(convertDataToTable(gradeNameList, gradeScaleList));
+    }
+  }, [scoreData]);
 
   const calculateTotalScale = (itemsToCalculate: any[]) => {
     let total = 0;
