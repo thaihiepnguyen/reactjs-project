@@ -1,14 +1,36 @@
-'use client'
-import React, { useState, useEffect } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import TableCell from '@mui/material/TableCell/TableCell';
-import { Button, Checkbox, Input, Table, TableBody, TableOwnProps, TableRow, TableRowOwnProps } from '@mui/material';
-import { TableHeaderLabel } from '@/models/general';
-import TableHeader from '../Table/TableHead';
-import DeleteIcon from '@mui/icons-material/Delete';
-import * as XLSX from 'xlsx'; 
-import axiosInstance from '@/app/routers/axios';
-import { CommonProps } from '@mui/material/OverridableComponent';
+"use client";
+import React, { useState, useEffect } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import TableCell from "@mui/material/TableCell/TableCell";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  Grid,
+  Input,
+  Table,
+  TableBody,
+  TableOwnProps,
+  TableRow,
+  TableRowOwnProps,
+} from "@mui/material";
+import { TableHeaderLabel } from "@/models/general";
+import TableHeader from "../Table/TableHead";
+import DeleteIcon from "@mui/icons-material/Delete";
+import * as XLSX from "xlsx";
+import axiosInstance from "@/app/routers/axios";
+import { CommonProps } from "@mui/material/OverridableComponent";
+import classes from "./styles.module.scss";
+
+import { DialogTitleConfirm } from "../dialogs/DialogTitle";
+import Heading4 from "../text/Heading4";
+import ButtonCLose from "../buttons/ButtonClose";
+import { DialogContentConfirm } from "../dialogs/DialogContent";
+import InputTag from "../InputTag";
+import ParagraphSmall from "../text/ParagraphSmall";
+import CustomBtn, { BtnType } from "../buttons/Button";
+import ErrorMessage from "../text/ErrorMessage";
 
 const tableHeaders: TableHeaderLabel[] = [
   { name: "grade_name", label: "Grade name", sortable: true },
@@ -18,21 +40,23 @@ const tableHeaders: TableHeaderLabel[] = [
 
 interface Props {
   courseId: string;
+  isOpen: boolean;
+  onCancel: () => void;
 }
-const GradeManagementTable = ( {courseId}: Props ) => {
+const GradeManagementTable = ({ courseId, isOpen, onCancel }: Props) => {
   const [items, setItems] = useState<any[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
-  const [newItemData, setNewItemData] = useState({ id: '', name: '', scale: '', isEditing: false });
-  const [errorMessage, setErrorMessage] = useState('');
+  const [newItemData, setNewItemData] = useState({ id: "", name: "", scale: "", isEditing: false });
+  const [errorMessage, setErrorMessage] = useState("");
   const [gradeNameList, setGradeNameList] = useState([]);
   const [gradeScaleList, setGradeScaleList] = useState([]);
   const [headerExcelFile, setHeaderExcelFile] = useState([]);
-  const [filename, setFileName] = useState('');
+  const [filename, setFileName] = useState("");
   const [studentList, setStudentList] = useState<any[]>([]);
 
-  const convertDataToTable = (gradeNameList: any[], gradeScaleList: { [x: string]: any; }) => {
+  const convertDataToTable = (gradeNameList: any[], gradeScaleList: { [x: string]: any }) => {
     const items = gradeNameList.map((itemName: any, index: string | number) => {
-      const scale = gradeScaleList[index]; 
+      const scale = gradeScaleList[index];
       return {
         id: `${index}`,
         name: itemName,
@@ -41,7 +65,7 @@ const GradeManagementTable = ( {courseId}: Props ) => {
         isPublished: false,
       };
     });
-  
+
     return items;
   };
 
@@ -51,14 +75,14 @@ const GradeManagementTable = ( {courseId}: Props ) => {
       const response = await axiosInstance.get(`/score/columns/${courseId}`);
       if (response.data) {
         const { data } = response.data;
-        
+
         // Get student list
         setStudentList(data.rows);
-        
+
         // Get the header columns
         setHeaderExcelFile(data.columns);
-        
-        // Get file excel name 
+
+        // Get file excel name
         setFileName(data.fileName);
 
         // Get grade name list of the course
@@ -72,30 +96,30 @@ const GradeManagementTable = ( {courseId}: Props ) => {
         // Covert to UI
         setItems(convertDataToTable(gradeNameList, gradeScaleList));
       } else {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
     fetchDataForGradeManagementTable();
   }, [courseId]);
-  
+
   const calculateTotalScale = (itemsToCalculate: any[]) => {
     let total = 0;
-    itemsToCalculate.forEach((item: { scale: string; }) => {
+    itemsToCalculate.forEach((item: { scale: string }) => {
       total += parseInt(item.scale);
     });
 
     return total;
   };
 
-  const handleDragEnd = async (result: { destination: { index: number; }; source: { index: number; }; }) => {
+  const handleDragEnd = async (result: { destination: { index: number }; source: { index: number } }) => {
     if (!result.destination) {
       return;
-    } 
+    }
 
     const reorderedItems = Array.from(items);
     const [reorderedItem] = reorderedItems.splice(result.source.index, 1);
@@ -105,7 +129,7 @@ const GradeManagementTable = ( {courseId}: Props ) => {
     setItems(reorderedItems);
 
     // Sett new header for the xls file
-    const headers = ['ID', 'Tên', ...reorderedItems.map((obj) => obj.name)];
+    const headers = ["ID", "Tên", ...reorderedItems.map((obj) => obj.name)];
     setHeaderExcelFile(headers);
 
     // Reorder the items
@@ -113,17 +137,17 @@ const GradeManagementTable = ( {courseId}: Props ) => {
       ...item,
       id: `${index}`, // Reassign IDs based on the new order
     }));
-    
+
     // Save new order index to DB
     try {
-      const response = await axiosInstance.post(`/score/update-score/${courseId}`, (reorderedItemsWithNewIDs));
+      const response = await axiosInstance.post(`/score/update-score/${courseId}`, reorderedItemsWithNewIDs);
       if (response.data) {
         console.log(response.data);
       } else {
-        throw new Error('Failed to fetch data');
+        throw new Error("Failed to fetch data");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -135,44 +159,50 @@ const GradeManagementTable = ( {courseId}: Props ) => {
     setItems(items.map((item) => ({ ...item, isEditing: !isEditingAll })));
     const total = calculateTotalScale(items);
     if (Number.isNaN(total)) {
-      setErrorMessage('The scale must be a number!');
-    }
-    else if (total !== 100) {
+      setErrorMessage("The scale must be a number!");
+    } else if (total !== 100) {
       setIsEditingAll(true);
-      setErrorMessage('Your total scale is ' + total + '%. The total scale must be 100% so you can not save');
-    }
-    else {
+      setErrorMessage("Your total scale is " + total + "%. The total scale must be 100% so you can not save");
+    } else {
       setIsEditingAll(false);
-      setErrorMessage('');
+      setErrorMessage("");
 
       // call API here
     }
-  }
+  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, itemId: any, field: string) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    itemId: any,
+    field: string
+  ) => {
     const { value } = e.target;
-    setItems(items.map((item) => {
-      if (item.id === itemId) {
-        return { ...item, [field]: value };
-      }
-      return item;
-    }));
+    setItems(
+      items.map((item) => {
+        if (item.id === itemId) {
+          return { ...item, [field]: value };
+        }
+        return item;
+      })
+    );
   };
 
   const handleInputBlur = (itemId: any) => {
-    setItems(items.map((item) => {
-      if (item.id === itemId) {
-        return { ...item, isEditing: false };
-      }
-      return item;
-    }));
+    setItems(
+      items.map((item) => {
+        if (item.id === itemId) {
+          return { ...item, isEditing: false };
+        }
+        return item;
+      })
+    );
   };
 
   const handleAddRow = () => {
     const newItemId = String(items.length);
-    const newItem = {...newItemData, id: newItemId };
-    setItems(prevItems => [...prevItems, newItem]);
-    setNewItemData({ id: '', name: '', scale: '', isEditing: false });
+    const newItem = { ...newItemData, id: newItemId };
+    setItems((prevItems) => [...prevItems, newItem]);
+    setNewItemData({ id: "", name: "", scale: "", isEditing: false });
   };
 
   const handleInputChangeNewRow = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
@@ -186,7 +216,7 @@ const GradeManagementTable = ( {courseId}: Props ) => {
   const handleDeleteRow = (itemId: any) => {
     const updatedItems = items.filter((item) => item.id !== itemId);
     setItems(updatedItems);
-  };  
+  };
 
   // Export file excel
   const handleExportToExcel = () => {
@@ -198,7 +228,7 @@ const GradeManagementTable = ( {courseId}: Props ) => {
     dataArray.unshift(headerExcelFile);
     const worksheet = XLSX.utils.aoa_to_sheet(dataArray);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'sheet 1');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet 1");
 
     XLSX.writeFile(workbook, filename);
   };
@@ -215,126 +245,169 @@ const GradeManagementTable = ( {courseId}: Props ) => {
   };
 
   return (
-    <div style={{padding: '1rem'}}>
-    <DragDropContext 
-      onDragEnd={handleDragEnd}
-      >
-      {
-      !isEditingAll ? 
-        (<Button 
-          variant="contained" 
-          color={isEditingAll ? "secondary" : "primary"} 
-          onClick={handleEditAllClick}
-          >
-          Edit
-        </Button>) : (
-        <Button 
-          variant="contained"
-          style={{backgroundColor: 'green'}}
-          onClick={handleSave}
-          >
-          Save
-        </Button>
-        )
-      }
-      <br/><br/>
-      {errorMessage && (
-        <>
-          <p style={{ color: 'red' }}>{errorMessage}</p>
-        </>
-      )}
-      
-      {isEditingAll && (
-        <>
-          <br/>
-          <div style={{display: 'flex', gap: '0.8rem'}}>
-            <Input
-              type="text"
-              placeholder="Grade name"
-              value={newItemData.name}
-              onChange={(e) => handleInputChangeNewRow(e, 'name')}
-            />
-            <Input
-              type="text"
-              placeholder="Scale"
-              value={newItemData.scale}
-              onChange={(e) => handleInputChangeNewRow(e, 'scale')}
-            />
-            <Button variant="contained" color="primary" onClick={handleAddRow}>
-              Add
-            </Button>
-          </div>
-          <br/>
-        </>
-      )}
+    <Dialog scroll="paper" open={isOpen} onClose={onCancel} classes={{ paper: classes.paper }}>
+      <DialogTitleConfirm className={classes.dialogTitle}>
+        <Box display="flex" alignItems="center">
+          <Heading4 $colorName="#333">Edit Grade Compositions</Heading4>
+        </Box>
+        <ButtonCLose $backgroundColor="--eerie-black-5" $colorName="--eerie-black-40" onClick={onCancel} />
+      </DialogTitleConfirm>
+      <DialogContentConfirm dividers>
+        <div style={{ padding: "1rem" }}>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            {!isEditingAll ? (
+              <CustomBtn btnType={BtnType.Primary} onClick={handleEditAllClick} className={classes.modalBtn}>
+                Edit
+              </CustomBtn>
+            ) : (
+              <Button
+                variant="contained"
+                style={{ backgroundColor: "green" }}
+                onClick={handleSave}
+                className={classes.saveBtn}
+              >
+                Save
+              </Button>
+            )}
+            <br />
+            <br />
+            {errorMessage && (
+              <>
+                <p style={{ color: "red" }}>{errorMessage}</p>
+              </>
+            )}
 
-      <Droppable droppableId="droppable">
-        {(provided: { droppableProps: React.JSX.IntrinsicAttributes & { component: React.ElementType<any>; } & TableOwnProps & CommonProps & Omit<any, "size" | "style" | "padding" | "children" | "className" | "classes" | "sx" | "stickyHeader">; innerRef: any; placeholder: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | Iterable<React.ReactNode> | null | undefined; }) => (
-          <Table
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            style={{ width: '30rem', borderCollapse: 'collapse' }}
-          > 
-            <TableHeader headers={tableHeaders} />
-            <tbody>
-              {items.map((item, index) => (
-                <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
-                  {(provided: { innerRef: any; draggableProps: React.JSX.IntrinsicAttributes & { component: React.ElementType<any>; } & TableRowOwnProps & CommonProps & Omit<any, "style" | "children" | "className" | "classes" | "sx" | "selected" | "hover">; dragHandleProps: React.JSX.IntrinsicAttributes & { component: React.ElementType<any>; } & TableRowOwnProps & CommonProps & Omit<any, "style" | "children" | "className" | "classes" | "sx" | "selected" | "hover">; }) => (
-                    <TableRow
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <TableCell style={{ padding: '1rem', width: '50%' }}>
-                        {item.isEditing || isEditingAll ? (
-                          <Input
-                            type="text"
-                            value={item.name}
-                            onChange={(e) => handleInputChange(e, item.id, 'name')}
-                            onBlur={() => handleInputBlur(item.id)}
-                          />
-                        ) : (
-                          item.name
+            {isEditingAll && (
+              <>
+                <br />
+                <div style={{ display: "flex", gap: "0.8rem" }}>
+                  <Input
+                    type="text"
+                    placeholder="Grade name"
+                    value={newItemData.name}
+                    onChange={(e) => handleInputChangeNewRow(e, "name")}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Scale"
+                    value={newItemData.scale}
+                    onChange={(e) => handleInputChangeNewRow(e, "scale")}
+                  />
+                  <CustomBtn btnType={BtnType.Primary} onClick={handleAddRow} className={classes.modalBtn}>
+                    Add
+                  </CustomBtn>
+                </div>
+                <br />
+              </>
+            )}
+
+            <Droppable droppableId="droppablessss">
+              {(provided: {
+                droppableProps: React.JSX.IntrinsicAttributes & { component: React.ElementType<any> } & TableOwnProps &
+                  CommonProps &
+                  Omit<
+                    any,
+                    "size" | "style" | "padding" | "children" | "className" | "classes" | "sx" | "stickyHeader"
+                  >;
+                innerRef: any;
+                placeholder:
+                  | string
+                  | number
+                  | boolean
+                  | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+                  | Iterable<React.ReactNode>
+                  | React.ReactPortal
+                  | React.PromiseLikeOfReactNode
+                  | Iterable<React.ReactNode>
+                  | null
+                  | undefined;
+              }) => (
+                <Table
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  style={{ width: "30rem", borderCollapse: "collapse" }}
+                >
+                  <TableHeader headers={tableHeaders} />
+                  <tbody>
+                    {items.map((item, index) => (
+                      <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
+                        {(provided: {
+                          innerRef: any;
+                          draggableProps: React.JSX.IntrinsicAttributes & {
+                            component: React.ElementType<any>;
+                          } & TableRowOwnProps &
+                            CommonProps &
+                            Omit<any, "style" | "children" | "className" | "classes" | "sx" | "selected" | "hover">;
+                          dragHandleProps: React.JSX.IntrinsicAttributes & {
+                            component: React.ElementType<any>;
+                          } & TableRowOwnProps &
+                            CommonProps &
+                            Omit<any, "style" | "children" | "className" | "classes" | "sx" | "selected" | "hover">;
+                        }) => (
+                          <TableRow ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                            <TableCell style={{ padding: "1rem", width: "50%" }}>
+                              {item.isEditing || isEditingAll ? (
+                                <Input
+                                  type="text"
+                                  value={item.name}
+                                  onChange={(e) => handleInputChange(e, item.id, "name")}
+                                  onBlur={() => handleInputBlur(item.id)}
+                                />
+                              ) : (
+                                item.name
+                              )}
+                            </TableCell>
+                            <TableCell style={{ padding: "1rem", width: "20%" }}>
+                              {item.isEditing || isEditingAll ? (
+                                <Input
+                                  type="text"
+                                  value={item.scale}
+                                  onChange={(e) => handleInputChange(e, item.id, "scale")}
+                                  onBlur={() => handleInputBlur(item.id)}
+                                />
+                              ) : (
+                                item.scale
+                              )}
+                            </TableCell>
+                            <TableCell style={{ padding: "1rem", width: "18%" }}>
+                              {isEditingAll ? (
+                                <Checkbox
+                                  checked={item.isPublished}
+                                  onChange={(e) => handleCheckboxChange(e, item.id)}
+                                />
+                              ) : (
+                                <Checkbox checked={item.isPublished} disabled />
+                              )}
+                            </TableCell>
+                            <TableCell style={{ padding: "1rem", width: "10%" }}>
+                              {isEditingAll ? (
+                                <Button onClick={() => handleDeleteRow(item.id)}>
+                                  <DeleteIcon style={{ color: "red" }} />
+                                </Button>
+                              ) : (
+                                ""
+                              )}
+                            </TableCell>
+                          </TableRow>
                         )}
-                      </TableCell>
-                      <TableCell style={{ padding: '1rem', width: '20%' }}>
-                        {item.isEditing || isEditingAll ? (
-                          <Input
-                            type="text"
-                            value={item.scale}
-                            onChange={(e) => handleInputChange(e, item.id, 'scale')}
-                            onBlur={() => handleInputBlur(item.id)}
-                          />
-                        ) : (
-                          item.scale
-                        )}
-                      </TableCell>
-                      <TableCell style={{ padding: '1rem', width: '18%' }}>
-                        {isEditingAll ?
-                          (<Checkbox checked={item.isPublished}  onChange={(e) => handleCheckboxChange(e, item.id)}/>) : 
-                          (<Checkbox checked={item.isPublished} disabled />)
-                        }
-                      </TableCell>
-                      <TableCell style={{ padding: '1rem', width: '10%' }}>
-                        {isEditingAll ? 
-                          (<Button onClick={() => handleDeleteRow(item.id)}><DeleteIcon style={{color: 'red'}}/></Button>) :
-                          ''
-                        }
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </tbody>
-          </Table>
-        )}
-      </Droppable>
-      {!isEditingAll ? (<Button variant="contained" color="primary" onClick={handleExportToExcel}>
-        Download Transcript
-      </Button>) : ''}
-    </DragDropContext>
-    </div>
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </tbody>
+                </Table>
+              )}
+            </Droppable>
+            {!isEditingAll ? (
+              <CustomBtn sx={{mt: "16px !important"}} btnType={BtnType.Primary} onClick={handleExportToExcel} className={classes.saveBtn}>
+                Download Transcript
+              </CustomBtn>
+            ) : (
+              ""
+            )}
+          </DragDropContext>
+        </div>
+      </DialogContentConfirm>
+    </Dialog>
   );
 };
 

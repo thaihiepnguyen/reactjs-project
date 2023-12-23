@@ -117,8 +117,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" className={classes.tabWrapper}>
           <Tab label="Dashboard" {...a11yProps(0)} />
           <Tab label="Classmate" {...a11yProps(1)} />
-          <Tab label="Grade Composition" {...a11yProps(2)} />
-          <Tab label="Score" {...a11yProps(3)} />
+          <Tab label="Score" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <div className={classes.container}>
@@ -220,11 +219,7 @@ export default function Page({ params }: { params: { id: string } }) {
         </CustomTabPanel>
 
         <CustomTabPanel value={value} index={2}>
-            <GradeManagementTable courseId={params.id}/>
-        </CustomTabPanel>
-
-        <CustomTabPanel value={value} index={3}>
-            <GradeTable/>
+            <GradeTable courseId={params.id}/>
         </CustomTabPanel>
       </div>
       <Popper

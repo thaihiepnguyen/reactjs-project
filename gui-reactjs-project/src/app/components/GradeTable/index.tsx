@@ -1,15 +1,16 @@
-import { Box, Input, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { Box, Button, IconButton, Input, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { SetupTable } from "../Table/SetupTable";
 import classes from "./styles.module.scss";
 import SubTitle from "../text/SubTitle";
 import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd";
-import { DragIndicator } from "@mui/icons-material";
+import { DragIndicator, MoreHoriz } from "@mui/icons-material";
 import clsx from "clsx";
 import ParagraphSmall from "../text/ParagraphSmall";
-import { useState } from "react";
+import { memo, useState } from "react";
 import MaterialTable, { Column } from "material-table";
 import { tableIcons } from "../TableIcon";
 import InputSearch from "../input/InputSearch";
+import GradeManagementTable from "../GradeManagementTable";
 
 interface GradeTableProps {
   courseId: string;
@@ -41,93 +42,8 @@ const sampleScore = [
     Final: 10,
   },
 ];
-const GradeTable = () => {
-  // const onDragEnd = ({ destination, source }: DropResult) => {
-  //   console.log(destination, source);
-  // };
-
-  // return (
-  //   <SetupTable className={classes.desktopTable}>
-  //     <Table>
-  //       <TableHead>
-  //         <TableRow>
-  //           <TableCell width="40"></TableCell>
-  //           <TableCell width="150">
-  //             <SubTitle>Student ID</SubTitle>
-  //           </TableCell>
-  //           <TableCell width="200">
-  //             <SubTitle>Student Name</SubTitle>
-  //           </TableCell>
-  //           <TableCell>
-  //             <SubTitle>Lab1</SubTitle>
-  //           </TableCell>
-  //           <TableCell>
-  //             <SubTitle>Lab2</SubTitle>
-  //           </TableCell>
-  //           <TableCell>
-  //             <SubTitle>Midterm</SubTitle>
-  //           </TableCell>
-  //           <TableCell>
-  //             <SubTitle>Final</SubTitle>
-  //           </TableCell>
-  //         </TableRow>
-  //       </TableHead>
-
-  //       <DragDropContext onDragEnd={onDragEnd}>
-  //         <Droppable droppableId="droppable-list-score">
-  //           {(provided) => (
-  //             <TableBody ref={provided.innerRef} {...provided.droppableProps}>
-  //               {sampleScore?.map((item, index) => (
-  //                 <Draggable draggableId={item.id.toString()} index={index} key={item.id}>
-  //                   {(provided, snapshot) => (
-  //                     <TableRow
-  //                       className={clsx(classes.rowItem, { [classes.rowItemDraging]: snapshot.isDragging })}
-  //                       ref={provided.innerRef}
-  //                       {...provided.draggableProps}
-
-  //                     >
-  //                       <TableCell valign="middle" sx={{ pl: "16px !important" }}>
-  //                         <Box display="flex" alignItems="center" justifyContent="center"  {...provided.dragHandleProps}>
-  //                           <DragIndicator className={classes.dragIcon} />
-  //                         </Box>
-  //                       </TableCell>
-
-  //                       <TableCell>
-  //                           <Input disableUnderline value={"20127533"}/>
-  //                       </TableCell>
-
-  //                       <TableCell>
-  //                           <Input disableUnderline value={"Lê Đăng Khoa"}/>
-  //                       </TableCell>
-
-  //                       <TableCell>
-  //                           <Input disableUnderline value={"10"}/>
-  //                       </TableCell>
-
-  //                       <TableCell>
-  //                           <Input disableUnderline value={"10"}/>
-  //                       </TableCell>
-
-  //                       <TableCell>
-  //                           <Input disableUnderline value={"10"}/>
-  //                       </TableCell>
-
-  //                       <TableCell>
-  //                           <Input disableUnderline value={"10"}/>
-  //                       </TableCell>
-
-  //                     </TableRow>
-  //                   )}
-  //                 </Draggable>
-  //               ))}
-  //             </TableBody>
-  //           )}
-  //         </Droppable>
-  //       </DragDropContext>
-  //     </Table>
-  //   </SetupTable>
-  // );
-
+const GradeTable = memo(({ courseId }: GradeTableProps) => {
+  const [showGradeSetup, setShowGradeSetup] = useState<boolean>(false);
   const [columns, setColumns] = useState([
     {
       title: "Student ID",
@@ -185,80 +101,95 @@ const GradeTable = () => {
     },
   ]);
 
+  const onShowGradeSetup = () => {
+    setShowGradeSetup(true);
+  };
+
+  const onCloseGradeSetup = () => {
+    setShowGradeSetup(false);
+  };
+
   return (
-    <div className={classes.rootTable}>
-      <MaterialTable
-        title="Students Score"
-        icons={tableIcons}
-        columns={columns}
-        data={data}
-        components={{
-          EditField: (props) => {
-            console.log(props);
-            return (
-              <InputSearch
-                sx={{ px: 1 }}
-                placeholder={props?.columnDef?.title}
-                type={props?.columnDef?.type ? "number" : "text"}
-                value={props.value}
-                onChange={(e) => props.onChange(e.target.value)}
-                inputProps={{
-                  min: 0,
-                  max: 10
-                }}
-              />
-            );
-          },
-        }}
-        options={{
-          exportButton: true,
-          headerStyle: {
-            backgroundColor: "var(--gray-10)",
-          },
-        }}
-        cellEditable={{
-          onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
-            return new Promise((resolve, reject) => {
-              console.log("newValue: " + newValue);
-              setTimeout(resolve, 1000);
-            });
-          },
-        }}
-        editable={{
-          onRowAdd: (newData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                setData([...data, newData]);
+    <>
+      <IconButton className={classes.iconMore}  onClick={onShowGradeSetup}>
+        <MoreHoriz />
+      </IconButton>
+      
+      <div className={classes.rootTable}>
+        <MaterialTable
+          title="Students Score"
+          icons={tableIcons}
+          columns={columns}
+          data={data}
+          components={{
+            EditField: (props) => {
+              console.log(props);
+              return (
+                <InputSearch
+                  sx={{ px: 1 }}
+                  placeholder={props?.columnDef?.title}
+                  type={props?.columnDef?.type ? "number" : "text"}
+                  value={props.value}
+                  onChange={(e) => props.onChange(e.target.value)}
+                  inputProps={{
+                    min: 0,
+                    max: 10,
+                  }}
+                />
+              );
+            },
+          }}
+          options={{
+            exportButton: true,
+            headerStyle: {
+              backgroundColor: "var(--gray-10)",
+            },
+          }}
+          cellEditable={{
+            onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+              return new Promise((resolve, reject) => {
+                console.log("newValue: " + newValue);
+                setTimeout(resolve, 1000);
+              });
+            },
+          }}
+          editable={{
+            onRowAdd: (newData) =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  setData([...data, newData]);
 
-                resolve(true);
-              }, 1000);
-            }),
-          onRowUpdate: (newData, oldData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                const dataUpdate = [...data];
-                const index = oldData.tableData.id;
-                dataUpdate[index] = newData;
-                setData([...dataUpdate]);
+                  resolve(true);
+                }, 1000);
+              }),
+            onRowUpdate: (newData, oldData) =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  const dataUpdate = [...data];
+                  const index = oldData.tableData.id;
+                  dataUpdate[index] = newData;
+                  setData([...dataUpdate]);
 
-                resolve(true);
-              }, 1000);
-            }),
-          onRowDelete: (oldData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                const dataDelete = [...data];
-                const index = oldData.tableData.id;
-                dataDelete.splice(index, 1);
-                setData([...dataDelete]);
+                  resolve(true);
+                }, 1000);
+              }),
+            onRowDelete: (oldData) =>
+              new Promise((resolve, reject) => {
+                setTimeout(() => {
+                  const dataDelete = [...data];
+                  const index = oldData.tableData.id;
+                  dataDelete.splice(index, 1);
+                  setData([...dataDelete]);
 
-                resolve(true);
-              }, 1000);
-            }),
-        }}
-      />
-    </div>
+                  resolve(true);
+                }, 1000);
+              }),
+          }}
+        />
+      </div>
+      <GradeManagementTable courseId={courseId} isOpen={showGradeSetup} onCancel={onCloseGradeSetup} />
+    </>
   );
-};
+});
 
 export default GradeTable;
