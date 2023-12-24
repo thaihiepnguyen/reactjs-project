@@ -254,15 +254,18 @@ export class ScoreService {
       ];
       const scoreData = scoreStudentIds.map((studentId: string) => {
         const scoreObj: any = {};
+        let avg: number = 0;
         scoresList
           ?.filter((s) => s.scores_student_id === studentId)
           ?.forEach((score) => {
-            (scoreObj.fullname = score.users_fullname ?? ''),
-              (scoreObj[score.grade_name] = score.scores_score);
+            scoreObj.fullname = score.users_fullname ?? '',
+            scoreObj[score.grade_name] = score.scores_score;
+            avg += score.scores_score *  score.grade_scale / 100;
           });
         return {
           studentId: studentId,
           ...scoreObj,
+          avg
         };
       });
 
@@ -366,15 +369,18 @@ export class ScoreService {
       ];
       const scoreData = scoreStudentIds.map((studentId: string) => {
         const scoreObj: any = {};
+        let avg: number = 0;
         scores
           ?.filter((s) => s.scores_student_id === studentId)
           ?.forEach((score) => {
-            (scoreObj.fullname = score.users_fullname ?? ''),
-              (scoreObj[score.grade_name] = score.scores_score);
+            scoreObj.fullname = score.users_fullname ?? '',
+            scoreObj[score.grade_name] = score.scores_score;
+            avg += score.scores_score *  score.grade_scale / 100;
           });
         return {
           studentId: studentId,
           ...scoreObj,
+          avg
         };
       });
 

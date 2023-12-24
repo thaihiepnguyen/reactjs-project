@@ -24,7 +24,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
   const dispatch = useAppDispatch();
   const [scoreData, setScoreData] = useState<any>(null);
   const [showGradeSetup, setShowGradeSetup] = useState<boolean>(false);
-  const [columns, setColumns] = useState([]);
+  const [columns, setColumns] = useState<any>([]);
   const [tableLoading, setTableLoading] = useState<boolean>(false);
 
   const [data, setData] = useState([]);
@@ -41,15 +41,21 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
         const { data } = response.data;
         setScoreData(data);
         if (data?.columns?.length) {
-          console.log(data.columns);
-          setColumns(
-            data?.columns?.map((col: any, index: number) => ({
-              title: `${capitalizeFirstLetter(col)} ${index >= 2 ? "(" + data?.scales?.[index - 2] + "%)" : ""}`,
-              field: col,
-              type: index >= 2 ? "numeric" : "string",
-              editable: col === "fullname" ? "never" : "always",
-            }))
-          );
+          const columnsList = data?.columns?.map((col: any, index: number) => ({
+            title: `${capitalizeFirstLetter(col)} ${index >= 2 ? "(" + data?.scales?.[index - 2] + "%)" : ""}`,
+            field: col,
+            type: index >= 2 ? "numeric" : "string",
+            editable: col === "fullname" ? "never" : "always",
+          }));
+          setColumns([
+            ...columnsList,
+            {
+              title: `Average`,
+              field: "avg",
+              type: "numeric",
+              editable: "never",
+            },
+          ]);
         }
 
         if (data?.scores?.length) {
@@ -101,7 +107,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
   }
 
   const onChangeOrder = async (src, dest) => {
-    if (src - 2 < 0 || dest - 2 < 0) return;
+    if (src - 2 < 0 || dest - 2 < 0 || src - 2 >= scoreData?.grade?.length || dest - 2>= scoreData?.grade?.length) return;
     const newOrder = move(src - 2, dest - 2, scoreData?.grade);
     try {
       dispatch(setLoading(true));
@@ -119,7 +125,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
 
   return (
     <>
-      <IconButton className={classes.iconMore} sx={{display: "block", ml: "auto"}} onClick={onShowGradeSetup}>
+      <IconButton className={classes.iconMore} sx={{ display: "block", ml: "auto" }} onClick={onShowGradeSetup}>
         <MoreHoriz />
       </IconButton>
 
@@ -160,8 +166,8 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
             onCellEditApproved: (newValue, oldValue: any, rowData: any, columnDef: any) => {
               return new Promise((resolve, reject) => {
                 const field = columnDef.field ?? "";
-                const newData = {...rowData, [field] : newValue};
-                const { studentId, fullname, tableData,  ...scores } = newData;
+                const newData = { ...rowData, [field]: newValue };
+                const { studentId, fullname, tableData, avg,  ...scores } = newData;
                 if (!studentId || Object.keys(scores).length != scoreData?.grade?.length) {
                   Swal.fire({
                     title: "Oops",
@@ -190,7 +196,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
           editable={{
             onRowAdd: (newData) => {
               return new Promise((resolve, reject) => {
-                const { studentId, fullname, ...scores } = newData;
+                const { studentId, fullname, avg,  ...scores } = newData;
                 if (!studentId || Object.keys(scores).length != scoreData?.grade?.length) {
                   Swal.fire({
                     title: "Oops",
@@ -216,7 +222,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
 
             onRowUpdate: (newData: any, oldData: any) => {
               return new Promise((resolve, reject) => {
-                const { studentId, fullname, ...scores } = newData;
+                const { studentId, fullname, avg,  ...scores } = newData;
                 if (!studentId || Object.keys(scores).length != scoreData?.grade?.length) {
                   Swal.fire({
                     title: "Oops",
@@ -229,8 +235,9 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
                   .post(`/score/add/by-student-code/${courseId}`, {
                     studentCode: studentId,
                     scores: scores,
-                    oldStudentId: oldData?.studentId,
+                    oldStudentId: oldData?.studentId !== newData?.studentId ? oldData?.studentId : "",
                   })
+                  
                   .then((response) => {
                     setData(response.data.data);
                     resolve(response);
