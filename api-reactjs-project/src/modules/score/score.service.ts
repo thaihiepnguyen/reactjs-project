@@ -181,7 +181,7 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
     try {
       if (oldStudentId) {
-        await runner.connection
+        await runner.manager
           .getRepository(Scores)
           .delete({ studentId: oldStudentId });
       }
@@ -229,7 +229,7 @@ export class ScoreService {
         return acc;
       }, []);
 
-      await runner.connection.getRepository(Scores).query(sql, valueParams);
+      await runner.manager.getRepository(Scores).query(sql, valueParams);
 
       const scoresList = await runner.manager
         .getRepository(Scores)
@@ -335,6 +335,14 @@ export class ScoreService {
         }),
       ]);
 
+      if (!grades || !grades.length) {
+        return {
+          message: 'No grades existed',
+          statusCode: 400,
+          data: null
+        };
+      }
+
       // step 3: Get names and studentId of the students
       const students = await runner.manager.getRepository(Users).find({
         select: {
@@ -439,11 +447,11 @@ export class ScoreService {
     const nStudents = data.length;
     let params = '(?, ?, ?, ?)';
     for (let i = 0; i < nColumns - 1; i++) {
-      params = params.concat(', ', params);
+      params = params.concat(', ', '(?, ?, ?, ?)');
     }
 
     for (let i = 0; i < nStudents - 1; i++) {
-      params = params.concat(', ', params);
+      params = params.concat(', ', '(?, ?, ?, ?)');
     }
 
     const index = await this._indexGrade(courseId);
@@ -506,7 +514,7 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
     try {
       if (deleteScoreByStudentCodes.oldStudentId) {
-        await runner.connection
+        await runner.manager
           .getRepository(Scores)
           .delete({ studentId: deleteScoreByStudentCodes.oldStudentId });
       }
@@ -585,7 +593,7 @@ export class ScoreService {
         return acc;
       }, []);
 
-      await runner.connection.getRepository(Scores).query(sql, valueParams);
+      await runner.manager.getRepository(Scores).query(sql, valueParams);
       return {
         message: 'success',
         statusCode: 200,
@@ -611,7 +619,7 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
 
     const ids = data?.filter((item) => !!item.id)?.map((item) => item.id);
-    const deleteScore = await runner.connection
+    const deleteScore = await runner.manager
       .getRepository(Scores)
       .createQueryBuilder()
       .delete()
@@ -619,7 +627,7 @@ export class ScoreService {
       .where('grade_id NOT IN (:...ids)', { ids })
       .execute();
 
-    const deletePromise = await runner.connection
+    const deletePromise = await runner.manager
       .getRepository(GradeCompositions)
       .createQueryBuilder()
       .delete()
@@ -631,7 +639,7 @@ export class ScoreService {
       ?.filter((item) => typeof item.id === 'number')
       .map((item) => {
         const { id, ...updateData } = item;
-        return runner.connection.getRepository(GradeCompositions).update(
+        return runner.manager.getRepository(GradeCompositions).update(
           {
             id: id,
           },
