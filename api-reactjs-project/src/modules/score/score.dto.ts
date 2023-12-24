@@ -41,6 +41,9 @@ export class AddScoreByStudentCodeDto {
 export class DeleteScoreByStudentCodeDto {
   @IsOptional()
   oldStudentId: string;
+
+  @IsOptional()
+  courseId: string;
 }
 
 export interface TScore {

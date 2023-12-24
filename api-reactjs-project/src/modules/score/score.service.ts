@@ -181,9 +181,22 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
     try {
       if (oldStudentId) {
-        await runner.manager
+        const deleteScore = await runner.manager
           .getRepository(Scores)
-          .delete({ studentId: oldStudentId });
+          .createQueryBuilder('scores')
+          .leftJoinAndSelect(
+            GradeCompositions,
+            'grade',
+            'grade.id = scores.grade_id',
+          )
+          .where('student_id = :oldStudentId and course_id = :courseId', {
+            oldStudentId,
+            courseId,
+          })
+          .getMany()
+          .then((scores) => {
+            return runner.connection.getRepository(Scores).remove(scores);
+          });
       }
       // Step 1: The teacher is correct
       const isTeacherCorrect = await this.courseService.isTeacherInCourse(
@@ -258,14 +271,14 @@ export class ScoreService {
         scoresList
           ?.filter((s) => s.scores_student_id === studentId)
           ?.forEach((score) => {
-            scoreObj.fullname = score.users_fullname ?? '',
-            scoreObj[score.grade_name] = score.scores_score;
-            avg += score.scores_score *  score.grade_scale / 100;
+            (scoreObj.fullname = score.users_fullname ?? ''),
+              (scoreObj[score.grade_name] = score.scores_score);
+            avg += (score.scores_score * score.grade_scale) / 100;
           });
         return {
           studentId: studentId,
           ...scoreObj,
-          avg
+          avg: avg.toFixed(2),
         };
       });
 
@@ -339,7 +352,7 @@ export class ScoreService {
         return {
           message: 'No grades existed',
           statusCode: 400,
-          data: null
+          data: null,
         };
       }
 
@@ -375,20 +388,22 @@ export class ScoreService {
       const scoreStudentIds = [
         ...new Set(scores.map((score) => score.scores_student_id)),
       ];
+      console.log(scores)
       const scoreData = scoreStudentIds.map((studentId: string) => {
         const scoreObj: any = {};
         let avg: number = 0;
+
         scores
           ?.filter((s) => s.scores_student_id === studentId)
           ?.forEach((score) => {
-            scoreObj.fullname = score.users_fullname ?? '',
-            scoreObj[score.grade_name] = score.scores_score;
-            avg += score.scores_score *  score.grade_scale / 100;
+            (scoreObj.fullname = score.users_fullname ?? ''),
+              (scoreObj[score.grade_name] = score.scores_score);
+            avg += (score.scores_score * score.grade_scale) / 100; 
           });
         return {
           studentId: studentId,
           ...scoreObj,
-          avg
+          avg: avg.toFixed(2),
         };
       });
 
@@ -514,9 +529,24 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
     try {
       if (deleteScoreByStudentCodes.oldStudentId) {
-        await runner.manager
+
+        const deleteScore = await runner.manager
           .getRepository(Scores)
-          .delete({ studentId: deleteScoreByStudentCodes.oldStudentId });
+          .createQueryBuilder('scores')
+          .leftJoinAndSelect(
+            GradeCompositions,
+            'grade',
+            'grade.id = scores.grade_id',
+          )
+          .where('student_id = :oldStudentId and course_id = :courseId', {
+            oldStudentId: deleteScoreByStudentCodes.oldStudentId,
+            courseId: deleteScoreByStudentCodes.courseId,
+          })
+          .getMany()
+          .then((scores) => {
+            return runner.connection.getRepository(Scores).remove(scores);
+          });
+
       }
       return {
         message: 'Delete successfully',
@@ -627,12 +657,14 @@ export class ScoreService {
         'grade',
         'grade.id = scores.grade_id',
       )
-      .where('grade_id NOT IN (:...ids) and course_id = :courseId', { ids, courseId })
+      .where('grade_id NOT IN (:...ids) and course_id = :courseId', {
+        ids,
+        courseId,
+      })
       .getMany()
       .then((scores) => {
         return runner.connection.getRepository(Scores).remove(scores);
-      })
-
+      });
 
     const deletePromise = await runner.manager
       .getRepository(GradeCompositions)

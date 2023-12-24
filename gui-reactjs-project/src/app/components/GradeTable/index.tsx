@@ -253,6 +253,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
                 axiosInstance
                   .post(`/score/delete-score`, {
                     oldStudentId: oldData?.studentId,
+                    courseId: courseId
                   })
                   .then((response) => {
                     const dataDelete = [...data];
