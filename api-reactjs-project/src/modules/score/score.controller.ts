@@ -51,7 +51,7 @@ export class ScoreController {
     @MetaDataAuth('userId') userId: number 
   ): Promise<TBaseDto<null>> {
     const { studentCode, scores } = addScoreByStudentCode;
-
+    
     return await this.scoreService.addScoreByStudentCode(studentCode, userId, scores, id);
   }
 

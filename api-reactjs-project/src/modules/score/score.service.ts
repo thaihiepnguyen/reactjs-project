@@ -4,7 +4,13 @@ import { TBaseDto } from 'src/app.dto';
 import { GradeCompositions } from 'src/typeorm/entity/GradeCompositions';
 import { Connection, In, IsNull, Like, Not } from 'typeorm';
 import { CourseService } from '../course/course.service';
-import { AddScoreByStudentCodeDto, ColumnDto, CreateColumnDto, CreateUpdateColumnDto, TScore } from './score.dto';
+import {
+  AddScoreByStudentCodeDto,
+  ColumnDto,
+  CreateColumnDto,
+  CreateUpdateColumnDto,
+  TScore,
+} from './score.dto';
 import { Users } from 'src/typeorm/entity/Users';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
@@ -74,9 +80,9 @@ export class ScoreService {
     }
   }
 
-    /*
+  /*
    * WARNING: THIS FUNCTION CURRENTLY IS NOT OK!
-   * Add a score based on student id. 
+   * Add a score based on student id.
    *
    * @param gradeId
    * @param studentId
@@ -140,7 +146,9 @@ export class ScoreService {
           data: null,
         };
 
-      const { studentId: studentCode } = await runner.manager.getRepository(Users).findOne({ select: { studentId: true }, where: {id: studentId}});
+      const { studentId: studentCode } = await runner.manager
+        .getRepository(Users)
+        .findOne({ select: { studentId: true }, where: { id: studentId } });
       // insert
       await runner.manager.getRepository(Scores).insert({
         gradeId,
@@ -152,8 +160,8 @@ export class ScoreService {
       await runner.release();
     }
   }
-    /*
-   * Add a score based on student code (MSSV). 
+  /*
+   * Add a score based on student code (MSSV).
    *
    * @param gradeId
    * @param studentId
@@ -166,12 +174,15 @@ export class ScoreService {
     studentCode: string,
     teacherId: number,
     scores: TScore,
-    courseId: number
-    ): Promise<TBaseDto<null>> {
+    courseId: number,
+  ): Promise<TBaseDto<any>> {
     const runner = this.connection.createQueryRunner();
     try {
       // Step 1: The teacher is correct
-      const isTeacherCorrect = await this.courseService.isTeacherInCourse(courseId, teacherId);
+      const isTeacherCorrect = await this.courseService.isTeacherInCourse(
+        courseId,
+        teacherId,
+      );
       if (!isTeacherCorrect) {
         return {
           message: 'The teacher id is invalid',
@@ -191,7 +202,7 @@ export class ScoreService {
       // insert on duplicate
       let params = '(?, ?, ?, ?)';
       for (let i = 0; i < Object.keys(scores).length - 1; i++) {
-        params = params.concat(', ', params);
+        params = params.concat(', ', '(?, ?, ?, ?)');
       }
 
       const index = await this._indexGrade(courseId);
@@ -212,18 +223,54 @@ export class ScoreService {
       }, []);
 
       await runner.connection.getRepository(Scores).query(sql, valueParams);
+
+      const scoresList = await runner.manager
+        .getRepository(Scores)
+        .createQueryBuilder('scores')
+        .where('scores.grade_id IN (:...gradeIds)', {
+          gradeIds: Object.values(index),
+        })
+        .leftJoinAndSelect(
+          GradeCompositions,
+          'grade',
+          'grade.id = scores.grade_id',
+        )
+        .leftJoinAndSelect(
+          Users,
+          'users',
+          'users.student_id = scores.student_id',
+        )
+        .execute();
+
+      const scoreStudentIds = [
+        ...new Set(scoresList.map((score) => score.scores_student_id)),
+      ];
+      const scoreData = scoreStudentIds.map((studentId: string) => {
+        const scoreObj: any = {};
+        scoresList
+          ?.filter((s) => s.scores_student_id === studentId)
+          ?.forEach((score) => {
+            (scoreObj.fullname = score.users_fullname ?? ''),
+              (scoreObj[score.grade_name] = score.scores_score);
+          });
+        return {
+          studentId: studentId,
+          ...scoreObj,
+        };
+      });
+
       return {
         message: 'success',
         statusCode: 200,
-        data: null,
-      }
+        data: scoreData,
+      };
     } catch (e) {
       console.log(e);
       return {
         message: 'Internal Error!',
         statusCode: 400,
         data: null,
-      }
+      };
     } finally {
       await runner.release();
     }
@@ -286,8 +333,42 @@ export class ScoreService {
         },
         where: {
           id: In(studentIds.map((item) => item.studentId)),
-          studentId: Not(IsNull())
+          studentId: Not(IsNull()),
         },
+      });
+
+      const gradeIds = grades.map((grade) => grade.id);
+      const scores = await runner.manager
+        .getRepository(Scores)
+        .createQueryBuilder('scores')
+        .where('scores.grade_id IN (:...gradeIds)', { gradeIds })
+        .leftJoinAndSelect(
+          GradeCompositions,
+          'grade',
+          'grade.id = scores.grade_id',
+        )
+        .leftJoinAndSelect(
+          Users,
+          'users',
+          'users.student_id = scores.student_id',
+        )
+        .execute();
+
+      const scoreStudentIds = [
+        ...new Set(scores.map((score) => score.scores_student_id)),
+      ];
+      const scoreData = scoreStudentIds.map((studentId: string) => {
+        const scoreObj: any = {};
+        scores
+          ?.filter((s) => s.scores_student_id === studentId)
+          ?.forEach((score) => {
+            (scoreObj.fullname = score.users_fullname ?? ''),
+              (scoreObj[score.grade_name] = score.scores_score);
+          });
+        return {
+          studentId: studentId,
+          ...scoreObj,
+        };
       });
 
       return {
@@ -295,9 +376,14 @@ export class ScoreService {
         statusCode: 200,
         data: {
           rows: students as Row[],
-          columns: [COLUMN_ID, COLUMN_FULLNAME, ...grades.map((item) => item.name)],
+          columns: [
+            COLUMN_ID,
+            COLUMN_FULLNAME,
+            ...grades.map((item) => item.name),
+          ],
           scales: grades.map((item) => item.scale),
           grade: grades,
+          scores: scoreData,
           fileName: `00${id}.xls`,
         },
       };
@@ -408,7 +494,10 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
     try {
       // Step 1: The teacher is correct
-      const isTeacherCorrect = await this.courseService.isTeacherInCourse(courseId, teacherId);
+      const isTeacherCorrect = await this.courseService.isTeacherInCourse(
+        courseId,
+        teacherId,
+      );
       if (!isTeacherCorrect) {
         return {
           message: 'The teacher id is invalid',
@@ -429,11 +518,12 @@ export class ScoreService {
       const N_COLUMNS = Object.keys(addScoreByStudentCodes[0].scores).length;
       let params = '(?, ?, ?, ?)';
       for (let i = 0; i < addScoreByStudentCodes.length * N_COLUMNS - 1; i++) {
-        params += ', (?, ?, ?, ?)'
+        params += ', (?, ?, ?, ?)';
       }
 
       const index = await this._indexGrade(courseId);
 
+      console.log(index);
       const sql = `
         INSERT INTO scores (grade_id, student_id, teacher_id, score)
         VALUES
@@ -447,7 +537,13 @@ export class ScoreService {
       const valueParams = addScoreByStudentCodes.reduce((acc, cur) => {
         let curScores = [];
         Object.keys(addScoreByStudentCodes[0].scores).forEach((item) => {
-          curScores = [...curScores, index[item] || 0, cur.studentCode, teacherId, cur.scores[item]];
+          curScores = [
+            ...curScores,
+            index[item] || 0,
+            cur.studentCode,
+            teacherId,
+            cur.scores[item],
+          ];
         });
         acc = [...acc, ...curScores];
         return acc;
@@ -458,57 +554,66 @@ export class ScoreService {
         message: 'success',
         statusCode: 200,
         data: null,
-      }
+      };
     } catch (e) {
       console.log(e);
       return {
         message: 'Internal Error!',
         statusCode: 400,
         data: null,
-      }
+      };
     } finally {
       await runner.release();
     }
   }
 
-  async createUpdateColumns(courseId: number, userId: number, data: CreateUpdateColumnDto[]): Promise<any> {
+  async createUpdateColumns(
+    courseId: number,
+    userId: number,
+    data: CreateUpdateColumnDto[],
+  ): Promise<any> {
     const runner = this.connection.createQueryRunner();
 
-    const ids = data?.filter(item => !!item.id)?.map(item => item.id);
+    const ids = data?.filter((item) => !!item.id)?.map((item) => item.id);
     const deletePromise = await this.connection
-    .getRepository(GradeCompositions)
-    .createQueryBuilder()
-    .delete()
-    .from(GradeCompositions)
-    .where('id NOT IN (:...ids) AND courseId = :courseId', { ids, courseId })
-    .execute();
+      .getRepository(GradeCompositions)
+      .createQueryBuilder()
+      .delete()
+      .from(GradeCompositions)
+      .where('id NOT IN (:...ids) AND courseId = :courseId', { ids, courseId })
+      .execute();
 
-    const updatePromises = data?.filter(item => typeof(item.id) === 'number').map(item => {
-      const { id,  ...updateData } = item;
-      return runner.connection.getRepository(GradeCompositions).update({
-        id: id,
-      }, {...updateData, order: data.indexOf(item)})
-    });
+    const updatePromises = data
+      ?.filter((item) => typeof item.id === 'number')
+      .map((item) => {
+        const { id, ...updateData } = item;
+        return runner.connection.getRepository(GradeCompositions).update(
+          {
+            id: id,
+          },
+          { ...updateData, order: data.indexOf(item) },
+        );
+      });
 
-    const createData = data?.filter(item => typeof(item.id) === 'string')
+    const createData = data?.filter((item) => typeof item.id === 'string');
     const createPromises = this.connection
-    .getRepository(GradeCompositions)
-    .createQueryBuilder()
-    .insert()
-    .into(GradeCompositions)
-    .values(
-      createData.map((item) => {
-        return {
-          courseId: courseId,
-          name: item.name,
-          scale: item.scale,
-          isFinal: item.isFinal,
-          order: data.indexOf(item)
-        };
-      }),
-    )
-    .execute();
-  
+      .getRepository(GradeCompositions)
+      .createQueryBuilder()
+      .insert()
+      .into(GradeCompositions)
+      .values(
+        createData.map((item) => {
+          return {
+            courseId: courseId,
+            name: item.name,
+            scale: item.scale,
+            isFinal: item.isFinal,
+            order: data.indexOf(item),
+          };
+        }),
+      )
+      .execute();
+
     try {
       await Promise.all([updatePromises, createPromises]);
       console.log('Bulk update successful');
@@ -522,6 +627,6 @@ export class ScoreService {
       message: 'Update Successfully!',
       statusCode: 200,
       data: [],
-    }
+    };
   }
 }
