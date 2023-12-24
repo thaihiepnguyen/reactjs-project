@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { ScoreService } from "./score.service";
-import { AddScoreByStudentCodeDto, AddScoreDto, CreateColumnDto } from "./score.dto";
+import { AddScoreByStudentCodeDto, AddScoreDto, CreateColumnDto, CreateUpdateColumnDto } from "./score.dto";
 import { TBaseDto } from "src/app.dto";
 import { MetaDataAuth } from "../auth/auth.decorator";
 import { ColumnsResponse } from "./score.typing";
@@ -91,5 +91,14 @@ export class ScoreController {
     @MetaDataAuth('userId') userId: number 
   ): Promise<TBaseDto<null>> {
     return await this.scoreService.updateScoresByStudentCode(userId, addScoreByStudentCodes, id);
+  }
+
+  @Post('/create-update-columns/:id') //course id
+  async createUpdateColumn(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: CreateUpdateColumnDto[],
+    @MetaDataAuth('userId') userId: number
+  ): Promise<TBaseDto<ColumnsResponse>> {
+    return await this.scoreService.createUpdateColumns(id, userId, data);
   }
 }

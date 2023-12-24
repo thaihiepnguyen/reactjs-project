@@ -1,5 +1,8 @@
 .paper {
-  width: 552px;
+  width: 675px;
+  table {
+    width: 100% !important;
+  }
   @media only screen and (max-width: 500px) {
       margin: 0;
   }

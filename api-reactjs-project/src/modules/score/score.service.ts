@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { TBaseDto } from 'src/app.dto';
 import { GradeCompositions } from 'src/typeorm/entity/GradeCompositions';
 import { Connection, In, IsNull, Like, Not } from 'typeorm';
 import { CourseService } from '../course/course.service';
-import { AddScoreByStudentCodeDto, ColumnDto, CreateColumnDto, TScore } from './score.dto';
+import { AddScoreByStudentCodeDto, ColumnDto, CreateColumnDto, CreateUpdateColumnDto, TScore } from './score.dto';
 import { Users } from 'src/typeorm/entity/Users';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
@@ -269,10 +269,6 @@ export class ScoreService {
           },
         }),
         runner.manager.getRepository(GradeCompositions).find({
-          select: {
-            name: true,
-            scale: true,
-          },
           where: {
             courseId: id,
           },
@@ -301,6 +297,7 @@ export class ScoreService {
           rows: students as Row[],
           columns: [COLUMN_ID, COLUMN_FULLNAME, ...grades.map((item) => item.name)],
           scales: grades.map((item) => item.scale),
+          grade: grades,
           fileName: `00${id}.xls`,
         },
       };
@@ -471,6 +468,60 @@ export class ScoreService {
       }
     } finally {
       await runner.release();
+    }
+  }
+
+  async createUpdateColumns(courseId: number, userId: number, data: CreateUpdateColumnDto[]): Promise<any> {
+    const runner = this.connection.createQueryRunner();
+
+    const ids = data?.filter(item => !!item.id)?.map(item => item.id);
+    const deletePromise = await this.connection
+    .getRepository(GradeCompositions)
+    .createQueryBuilder()
+    .delete()
+    .from(GradeCompositions)
+    .where('id NOT IN (:...ids) AND courseId = :courseId', { ids, courseId })
+    .execute();
+
+    const updatePromises = data?.filter(item => typeof(item.id) === 'number').map(item => {
+      const { id,  ...updateData } = item;
+      return runner.connection.getRepository(GradeCompositions).update({
+        id: id,
+      }, {...updateData, order: data.indexOf(item)})
+    });
+
+    const createData = data?.filter(item => typeof(item.id) === 'string')
+    const createPromises = this.connection
+    .getRepository(GradeCompositions)
+    .createQueryBuilder()
+    .insert()
+    .into(GradeCompositions)
+    .values(
+      createData.map((item) => {
+        return {
+          courseId: courseId,
+          name: item.name,
+          scale: item.scale,
+          isFinal: item.isFinal,
+          order: data.indexOf(item)
+        };
+      }),
+    )
+    .execute();
+  
+    try {
+      await Promise.all([updatePromises, createPromises]);
+      console.log('Bulk update successful');
+    } catch (error) {
+      // Handle errors, you can throw or log as needed
+      console.error('Error in bulk update:', error);
+      throw new NotFoundException('Failed to update records');
+    }
+
+    return {
+      message: 'Update Successfully!',
+      statusCode: 200,
+      data: [],
     }
   }
 }

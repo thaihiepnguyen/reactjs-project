@@ -175,7 +175,7 @@ export default function Page({ params }: { params: { id: string } }) {
           ) : null}
           <div className={classes.list}>
             <Divider>
-              <Heading3>Teachers</Heading3>
+              <Heading3 $colorName="--eerie-black">Teachers</Heading3>
             </Divider>
             {course?.teacherList?.map((teacher: User, teacherIdx: number) => (
               <div className={classes.infoWrapper} key={teacherIdx}>
@@ -193,7 +193,7 @@ export default function Page({ params }: { params: { id: string } }) {
           </div>
           <Box className={classes.list} sx={{ mt: 4 }}>
             <Divider>
-              <Heading3>Students</Heading3>
+              <Heading3 $colorName="--eerie-black">Students</Heading3>
             </Divider>
             {course?.studentList?.map((student: User, studentIdx: number) => (
               <div className={classes.wrapper}>

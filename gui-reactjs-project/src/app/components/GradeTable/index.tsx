@@ -20,7 +20,6 @@ interface GradeTableProps {
 
 const GradeTable = memo(({ courseId }: GradeTableProps) => {
   const [scoreData, setScoreData] = useState<any>(null);
-console.log(scoreData)
   const [showGradeSetup, setShowGradeSetup] = useState<boolean>(false);
   const [columns, setColumns] = useState([]);
 
@@ -75,6 +74,9 @@ console.log(scoreData)
     setShowGradeSetup(false);
   };
 
+  const onSaveGradeComposition = async () => {
+    await fetchDataForGradeManagementTable();
+  }
   return (
     <>
       <IconButton className={classes.iconMore} onClick={onShowGradeSetup}>
@@ -153,7 +155,8 @@ console.log(scoreData)
           }}
         />
       </div>
-      <GradeManagementTable courseId={courseId} isOpen={showGradeSetup} onCancel={onCloseGradeSetup} scoreData={scoreData} />
+      {showGradeSetup ? <GradeManagementTable courseId={courseId} isOpen={showGradeSetup} onCancel={onCloseGradeSetup} scoreData={scoreData} onSave={onSaveGradeComposition} /> : null}
+      
     </>
   );
 });

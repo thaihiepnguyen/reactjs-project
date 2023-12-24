@@ -7,5 +7,6 @@ export interface ColumnsResponse {
   rows: Row[],
   columns: string[],
   scales: number[],
-  fileName: string
+  fileName: string,
+  grade: any
 }

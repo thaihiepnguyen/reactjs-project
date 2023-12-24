@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import TableCell from "@mui/material/TableCell/TableCell";
 import {
@@ -37,7 +37,7 @@ import { setLoading } from "@/redux/reducers/loading";
 const tableHeaders: TableHeaderLabel[] = [
   { name: "grade_name", label: "Grade name", sortable: true },
   { name: "scale", label: "Scale", sortable: true },
-  { name: "is_published", label: "Published", sortable: true },
+  { name: "is_published", label: "Finalize", sortable: true },
 ];
 
 interface Props {
@@ -45,59 +45,40 @@ interface Props {
   isOpen: boolean;
   onCancel: () => void;
   scoreData: any;
+  onSave: () => void;
 }
-const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) => {
+
+const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSave }: Props) => {
   const dispatch = useAppDispatch();
   const [items, setItems] = useState<any[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
-  const [newItemData, setNewItemData] = useState({ id: "", name: "", scale: "", isEditing: false });
+  const [newItemData, setNewItemData] = useState({ name: "", scale: "", isEditing: false });
   const [errorMessage, setErrorMessage] = useState("");
-  const [gradeNameList, setGradeNameList] = useState<any>([]);
-  const [gradeScaleList, setGradeScaleList] = useState<any>([]);
-  const [headerExcelFile, setHeaderExcelFile] = useState<any>([]);
-  const [filename, setFileName] = useState("");
-  const [studentList, setStudentList] = useState<any[]>([]);
+  const [gradeNameList, setGradeNameList] = useState<any>(scoreData?.grade);
+  const [headerExcelFile, setHeaderExcelFile] = useState<any>(scoreData?.columns);
+  const [filename, setFileName] = useState(scoreData?.fileName);
+  const [studentList, setStudentList] = useState<any[]>(scoreData?.rows);
 
-  const convertDataToTable = (gradeNameList: any[], gradeScaleList: { [x: string]: any }) => {
-    const items = gradeNameList.map((itemName: any, index: string | number) => {
-      const scale = gradeScaleList[index];
+  const convertDataToTable = (gradeNameList: any[]) => {
+    const items = gradeNameList.map((grade: any) => {
       return {
-        id: `${index}`,
-        name: itemName,
-        scale: scale,
+        id: grade?.id,
+        name: grade?.name,
+        scale: grade?.scale,
         isEditing: false,
-        isPublished: false,
+        isFinal: grade?.isFinal,
       };
     });
 
     return items;
   };
 
-  // Function to fetch data from the API based on the provided ID
-
   useEffect(() => {
-    if (scoreData) {
-      // Get student list
-      setStudentList(scoreData.rows);
-
-      // Get the header columns
-      setHeaderExcelFile(scoreData.columns);
-
-      // Get file excel name
-      setFileName(scoreData.fileName);
-
-      // Get grade name list of the course
-      const gradeNameList = scoreData.columns.slice(2);
-      setGradeNameList(gradeNameList);
-
-      // Get grade scale list of the course
-      const gradeScaleList = scoreData.scales;
-      setGradeScaleList(gradeScaleList);
-
-      // Covert to UI
-      setItems(convertDataToTable(gradeNameList, gradeScaleList));
+    console.log(gradeNameList);
+    if (gradeNameList?.length) {
+      setItems(convertDataToTable(gradeNameList));
     }
-  }, [scoreData]);
+  }, [gradeNameList]);
 
   const calculateTotalScale = (itemsToCalculate: any[]) => {
     let total = 0;
@@ -121,22 +102,23 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) 
     setItems(reorderedItems);
 
     // Sett new header for the xls file
-    const headers = ["ID", "Tên", ...reorderedItems.map((obj) => obj.name)];
+    const headers = ["studentId", "fullname", ...reorderedItems.map((obj) => obj.name)];
     setHeaderExcelFile(headers);
-
-    // Reorder the items
-    const reorderedItemsWithNewIDs = reorderedItems.map((item, index) => ({
-      ...item,
-      id: `${index}`, // Reassign IDs based on the new order
-    }));
 
     // Save new order index to DB
     try {
+      if(isEditingAll) return
+      const updatedData = reorderedItems.map(item => {
+        const { isEditing, ...updatedItem } = item;
+        return updatedItem;
+      });
+
+      console.log(updatedData)
       dispatch(setLoading(true));
-      const response = await axiosInstance.post(`/score/update-score/${courseId}`, reorderedItemsWithNewIDs);
+      const response = await axiosInstance.post(`/score/create-update-columns/${courseId}`, updatedData);
       dispatch(setLoading(false));
       if (response.data) {
-        console.log(response.data);
+        onSave()
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -163,23 +145,20 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) 
 
       const reorderedItems = Array.from(items);
       // Sett new header for the xls file
-      const headers = ["ID", "Tên", ...reorderedItems.map((obj) => obj.name)];
+      const headers = ["studentId", "fullname", ...reorderedItems.map((obj) => obj.name)];
       setHeaderExcelFile(headers);
-
-      // Reorder the items
-      const reorderedItemsWithNewIDs = reorderedItems.map((item, index) => ({
-        ...item,
-        id: `${index}`, // Reassign IDs based on the new order
-      }));
 
       // Save new order index to DB
       try {
         dispatch(setLoading(true));
-        const response = await axiosInstance.post(`/score/update-score/${courseId}`, reorderedItemsWithNewIDs);
+        const updatedData = items.map(item => {
+          const { isEditing, ...updatedItem } = item;
+          return updatedItem;
+        });
+        const response = await axiosInstance.post(`/score/create-update-columns/${courseId}`, updatedData);
         dispatch(setLoading(false));
-
         if (response.data) {
-          console.log(response.data);
+          onSave();
         } else {
           throw new Error("Failed to fetch data");
         }
@@ -218,9 +197,9 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) 
 
   const handleAddRow = async () => {
     const newItemId = String(items.length);
-    const newItem = { ...newItemData, id: newItemId };
+    const newItem = { ...newItemData, id: newItemId};
     setItems((prevItems) => [...prevItems, newItem]);
-    setNewItemData({ id: "", name: "", scale: "", isEditing: false });
+    setNewItemData({name: "", scale: "", isEditing: false });
   };
 
   const handleInputChangeNewRow = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, field: string) => {
@@ -254,7 +233,7 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, itemId: any) => {
     const updatedItems = items.map((item) => {
       if (item.id === itemId) {
-        return { ...item, isPublished: e.target.checked };
+        return { ...item, isFinal: e.target.checked };
       }
       return item;
     });
@@ -326,13 +305,13 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) 
                   ref={provided.innerRef}
                   style={{ width: "30rem", borderCollapse: "collapse" }}
                 >
-                  <TableHeader headers={tableHeaders} />
+                  <TableHeader headers={isEditingAll ? [...tableHeaders, {label: "Action"}] : tableHeaders} />
                   <tbody>
                     {items.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
+                      <Draggable key={`gc-${index}`} draggableId={`gc-${index}`} index={index}>
                         {(provided) => (
                           <TableRow ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                            <TableCell style={{ padding: "1rem", width: "50%" }}>
+                            <TableCell style={{ padding: "1rem", width: "40%" }}>
                               {item.isEditing || isEditingAll ? (
                                 <Input
                                   type="text"
@@ -358,23 +337,18 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) 
                             </TableCell>
                             <TableCell style={{ padding: "1rem", width: "18%" }}>
                               {isEditingAll ? (
-                                <Checkbox
-                                  checked={item.isPublished}
-                                  onChange={(e) => handleCheckboxChange(e, item.id)}
-                                />
+                                <Checkbox checked={item.isFinal} onChange={(e) => handleCheckboxChange(e, item.id)} />
                               ) : (
-                                <Checkbox checked={item.isPublished} disabled />
+                                <Checkbox checked={item.isFinal} disabled />
                               )}
                             </TableCell>
-                            <TableCell style={{ padding: "1rem", width: "10%" }}>
-                              {isEditingAll ? (
+                            {isEditingAll ? (
+                              <TableCell style={{ padding: "1rem" }}>
                                 <Button onClick={() => handleDeleteRow(item.id)}>
                                   <DeleteIcon style={{ color: "red" }} />
                                 </Button>
-                              ) : (
-                                ""
-                              )}
-                            </TableCell>
+                              </TableCell>
+                            ) : null}
                           </TableRow>
                         )}
                       </Draggable>
@@ -401,6 +375,6 @@ const GradeManagementTable = ({ courseId, isOpen, onCancel, scoreData }: Props) 
       </DialogContentConfirm>
     </Dialog>
   );
-};
+});
 
 export default GradeManagementTable;
