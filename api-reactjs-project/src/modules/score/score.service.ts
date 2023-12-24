@@ -613,11 +613,18 @@ export class ScoreService {
     const ids = data?.filter((item) => !!item.id)?.map((item) => item.id);
     const deleteScore = await runner.connection
       .getRepository(Scores)
-      .createQueryBuilder()
-      .delete()
-      .from(Scores)
-      .where('grade_id NOT IN (:...ids)', { ids })
-      .execute();
+      .createQueryBuilder('scores')
+      .leftJoinAndSelect(
+        GradeCompositions,
+        'grade',
+        'grade.id = scores.grade_id',
+      )
+      .where('grade_id NOT IN (:...ids) and course_id = :courseId', { ids, courseId })
+      .getMany()
+      .then((scores) => {
+        return runner.connection.getRepository(Scores).remove(scores);
+      })
+
 
     const deletePromise = await runner.connection
       .getRepository(GradeCompositions)
