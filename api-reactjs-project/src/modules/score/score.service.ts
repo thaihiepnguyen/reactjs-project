@@ -9,6 +9,7 @@ import {
   ColumnDto,
   CreateColumnDto,
   CreateUpdateColumnDto,
+  DeleteScoreByStudentCodeDto,
   TScore,
 } from './score.dto';
 import { Users } from 'src/typeorm/entity/Users';
@@ -175,9 +176,15 @@ export class ScoreService {
     teacherId: number,
     scores: TScore,
     courseId: number,
+    oldStudentId: string,
   ): Promise<TBaseDto<any>> {
     const runner = this.connection.createQueryRunner();
     try {
+      if (oldStudentId) {
+        await runner.connection
+          .getRepository(Scores)
+          .delete({ studentId: oldStudentId });
+      }
       // Step 1: The teacher is correct
       const isTeacherCorrect = await this.courseService.isTeacherInCourse(
         courseId,
@@ -486,6 +493,30 @@ export class ScoreService {
     }, {});
   }
 
+  async deleteScoreByStudentCode(
+    teacherId: number,
+    deleteScoreByStudentCodes: DeleteScoreByStudentCodeDto,
+  ): Promise<TBaseDto<null>> {
+    const runner = this.connection.createQueryRunner();
+    try {
+      if (deleteScoreByStudentCodes.oldStudentId) {
+        await runner.connection
+          .getRepository(Scores)
+          .delete({ studentId: deleteScoreByStudentCodes.oldStudentId });
+      }
+      return {
+        message: 'Delete successfully',
+        statusCode: 200,
+        data: null,
+      };
+    } catch (e) {
+      return {
+        message: 'Error',
+        statusCode: 400,
+        data: e,
+      };
+    }
+  }
   async updateScoresByStudentCode(
     teacherId: number,
     addScoreByStudentCodes: AddScoreByStudentCodeDto[],
@@ -523,7 +554,6 @@ export class ScoreService {
 
       const index = await this._indexGrade(courseId);
 
-      console.log(index);
       const sql = `
         INSERT INTO scores (grade_id, student_id, teacher_id, score)
         VALUES
@@ -575,7 +605,15 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
 
     const ids = data?.filter((item) => !!item.id)?.map((item) => item.id);
-    const deletePromise = await this.connection
+    const deleteScore = await runner.connection
+      .getRepository(Scores)
+      .createQueryBuilder()
+      .delete()
+      .from(Scores)
+      .where('grade_id NOT IN (:...ids)', { ids })
+      .execute();
+
+    const deletePromise = await runner.connection
       .getRepository(GradeCompositions)
       .createQueryBuilder()
       .delete()
@@ -596,7 +634,7 @@ export class ScoreService {
       });
 
     const createData = data?.filter((item) => typeof item.id === 'string');
-    const createPromises = this.connection
+    const createPromises = runner.connection
       .getRepository(GradeCompositions)
       .createQueryBuilder()
       .insert()

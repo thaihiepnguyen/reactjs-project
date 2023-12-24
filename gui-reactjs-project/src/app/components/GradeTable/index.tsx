@@ -47,7 +47,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
               title: `${capitalizeFirstLetter(col)} ${index >= 2 ? "(" + data?.scales?.[index - 2] + "%)" : ""}`,
               field: col,
               type: index >= 2 ? "numeric" : "string",
-              editable: col === "fullname" ? "never" : "always"
+              editable: col === "fullname" ? "never" : "always",
             }))
           );
         }
@@ -116,9 +116,10 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
       console.error("Error fetching data:", error);
     }
   };
+
   return (
     <>
-      <IconButton className={classes.iconMore} onClick={onShowGradeSetup}>
+      <IconButton className={classes.iconMore} sx={{display: "block", ml: "auto"}} onClick={onShowGradeSetup}>
         <MoreHoriz />
       </IconButton>
 
@@ -148,16 +149,40 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
             },
           }}
           options={{
+            pageSize: 20,
+            pageSizeOptions: [20, 30, 50],
             exportButton: true,
             headerStyle: {
               backgroundColor: "var(--gray-10)",
             },
           }}
           cellEditable={{
-            onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+            onCellEditApproved: (newValue, oldValue: any, rowData: any, columnDef: any) => {
               return new Promise((resolve, reject) => {
-                console.log("newValue: " + newValue);
-                setTimeout(resolve, 1000);
+                const field = columnDef.field ?? "";
+                const newData = {...rowData, [field] : newValue};
+                const { studentId, fullname, tableData,  ...scores } = newData;
+                if (!studentId || Object.keys(scores).length != scoreData?.grade?.length) {
+                  Swal.fire({
+                    title: "Oops",
+                    text: "Please enter Student ID and Scores",
+                    icon: "error",
+                  });
+                  return reject(false);
+                }
+                axiosInstance
+                  .post(`/score/add/by-student-code/${courseId}`, {
+                    studentCode: studentId,
+                    scores: scores,
+                    oldStudentId: rowData?.studentId !== newData?.studentId ? rowData?.studentId : "",
+                  })
+                  .then((response) => {
+                    setData(response.data.data);
+                    resolve;
+                  })
+                  .catch((error) => {
+                    reject(error);
+                  });
               });
             },
           }}
@@ -180,7 +205,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
                     scores: scores,
                   })
                   .then((response) => {
-                    setData(response.data.data)
+                    setData(response.data.data);
                     resolve(response);
                   })
                   .catch((error) => {
@@ -189,28 +214,51 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
               });
             },
 
-            onRowUpdate: (newData, oldData) =>
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  const dataUpdate = [...data];
-                  const index = oldData.tableData.id;
-                  dataUpdate[index] = newData;
-                  setData([...dataUpdate]);
+            onRowUpdate: (newData: any, oldData: any) => {
+              return new Promise((resolve, reject) => {
+                const { studentId, fullname, ...scores } = newData;
+                if (!studentId || Object.keys(scores).length != scoreData?.grade?.length) {
+                  Swal.fire({
+                    title: "Oops",
+                    text: "Please enter Student ID and Scores",
+                    icon: "error",
+                  });
+                  return reject(false);
+                }
+                axiosInstance
+                  .post(`/score/add/by-student-code/${courseId}`, {
+                    studentCode: studentId,
+                    scores: scores,
+                    oldStudentId: oldData?.studentId,
+                  })
+                  .then((response) => {
+                    setData(response.data.data);
+                    resolve(response);
+                  })
+                  .catch((error) => {
+                    reject(error);
+                  });
+              });
+            },
 
-                  resolve(true);
-                }, 1000);
-              }),
-            onRowDelete: (oldData) =>
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  const dataDelete = [...data];
-                  const index = oldData.tableData.id;
-                  dataDelete.splice(index, 1);
-                  setData([...dataDelete]);
-
-                  resolve(true);
-                }, 1000);
-              }),
+            onRowDelete: (oldData) => {
+              return new Promise((resolve, reject) => {
+                axiosInstance
+                  .post(`/score/delete-score`, {
+                    oldStudentId: oldData?.studentId,
+                  })
+                  .then((response) => {
+                    const dataDelete = [...data];
+                    const index = oldData.tableData.id;
+                    dataDelete.splice(index, 1);
+                    setData([...dataDelete]);
+                    resolve(true);
+                  })
+                  .catch(() => {
+                    reject(false);
+                  });
+              });
+            },
           }}
         />
       </div>

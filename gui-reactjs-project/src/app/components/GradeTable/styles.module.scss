@@ -97,16 +97,13 @@
     th {
       text-align: left;
       flex-direction: row !important;
+      min-width: 145px;
     }
-    thead th:first-child,
-    thead th:nth-child(2), 
-    thead th:nth-child(3), {
-      pointer-events: none;
-    }
+    
   }
 }
 
 .iconMore {
-  margin-left: auto;
-  justify-content: right;
+  margin-left: auto !important;
+  display: block !important;
 }

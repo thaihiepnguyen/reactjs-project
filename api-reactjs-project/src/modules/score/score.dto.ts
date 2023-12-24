@@ -33,6 +33,14 @@ export class AddScoreByStudentCodeDto {
 
   @IsObject()
   scores: TScore;
+
+  @IsOptional()
+  oldStudentId: string;
+}
+
+export class DeleteScoreByStudentCodeDto {
+  @IsOptional()
+  oldStudentId: string;
 }
 
 export interface TScore {

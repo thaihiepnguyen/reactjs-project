@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { ScoreService } from "./score.service";
-import { AddScoreByStudentCodeDto, AddScoreDto, CreateColumnDto, CreateUpdateColumnDto } from "./score.dto";
+import { AddScoreByStudentCodeDto, AddScoreDto, CreateColumnDto, CreateUpdateColumnDto, DeleteScoreByStudentCodeDto } from "./score.dto";
 import { TBaseDto } from "src/app.dto";
 import { MetaDataAuth } from "../auth/auth.decorator";
 import { ColumnsResponse } from "./score.typing";
@@ -50,9 +50,9 @@ export class ScoreController {
     @Body() addScoreByStudentCode: AddScoreByStudentCodeDto,
     @MetaDataAuth('userId') userId: number 
   ): Promise<TBaseDto<null>> {
-    const { studentCode, scores } = addScoreByStudentCode;
-    
-    return await this.scoreService.addScoreByStudentCode(studentCode, userId, scores, id);
+    const { studentCode, scores, oldStudentId } = addScoreByStudentCode;
+
+    return await this.scoreService.addScoreByStudentCode(studentCode, userId, scores, id, oldStudentId);
   }
 
   @Get('/columns/:id')
@@ -93,6 +93,14 @@ export class ScoreController {
     return await this.scoreService.updateScoresByStudentCode(userId, addScoreByStudentCodes, id);
   }
 
+  @Post('/delete-score')
+  async deleteScore(
+    @Body() deleteScoreByStudentCodes: DeleteScoreByStudentCodeDto,
+    @MetaDataAuth('userId') userId: number 
+  ): Promise<TBaseDto<null>> {
+    return await this.scoreService.deleteScoreByStudentCode(userId, deleteScoreByStudentCodes);
+  }
+
   @Post('/create-update-columns/:id') //course id
   async createUpdateColumn(
     @Param('id', ParseIntPipe) id: number,
@@ -101,4 +109,6 @@ export class ScoreController {
   ): Promise<TBaseDto<ColumnsResponse>> {
     return await this.scoreService.createUpdateColumns(id, userId, data);
   }
+
+  
 }
