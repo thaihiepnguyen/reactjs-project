@@ -91,6 +91,11 @@
   width: 100%;
 }
 
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .infoWrapper {
   display: flex;
   align-items: center;
@@ -102,6 +107,7 @@
     object-fit: cover;
   }
 }
+
 
 .iconMore {
   color: #767676;
@@ -118,4 +124,9 @@
 .iconMore:hover {
   border: 1px solid #f4f4f4;
   background: #f4f4f4;
+}
+.tabWrapper {
+  button {
+    padding: 12px 16px !important;
+  }
 }

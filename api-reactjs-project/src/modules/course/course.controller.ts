@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post, Put, UseGuards} from "@nestjs/common";
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards} from "@nestjs/common";
 import {Role} from "../auth/roles/role.enum";
 import {Roles} from "../auth/roles/roles.decorator";
 import {CourseService} from "./course.service";
@@ -91,7 +91,7 @@ export class CourseController {
     return this.courseService.getMyCourseDetail(id, userId)
   }
 
-  @Put('ban-student/:id/from/:courseId')
+  @Delete('ban-student/:id/from/:courseId')
   async banStudent(
     @MetaDataAuth('userId') userId: number,
     @Param('id', ParseIntPipe) id: number,

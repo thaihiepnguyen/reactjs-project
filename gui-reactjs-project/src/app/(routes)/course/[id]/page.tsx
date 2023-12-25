@@ -20,6 +20,8 @@ import { User } from "@/models/user";
 import { MoreHoriz, PeopleAltOutlined } from "@mui/icons-material";
 import PopupInviteCourse from "@/app/components/PopupInviteCourse";
 import GradeManagementTable from "@/app/components/GradeManagementTable";
+import MoreHorizContainer from "@/app/components/MoreHorizContainer";
+import GradeTable from "@/app/components/GradeTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -50,28 +52,30 @@ export default function Page({ params }: { params: { id: string } }) {
   const anchorRef = React.useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    function getCourseDetail(id: string) {
-      dispatch(setLoading(true));
-      axiosInstance
-        .get(`/courses/user/my-courses/detail/${id}`)
-        .then((response) => {
-          setCourse(response.data.data);
-        })
-        .catch((err) => {
-          Swal.fire({
-            title: err.response.data.message,
-            icon: "error",
-          }).then(() => {
-            router.back();
-          });
-        })
-        .finally(() => {
-          dispatch(setLoading(false));
-        });
-    }
-
+    
     getCourseDetail(params.id);
   }, []);
+
+  function getCourseDetail(id: string) {
+    dispatch(setLoading(true));
+    axiosInstance
+      .get(`/courses/user/my-courses/detail/${id}`)
+      .then((response) => {
+        setCourse(response.data.data);
+      })
+      .catch((err) => {
+        Swal.fire({
+          title: err.response.data.message,
+          icon: "error",
+        }).then(() => {
+          router.back();
+        });
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
+  }
+
 
   function a11yProps(index: number) {
     return {
@@ -110,10 +114,10 @@ export default function Page({ params }: { params: { id: string } }) {
   return (
     <Box className={classes.root}>
       <Box className={classes.menu} sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" className={classes.tabWrapper}>
           <Tab label="Dashboard" {...a11yProps(0)} />
           <Tab label="Classmate" {...a11yProps(1)} />
-          <Tab label="Grade Composition" {...a11yProps(2)} />
+          <Tab label="Score" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <div className={classes.container}>
@@ -171,7 +175,7 @@ export default function Page({ params }: { params: { id: string } }) {
           ) : null}
           <div className={classes.list}>
             <Divider>
-              <Heading3>Teachers</Heading3>
+              <Heading3 $colorName="--eerie-black">Teachers</Heading3>
             </Divider>
             {course?.teacherList?.map((teacher: User, teacherIdx: number) => (
               <div className={classes.infoWrapper} key={teacherIdx}>
@@ -189,26 +193,33 @@ export default function Page({ params }: { params: { id: string } }) {
           </div>
           <Box className={classes.list} sx={{ mt: 4 }}>
             <Divider>
-              <Heading3>Students</Heading3>
+              <Heading3 $colorName="--eerie-black">Students</Heading3>
             </Divider>
             {course?.studentList?.map((student: User, studentIdx: number) => (
-              <div className={classes.infoWrapper} key={studentIdx}>
-                <div className={classes.personalImage}>
-                  <Avatar>{student?.avatarUrl ? <img src={student.avatarUrl} alt=""></img> : "T"}</Avatar>
+              <div className={classes.wrapper}>
+                <div className={classes.infoWrapper} key={studentIdx}>
+                  <div className={classes.personalImage}>
+                    <Avatar>{student?.avatarUrl ? <img src={student.avatarUrl} alt=""></img> : "T"}</Avatar>
+                  </div>
+                  <div className={classes.personalInfo}>
+                    <Heading4 $colorName="--eerie-black" className={classes.name}>
+                      {student?.id === user?.id ? "You" : student?.fullname}
+                    </Heading4>
+                    <ParagraphSmall>{student?.email}</ParagraphSmall>
+                  </div>
                 </div>
-                <div className={classes.personalInfo}>
-                  <Heading4 $colorName="--eerie-black" className={classes.name}>
-                    {student?.id === user?.id ? "You" : student?.fullname}
-                  </Heading4>
-                  <ParagraphSmall>{student?.email}</ParagraphSmall>
-                </div>
+                {user?.role?.name === "teacher" ? (
+                  <div>
+                    <MoreHorizContainer studentId={student?.id} courseId={params.id} onBanStudent={() => getCourseDetail(params.id)}/>
+                  </div>
+                ) : null}
               </div>
             ))}
           </Box>
         </CustomTabPanel>
 
         <CustomTabPanel value={value} index={2}>
-            <GradeManagementTable courseId={params.id}/>
+            <GradeTable courseId={params.id}/>
         </CustomTabPanel>
       </div>
       <Popper

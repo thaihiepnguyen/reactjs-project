@@ -105,7 +105,7 @@ const LandingPage = () => {
 
       <footer className={classes.footer}>
         <h2 className={classes.footer__title}>
-          A tecnology-first approach to education and colaborative work
+          {t('desc_temp')}
         </h2>
         <div className={classes.footer__images}>
           <div className={classes.footer__image}>

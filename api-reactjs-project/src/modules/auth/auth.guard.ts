@@ -12,7 +12,6 @@ export class AuthGuard implements CanActivate {
 
   async validateRequest(request): Promise<boolean> {
     let { userId, userName } = request.cookies;
-    console.log('2', 'Guard');
 
     userId = userId ? userId : request.headers["x-user-id"];
     userName = userName? userName : decodeURI(request.headers["x-user-name"]);

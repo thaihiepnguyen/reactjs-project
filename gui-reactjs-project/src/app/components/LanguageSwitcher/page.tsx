@@ -2,7 +2,7 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { USA, VN } from '@/assets';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -22,27 +22,45 @@ i18n.use(initReactI18next).init({
 });
 
 const menu = ['EN', 'VI'];
-const imgMenu = [USA, VN];
 
-export default function LanguageSwitcher() {
+const LanguageSwitcher = () => {
+  const isBrowser = typeof window !== 'undefined';
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   
+  // useEffect(() => {
+  //   // Save selected language to local storage whenever it changes
+  //   localStorage.setItem('selectedLanguage', selectedIndex);
+  // }, [selectedIndex]);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
-    // console.log();
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   const handleMenuItemClick = (index, lng) => {
-    // console.log(`Selected language: ${index}`);
     setSelectedIndex(index);
     i18n.changeLanguage(lng);
     handleClose(); 
   };
+
+  useEffect(() => {
+    if (isBrowser) {
+      const savedLanguage = localStorage.getItem('selectedLanguage');
+      setSelectedIndex(savedLanguage ? parseInt(savedLanguage, 10) : 0);
+    }
+  }, [isBrowser]);
+
+  useEffect(() => {
+    if (isBrowser) {
+      localStorage.setItem('selectedLanguage', selectedIndex);
+      i18n.changeLanguage(selectedIndex === 0 ? 'en' : 'vi');
+    }
+  }, [selectedIndex, isBrowser]);
 
   return (
     <div>
@@ -55,7 +73,7 @@ export default function LanguageSwitcher() {
         style={{width: 'auto'}}
       >
         <div style={{margin: "0 2px"}}>{menu[selectedIndex]}</div>
-        {selectedIndex === 0 ? <USA/>:<VN/>}
+        {selectedIndex === 0 ? <USA/> : <VN/>}
       </Button>
       <Menu
         id="basic-menu"
@@ -71,4 +89,6 @@ export default function LanguageSwitcher() {
       </Menu>
     </div>
   );
-}
+};
+
+export default LanguageSwitcher;

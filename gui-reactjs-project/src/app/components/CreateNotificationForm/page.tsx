@@ -5,6 +5,7 @@ import { Button, Checkbox, Stack, TextField } from '@mui/material';
 import { Create } from '@mui/icons-material';
 import axiosInstance from "@/app/routers/axios";
 import Swal from 'sweetalert2';
+import Editor from '../Editor';
 
 export default function CreateNotificationForm({onHideForm, id}){
     const [notificationData, setNotifictionData] = useState({
@@ -63,17 +64,15 @@ export default function CreateNotificationForm({onHideForm, id}){
           onChange={handleChange}
         />
         <br/><br/>
-        <TextField
-          id="content"
-          label=""
-          multiline
-          rows={6}
-          placeholder='Your notification'
-          variant="filled"
-          style={{width: '100%'}}
-          value={notificationData.content}
-          onChange={handleChange}
-        />
+        <Editor value={notificationData.content} onChange={(data) => {
+          handleChange({
+            target: {
+              id: "content",
+              value: data
+            }
+          })
+        }}/>
+        
         <br/><br/>
         <Stack direction="row" spacing={2} sx={{ justifyContent: 'end' }}>
           <Button 

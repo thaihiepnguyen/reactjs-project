@@ -170,6 +170,7 @@ export class AuthService {
       id: user.id,
       fullname: user.fullname,
       email: user.email,
+      roleId: user.roleId,
     }
     
     const token = await this.generateToken(payload);

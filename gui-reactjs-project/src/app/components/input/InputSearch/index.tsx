@@ -34,7 +34,7 @@ const InputSearch = memo(React.forwardRef((props: InputSearchProps, ref) => {
   return (
     <FormControl sx={{ width: width }}>
       <OutlinedInput
-        type='text'
+        type= {type || 'text'}
         disabled={disabled}
         className={className}
         placeholder={placeholder}
