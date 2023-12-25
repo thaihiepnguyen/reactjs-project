@@ -6,11 +6,13 @@ import SocketService from "@/services/socketService";
 import NotificationItem from "@/app/components/NotificationItem";
 import axiosInstance from "@/app/routers/axios";
 import parse from 'html-react-parser';
+import { useTranslation } from 'next-i18next';
 
 export default function Page() {
   const socketService = SocketService.instance();
   const [notifications, setNotifications] = useState([]);
   const [notiDetail, setNotiDetail] = useState(0)
+  const {t} = useTranslation();
   useEffect(() => {
     async function getNotis() {
       const response = await axiosInstance.get('/noti/student');
@@ -28,7 +30,7 @@ export default function Page() {
   return <>
     <div className={classes.notificationContainer}>
       <div className={classes.listNotification}>
-        <h2 style={{marginBottom: 16}}>{`Notifications`}</h2>
+        <h2 style={{marginBottom: 16}}>{t('Notifications')}</h2>
         <div className={classes.list}>
         {
           notifications.map((item, index) => {

@@ -110,37 +110,32 @@ const LandingPage = () => {
         <div className={classes.footer__images}>
           <div className={classes.footer__image}>
             <img src="./images/up-arrow-icon.svg" alt="" />
-            <h3>Highlight Text</h3>
+            <h3>{t('Quality')}</h3>
             <p>
-              We deliver high quality <span>content</span> that will impact in
-              your profesional life.
+              {t('We deliver high quality content that will impact in your profesional life.')}
             </p>
           </div>
           <div className={classes.footer__image}>
             <img src="./images/paste.svg" alt="" />
-            <h3>Highlight Text</h3>
-            <p>Get started now or read <span>the docs</span> to know more.</p>
+            <h3>{t("Fast")}</h3>
+            <p>{t('Get started now or read the docs to know more.')}</p>
           </div>
           <div className={classes.footer__image}>
-            <img src="./images/copy-icon.svg" alt="" />
-            <h3>Highlight Text</h3>
+            <img src="./images/up-arrow-icon.svg" alt="" />
+            <h3>{t('Quality')}</h3>
             <p>
-              We deliver <span>high quality</span> content that will impact in
-              your profesional life.
+              {t('We deliver high quality content that will impact in your profesional life.')}
             </p>
           </div>
           <div className={classes.footer__image}>
-            <img src="./images/target-icon.svg" alt="" />
-            <h3>Highlight Text</h3>
-            <p>
-              We deliver high quality content that will impact in your
-              <span>profesional life.</span>
-            </p>
+            <img src="./images/paste.svg" alt="" />
+            <h3>{t("Fast")}</h3>
+            <p>{t('Get started now or read the docs to know more.')}</p>
           </div>
         </div>
         <div className={classes.footer__logo}>
           <h2 className={classes.footer__logo_title}>PTUDWNC - 20CLC02</h2>
-          <p>2023 All rights reserved</p>
+          <p>2023 {t('All rights reserved')}</p>
         </div>
       </footer>
     </>

@@ -61,5 +61,17 @@
     "Teacher": "Teacher",
     "Student": "Student",
     "Invite": "Invite",
-    "Students Score": "Students Score"
+    "Students Score": "Students Score",
+    "Download Template Student List": "Download Template Student List",
+    "All rights reserved": "All rights reserved",
+    "Quality": "Quality",
+    "We deliver high quality content that will impact in your profesional life.": "We deliver high quality content that will impact in your profesional life.",
+    "Fast": "Fast",
+    "Get started now or read the docs to know more.": "Get started now or read the docs to know more.",
+    "Add a course": "Add a course",
+    "Join as a tutor": "Join as a tutor",
+    "Name (Required)": "Name (Required)",
+    "Description (Required)": "Description (Required)",
+    "Class Code (Optional)": "Class Code (Optional)",
+    "Add": "Add"
 }

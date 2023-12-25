@@ -8,10 +8,12 @@ import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
 import { useAppDispatch } from "@/redux/hook";
 import { getMyCourse } from "@/redux/reducers/courses";
+import { useTranslation } from "next-i18next";
 
 export default function AddCoursesModal(props: any) {
   const { closeModel, openJoinModel } = props;
   const dispatch = useAppDispatch();
+  const {t} = useTranslation();
 
   const [courseData, setCourseData] = useState({
     name: '',
@@ -64,12 +66,12 @@ export default function AddCoursesModal(props: any) {
         autoComplete="off"
       >
         <div style={{display: 'flex', justifyContent: 'space-between'}}>
-          <h3 style={{ padding: 10 }}>Add a course</h3>
+          <h3 style={{ padding: 10 }}>{t('Add a course')}</h3>
           <Button onClick={() => {
               closeModel();
               openJoinModel();
               }} variant="outlined" color="success" style={{marginLeft: 10}}>
-              Join as a tutor
+              {t('Join as a tutor')}
           </Button>
         </div>
 
@@ -77,7 +79,7 @@ export default function AddCoursesModal(props: any) {
           <TextField
             required
             id="name"
-            label="Name (Required)"
+            label={t("Name (Required)")}
             margin="normal"
             fullWidth
             value={courseData.name}
@@ -86,7 +88,7 @@ export default function AddCoursesModal(props: any) {
           <TextField
             required
             id="description"
-            label="Description (Required)"
+            label={t("Description (Required)")}
             margin="normal"
             fullWidth
             value={courseData.description}
@@ -94,7 +96,7 @@ export default function AddCoursesModal(props: any) {
           />
           <TextField
             id="classCode"
-            label="Class Code (Optional)"
+            label={t("Class Code (Optional)")}
             margin="normal"
             fullWidth
             value={courseData.classCode}
@@ -103,7 +105,7 @@ export default function AddCoursesModal(props: any) {
         </div>
         <div style={{ marginTop: 24 }}>
           <Button type="submit" variant="outlined">
-            Add
+            {t('Add')}
           </Button>
         </div>
       </form>

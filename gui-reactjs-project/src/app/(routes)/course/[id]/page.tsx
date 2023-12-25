@@ -23,6 +23,7 @@ import GradeManagementTable from "@/app/components/GradeManagementTable";
 import MoreHorizContainer from "@/app/components/MoreHorizContainer";
 import GradeTable from "@/app/components/GradeTable";
 import { useTranslation } from "next-i18next";
+import DownloadStudentListButton from "@/app/components/DownloadStudentListButton";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -194,6 +195,9 @@ export default function Page({ params }: { params: { id: string } }) {
             ))}
           </div>
           <Box className={classes.list} sx={{ mt: 4 }}>
+            <br/>
+            <DownloadStudentListButton />
+            <br/>
             <Divider>
               <Heading3 $colorName="--eerie-black">{t('Students')}</Heading3>
             </Divider>
