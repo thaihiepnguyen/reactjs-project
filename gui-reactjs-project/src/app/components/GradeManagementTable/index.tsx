@@ -146,30 +146,12 @@ const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSa
       setErrorMessage("Your total scale is " + total + "%. The total scale must be 100% so you can not save");
     } else {
       setIsEditingAll(false);
-<<<<<<< HEAD
-      setErrorMessage('');
-      
-      // post API here
-      // try {
-      //   const response = await axiosInstance.post(`/score/update-score/${courseId}`, (courseId, ));
-      //   if (response.data) {
-      //     console.log(response.data);
-      //   } else {
-      //     throw new Error('Failed to fetch data');
-      //   }
-      // } catch (error) {
-      //   console.error('Error fetching data:', error);
-      // }
-    }
-  }
-=======
       setErrorMessage("");
 
       const reorderedItems = Array.from(items);
       // Sett new header for the xls file
       const headers = ["studentId", "fullname", ...reorderedItems.map((obj) => obj.name)];
       setHeaderExcelFile(headers);
->>>>>>> f254a02bcbda5fce9e211797188416f1ff7db966
 
       // Save new order index to DB
       try {
