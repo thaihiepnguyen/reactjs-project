@@ -10,6 +10,14 @@ import * as XLSX from 'xlsx';
 import axiosInstance from '@/app/routers/axios';
 import { CommonProps } from '@mui/material/OverridableComponent';
 
+type Item = {
+  id: string;
+  name: string;
+  scale: string;
+  isEditing: boolean;
+  isPublished: boolean;
+};
+
 const tableHeaders: TableHeaderLabel[] = [
   { name: "grade_name", label: "Grade name", sortable: true },
   { name: "scale", label: "Scale", sortable: true },
@@ -17,7 +25,7 @@ const tableHeaders: TableHeaderLabel[] = [
 ];
 
 const GradeManagementTable = ( {courseId} ) => {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
   const [newItemData, setNewItemData] = useState({ id: '', name: '', scale: '', isEditing: false });
   const [errorMessage, setErrorMessage] = useState('');
@@ -98,26 +106,27 @@ const GradeManagementTable = ( {courseId} ) => {
     const [reorderedItem] = reorderedItems.splice(result.source.index, 1);
     reorderedItems.splice(result.destination.index, 0, reorderedItem);
 
-    // Reorder the items
-    setItems(reorderedItems);
-
     // Sett new header for the xls file
     const headers = ['ID', 'Tên', ...reorderedItems.map((obj) => obj.name)];
     setHeaderExcelFile(headers);
 
-    // Reorder the items
+    // Reorder the items with new ID order index
     const reorderedItemsWithNewIDs = reorderedItems.map((item, index) => ({
       ...item,
       id: `${index}`, // Reassign IDs based on the new order
     }));
-    
+
+    // Set items with new index order
+    setItems(reorderedItemsWithNewIDs);
+    console.log(items);
     // Save new order index to DB
     try {
       const response = await axiosInstance.post(`/score/update-score/${courseId}`, (courseId, reorderedItemsWithNewIDs));
       if (response.data) {
         console.log(response.data);
+        console.log(items);
       } else {
-        throw new Error('Failed to fetch data');
+        throw new Error('Failed to fetch data');  
       }
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -128,7 +137,7 @@ const GradeManagementTable = ( {courseId} ) => {
     setIsEditingAll(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setItems(items.map((item) => ({ ...item, isEditing: !isEditingAll })));
     const total = calculateTotalScale(items);
     if (Number.isNaN(total)) {
@@ -141,8 +150,18 @@ const GradeManagementTable = ( {courseId} ) => {
     else {
       setIsEditingAll(false);
       setErrorMessage('');
-
-      // call API here
+      
+      // post API here
+      // try {
+      //   const response = await axiosInstance.post(`/score/update-score/${courseId}`, (courseId, ));
+      //   if (response.data) {
+      //     console.log(response.data);
+      //   } else {
+      //     throw new Error('Failed to fetch data');
+      //   }
+      // } catch (error) {
+      //   console.error('Error fetching data:', error);
+      // }
     }
   }
 
