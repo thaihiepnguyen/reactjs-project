@@ -49,5 +49,17 @@
     "Student Ids Mapping": "Ánh xạ ID sinh viên",
     "Import Excel": "Nhập file excel",
     "Manual Mapping": "Nhập thủ công",
-    "desc_temp": "Phương pháp tiếp cận công nghệ đầu tiên đối với giáo dục và công việc hợp tác"
+    "desc_temp": "Phương pháp tiếp cận công nghệ đầu tiên đối với giáo dục và công việc hợp tác",
+    "Class Code": "Mã lớp",
+    "Deadline": "Hạn chót",
+    "Create notification for the class": "Tạo thông báo cho lớp học",
+    "Dashboard": "Nội dung",
+    "Classmate": "Thành viên",
+    "Score": "Điểm",
+    "There is no deadline": "Không có bài tập đến hạn",
+    "View excercises": "Xem bài tập",
+    "Teacher": "Giảng viên",
+    "Student": "Sinh viên",
+    "Invite": "Mời",
+    "Students Score": "Bảng điểm sinh viên"
 }

@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import axiosInstance from "@/app/routers/axios";
 import { useAppDispatch } from "@/redux/hook";
 import { setLoading } from "@/redux/reducers/loading";
+import { useTranslation } from "next-i18next";
 
 interface GradeTableProps {
   courseId: string;
@@ -28,6 +29,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
   const [tableLoading, setTableLoading] = useState<boolean>(false);
 
   const [data, setData] = useState([]);
+  const {t} = useTranslation();
 
   function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -131,7 +133,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
 
       <div className={classes.rootTable}>
         <MaterialTable
-          title="Students Score"
+          title={t("Students Score")}
           icons={tableIcons}
           columns={columns}
           isLoading={tableLoading}

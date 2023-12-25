@@ -49,5 +49,17 @@
     "Student Ids Mapping": "Student Ids Mapping",
     "Import Excel": "Import Excel",
     "Manual Mapping": "Manual Mapping",
-    "desc_temp": "A tecnology-first approach to education and colaborative work"
+    "desc_temp": "A tecnology-first approach to education and colaborative work",
+    "Class Code": "Class Code",
+    "Deadline": "Deadline",
+    "Create notification for the class": "Create notification for the class",
+    "Dashboard": "Dashboard",
+    "Classmate": "Classmate",
+    "Score": "Score",
+    "There is no deadline": "There is no deadline",
+    "View excercises": "View excercises",
+    "Teacher": "Teacher",
+    "Student": "Student",
+    "Invite": "Invite",
+    "Students Score": "Students Score"
 }

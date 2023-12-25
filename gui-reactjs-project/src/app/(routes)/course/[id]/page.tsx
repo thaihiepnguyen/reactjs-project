@@ -22,6 +22,7 @@ import PopupInviteCourse from "@/app/components/PopupInviteCourse";
 import GradeManagementTable from "@/app/components/GradeManagementTable";
 import MoreHorizContainer from "@/app/components/MoreHorizContainer";
 import GradeTable from "@/app/components/GradeTable";
+import { useTranslation } from "next-i18next";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -48,6 +49,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [course, setCourse] = useState<any>({});
   const [openMenuShare, setOpenMenuShare] = React.useState(false);
   const [isOpenModalShare, setIsOpenModalShare] = useState<boolean>(false);
+  const {t} = useTranslation();
 
   const anchorRef = React.useRef<HTMLButtonElement>(null);
 
@@ -115,9 +117,9 @@ export default function Page({ params }: { params: { id: string } }) {
     <Box className={classes.root}>
       <Box className={classes.menu} sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" className={classes.tabWrapper}>
-          <Tab label="Dashboard" {...a11yProps(0)} />
-          <Tab label="Classmate" {...a11yProps(1)} />
-          <Tab label="Score" {...a11yProps(2)} />
+          <Tab label={t("Dashboard")} {...a11yProps(0)} />
+          <Tab label={t("Classmate")} {...a11yProps(1)} />
+          <Tab label={t("Score")} {...a11yProps(2)} />
         </Tabs>
       </Box>
       <div className={classes.container}>
@@ -140,7 +142,7 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className={classes.leftSection}>
               <div className={classes.codeCourse}>
                 <div className={classes.boxClassCourseTitle}>
-                  <h3>Class Code</h3>
+                  <h3>{t('Class Code')}</h3>
                   <MenuListComposition />
                 </div>
                 <br />
@@ -148,17 +150,17 @@ export default function Page({ params }: { params: { id: string } }) {
               </div>
               <br />
               <div className={classes.deadline}>
-                <h3>Deadline</h3>
+                <h3>{t('Deadline')}</h3>
                 <br />
-                <p style={{ color: "rgba(0,0,0,.549)" }}>There is no deadline</p>
+                <p style={{ color: "rgba(0,0,0,.549)" }}>{t('There is no deadline')}</p>
                 <br />
-                <Button variant="text">View excercises</Button>
+                <Button variant="text">{t('View excercises')}</Button>
               </div>
             </div>
             <div className={classes.rightSection}>
               {!showTable && (
                 <div className={classes.createNotificationDiv} onClick={handleClickCreationDiv}>
-                  <p>Create notification for the class</p>
+                  <p>{t('Create notification for the class')}</p>
                   <AddCircleOutlineIcon />
                 </div>
               )}
@@ -175,7 +177,7 @@ export default function Page({ params }: { params: { id: string } }) {
           ) : null}
           <div className={classes.list}>
             <Divider>
-              <Heading3 $colorName="--eerie-black">Teachers</Heading3>
+              <Heading3 $colorName="--eerie-black">{t('Teacher')}</Heading3>
             </Divider>
             {course?.teacherList?.map((teacher: User, teacherIdx: number) => (
               <div className={classes.infoWrapper} key={teacherIdx}>
@@ -193,7 +195,7 @@ export default function Page({ params }: { params: { id: string } }) {
           </div>
           <Box className={classes.list} sx={{ mt: 4 }}>
             <Divider>
-              <Heading3 $colorName="--eerie-black">Students</Heading3>
+              <Heading3 $colorName="--eerie-black">{t('Students')}</Heading3>
             </Divider>
             {course?.studentList?.map((student: User, studentIdx: number) => (
               <div className={classes.wrapper}>
@@ -245,7 +247,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     <Box display="flex" alignItems={"center"}>
                       <PeopleAltOutlined sx={{ marginRight: "13.5px" }} />
                       <ParagraphSmall $fontWeight="400" $colorName="--gray-80" translation-key="project_header_menu_share_option">
-                        Invite
+                        {t('Invite')}
                       </ParagraphSmall>
                     </Box>
                   </MenuItem>
