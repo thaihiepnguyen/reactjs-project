@@ -484,7 +484,7 @@ export class ScoreService {
     const valueParams = data.reduce((acc, cur) => {
       let curScores = [];
       valueColumns.forEach((item) => {
-        curScores = [...curScores, index[item] || 0, cur.id, userId, cur[item]];
+        curScores = [...curScores, index[item] || 0, cur.studentId, userId, cur[item]];
       });
       acc = [...acc, ...curScores];
       return acc;
@@ -756,10 +756,6 @@ export class ScoreService {
         });
 
       const rawGradeIds = rawData.map(item => (item.id));
-      const gradeIndex = rawData.reduce((acc, cur) => {
-        acc[cur.id] = cur;
-        return acc;
-      }, {})
 
       let isGradeValid = true;
       gradeIds.forEach(item => {
@@ -781,10 +777,16 @@ export class ScoreService {
         SET is_final = 1
         WHERE id IN (?);
       `;
+
+
       await runner.manager.getRepository(GradeCompositions).query(sql, [gradeIds]);
       // Step 3: notify to students who are in this course
       await this.notificationService.pushScores(id, gradeIds, 'Thông báo điểm thi');
-
+      return {
+        message: 'success',
+        statusCode: 200,
+        data: null
+      }
     } catch (e) {
       console.log(e);
     } finally {
