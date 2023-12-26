@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
@@ -8,6 +8,7 @@ import { EnrolledCoursesResponse, MyCoursesResponse } from './course.typing';
 import { v4 as uuidv4 } from 'uuid';
 import { TBaseDto } from '../../app.dto';
 import { AuthService } from '../auth/auth.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class CourseService {
@@ -15,6 +16,8 @@ export class CourseService {
     @InjectConnection()
     private readonly connection: Connection,
     private authService: AuthService,
+    private readonly mailerService: MailerService,
+
   ) {}
 
   async getEnrolledCourses(userId: number): Promise<EnrolledCoursesResponse[]> {
@@ -442,6 +445,42 @@ export class CourseService {
         message: e,
         statusCode: 400
       }
+    }
+  }
+
+  public async inviteToCourse(emails: string[], courseId: string) {
+    const runner = this.connection.createQueryRunner();
+
+    const course = await runner.connection.getRepository(Courses).findOne({
+      where: {
+        id: +courseId
+      }
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found')
+    }
+    
+
+
+
+    const rawData = await runner.connection.query(`SELECT * FROM email_templates WHERE id = 3`);
+    const content = rawData[0].content;
+
+    if (!content) {
+      throw new NotFoundException('Email template not found')
+    }
+    const html = content.replace('$courseName$', course.title).replace("$url$", process.env.CLIENT_URL).replace("classCode",course.classCode);
+
+    await this.mailerService.sendMail({
+      to: emails,
+      from: process.env.USER_NODEMAILER, 
+      subject: `Invitation to ${course.title} course`,
+      html: html,
+    });
+
+    return {
+      data: "success"
     }
   }
 }

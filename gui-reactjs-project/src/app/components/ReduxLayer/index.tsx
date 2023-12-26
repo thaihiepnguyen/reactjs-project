@@ -61,7 +61,7 @@ const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const classCode = localStorage.getItem("classCode");
-    if (classCode) {
+    if (classCode && user) {
       localStorage.removeItem("classCode");
       axiosInstance
         .post("courses/user/enroll-courses/add", {
@@ -91,16 +91,15 @@ const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
           }
         })
         .catch((err) => {
+          console.log(err);
           Swal.fire({
             title: "Oops!",
             text: "Please try again!",
             icon: "error",
-          }).then(() => {
-            router.push(user?.role?.name === "teacher" ? `user/my-courses` : "user/enrolled-courses");
-          });
+          })
         })
     }
-  }, []);
+  }, [user]);
   return <>{children}</>;
 };
 

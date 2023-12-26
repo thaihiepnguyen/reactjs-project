@@ -261,7 +261,7 @@ export default function Page({ params }: { params: { id: string } }) {
           </Grow>
         )}
       </Popper>
-      <PopupInviteCourse isOpen={isOpenModalShare} onCancel={onCloseShowModalShareProject} />
+      <PopupInviteCourse isOpen={isOpenModalShare} onCancel={onCloseShowModalShareProject} courseId={course.id}/>
     </Box>
   );
 }

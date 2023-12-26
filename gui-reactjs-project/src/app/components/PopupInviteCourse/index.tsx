@@ -12,10 +12,12 @@ import InputTag from "../InputTag";
 import ParagraphSmall from "../text/ParagraphSmall";
 import Button, { BtnType } from "../buttons/Button";
 import ErrorMessage from "../text/ErrorMessage";
+import axiosInstance from "@/app/routers/axios";
 
 interface Props {
   isOpen: boolean;
   onCancel: () => void;
+  courseId: string;
 }
 
 interface DataForm {
@@ -24,7 +26,7 @@ interface DataForm {
 }
 
 const PopupInviteCourse = memo((props: Props) => {
-  const { isOpen, onCancel } = props;
+  const { isOpen, onCancel, courseId } = props;
 
   const schema = useMemo(() => {
     return yup.object().shape({
@@ -48,7 +50,21 @@ const PopupInviteCourse = memo((props: Props) => {
     mode: "onChange",
   });
 
-  const onSubmit = (data: DataForm) => {};
+  const onSubmit = (data: DataForm) => {
+    const listEmail = [...data.emails];
+    if (data.email) listEmail.push(data.email);
+    axiosInstance
+      .post("/courses/invite", {
+        emails: listEmail,
+        courseId: courseId
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <Dialog scroll="paper" open={isOpen} onClose={onCancel} classes={{ paper: classes.paper }}>
@@ -59,9 +75,21 @@ const PopupInviteCourse = memo((props: Props) => {
         <ButtonCLose $backgroundColor="--eerie-black-5" $colorName="--eerie-black-40" onClick={onCancel} />
       </DialogTitleConfirm>
       <DialogContentConfirm dividers>
-        <Grid noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)} component={"form"} className={classes.emailsShareContainer}>
+        <Grid
+          noValidate
+          autoComplete="off"
+          onSubmit={handleSubmit(onSubmit)}
+          component={"form"}
+          className={classes.emailsShareContainer}
+        >
           <Box className={classes.tagInputContainer}>
-            <InputTag className={classes.inputTag} control={control} name="emails" nameText="email" placeholder={"Enter email address"} />
+            <InputTag
+              className={classes.inputTag}
+              control={control}
+              name="emails"
+              nameText="email"
+              placeholder={"Enter email address"}
+            />
           </Box>
           <Button
             type="submit"

@@ -6,12 +6,13 @@ import {MetaDataAuth} from "../auth/auth.decorator";
 import {TBaseDto} from "../../app.dto";
 import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 import {RolesGuard} from "../auth/roles/roles.guard";
+import { MailerService } from "@nestjs-modules/mailer";
 
 
 @Controller('courses')
 export class CourseController {
   constructor(
-    private readonly courseService: CourseService
+    private readonly courseService: CourseService,
   ) {}
 
   @Get('user/enrolled-courses')
@@ -102,5 +103,13 @@ export class CourseController {
     @Param('courseId', ParseIntPipe) courseId: number
   ): Promise<TBaseDto<null>> {
     return this.courseService.banStudent(userId, id, courseId);
+  }
+
+  @Post('invite')
+  async inviteToCourse(
+    @Body('emails') emails: string[],
+    @Body('courseId') courseId: string
+  ): Promise<TBaseDto<any>> {
+    return this.courseService.inviteToCourse(emails, courseId);
   }
 }
