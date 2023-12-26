@@ -164,6 +164,7 @@ const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSa
         dispatch(setLoading(false));
         if (response.data) {
           onSave();
+          onCancel();
         } else {
           throw new Error("Failed to fetch data");
         }
@@ -226,8 +227,8 @@ const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSa
       return;
     }
     // Convert the array of objects to an array of arrays
-    const dataArray = studentList.map((item) => [item.id, item.fullname]);
-    dataArray.unshift(headerExcelFile);
+    const dataArray = studentList?.map((item) => [item.id, item.fullname]) || [];
+    dataArray?.unshift(headerExcelFile);
     const worksheet = XLSX.utils.aoa_to_sheet(dataArray);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "sheet 1");
