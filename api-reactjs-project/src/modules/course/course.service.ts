@@ -195,25 +195,46 @@ export class CourseService {
   }
 
   async enrollCourse(userId: number, classCode: string): Promise<any> {
-    const course = await this.connection.getRepository(Courses).findOne({
-      where: {
-        classCode,
-      },
-    });
-
-    if (!course || !course.isValid || !course.isActive) {
-      return {
-        status: false,
-        msg: "Course not found"
-      };
-    }
+    const runner = this.connection.createQueryRunner();
 
     try {
+      const course = await runner.manager.getRepository(Courses).findOne({
+        where: {
+          classCode,
+        },
+      });
+
+      if (!course || !course.isValid || !course.isActive) {
+        return {
+          status: false,
+          msg: "Course not found"
+        };
+      }
+
+      // validate user id
+      const user = await runner.manager.getRepository(Users).findOne({
+        where: {
+          id: userId,
+          isValid: true
+        },
+        select: {
+          studentId: true
+        }
+      })
+
+      if (!user || !user.studentId) {
+        return {
+          status: false,
+          msg: "You must add student id at your profile",
+          data: course.id,
+        }
+      }
+
       const userRole = await this.authService.getRole(userId);
       if (userRole.role.name === 'teacher') {
         if (!course.teacherIds.includes(`${userId}`)) {
           const newIds = course.teacherIds + `, ${userId}`;
-          await this.connection.getRepository(Courses).update(
+          await runner.manager.getRepository(Courses).update(
             {
               id: course.id,
             },
@@ -230,7 +251,7 @@ export class CourseService {
         }
       }
       if (userRole.role.name === 'student') {
-        const alreadyJoin = await this.connection.getRepository(Participants).findOne({
+        const alreadyJoin = await runner.manager.getRepository(Participants).findOne({
           where: {
             courseId: course.id,
             studentId: userId
@@ -244,19 +265,25 @@ export class CourseService {
             data: course.id,
           };
         }
-        await this.connection
-          .getRepository(Participants)
-          .createQueryBuilder()
-          .insert()
-          .into(Participants)
-          .values([
-            {
-              studentId: userId,
-              courseId: course.id,
-            },
-          ])
-          .execute();
       }
+      await runner.manager
+        .getRepository(Participants)
+        .createQueryBuilder()
+        .insert()
+        .into(Participants)
+        .values([
+          {
+            studentId: userId,
+            courseId: course.id,
+          },
+        ])
+        .execute();
+
+      return {
+        status: true,
+        msg: "Enrolled course successfully",
+        data: course.id,
+      };
     } catch (e) {
       return {
         status: false,
@@ -264,12 +291,6 @@ export class CourseService {
         data: null,
       };
     }
-
-    return {
-      status: true,
-      msg: "Enrolled course successfully",
-      data: course.id,
-    };
   }
 
   async removeCourse(userId:number, id: number): Promise<TBaseDto<null>> {
