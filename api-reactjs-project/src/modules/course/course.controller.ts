@@ -23,6 +23,8 @@ export class CourseController {
     };
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.Teacher)
   @Get('user/my-courses')
   async getMyCourses(@MetaDataAuth('userId') userId: number): Promise<TBaseDto<MyCoursesResponse[]>> {
     const courses = await this.courseService.getMyCourses(userId)
@@ -91,6 +93,8 @@ export class CourseController {
     return this.courseService.getMyCourseDetail(id, userId)
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.Teacher)
   @Delete('ban-student/:id/from/:courseId')
   async banStudent(
     @MetaDataAuth('userId') userId: number,
