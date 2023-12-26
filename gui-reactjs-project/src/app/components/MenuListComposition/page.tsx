@@ -3,8 +3,13 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useAppSelector } from '@/redux/hook';
+import { Course } from '@/models/course';
 
-export default function PositionedMenu() {
+interface Props {
+  course: Course;
+}
+export default function PositionedMenu({course}: Props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -14,6 +19,16 @@ export default function PositionedMenu() {
     setAnchorEl(null);
   };
 
+  const onCopyLink = () => {
+    navigator.clipboard.writeText(`${process.env.GUI_URL}/join-class/?code=${course.classCode ?? ""}`);
+    handleClose();
+  }
+
+  const onCopyCode = () => {
+    navigator.clipboard.writeText(course.classCode ?? "");
+
+    handleClose();
+  }
   return (
     <div>
       <Button
@@ -42,8 +57,8 @@ export default function PositionedMenu() {
           horizontal: 'left',
         }}
       >
-        <MenuItem onClick={handleClose}>Copy Link</MenuItem>
-        <MenuItem onClick={handleClose}>Copy the code</MenuItem>
+        <MenuItem onClick={onCopyLink}>Copy Link</MenuItem>
+        <MenuItem onClick={onCopyCode}>Copy the code</MenuItem>
         {/* <MenuItem onClick={handleClose}>Close</MenuItem> */}
       </Menu>
     </div>

@@ -3,6 +3,7 @@ const nextConfig = {
   reactStrictMode: false,
   env: {
     API_URL: process.env.API_URL,
+    GUI_URL: process.env.GUI_URL
   },
   compiler: {
     styledComponents: true,

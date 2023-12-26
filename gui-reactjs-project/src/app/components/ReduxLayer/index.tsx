@@ -16,7 +16,7 @@ const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
   const { enrolledCourses, myCourses } = useAppSelector((state) => state.courseReducer);
   const { data: session, status } = useSession();
   const router = useRouter();
-  
+
   useEffect(() => {
     if (!session) {
       dispatch(setLoading(true));
@@ -62,6 +62,7 @@ const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const classCode = localStorage.getItem("classCode");
     if (classCode) {
+      localStorage.removeItem("classCode");
       axiosInstance
         .post("courses/user/enroll-courses/add", {
           classCode: classCode,
@@ -77,17 +78,16 @@ const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
               router.push(`/course/${response.data.data}`);
             });
           } else {
-            await Swal.fire({
+            Swal.fire({
               title: response.data.message,
               text: "Please try again!",
-              icon: "error",
-            }).then(() => {
-              if (response.data.data) {
-                router.push(`/course/${response.data.data}`);
-              } else {
-                router.push(user?.role?.name === "teacher" ? `user/my-courses` : "user/enrolled-courses");
-              }
+              icon: response.data.data ? "info" : "error",
             });
+            if (response.data.data) {
+              router.push(`/course/${response.data.data}`);
+            } else {
+              router.push(user?.role?.name === "teacher" ? `user/my-courses` : "user/enrolled-courses");
+            }
           }
         })
         .catch((err) => {
@@ -99,9 +99,6 @@ const ReduxLayer = ({ children }: { children: React.ReactNode }) => {
             router.push(user?.role?.name === "teacher" ? `user/my-courses` : "user/enrolled-courses");
           });
         })
-        .finally(() => {
-          localStorage.removeItem("classCode");
-        });
     }
   }, []);
   return <>{children}</>;

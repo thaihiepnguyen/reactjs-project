@@ -144,7 +144,7 @@ export default function Page({ params }: { params: { id: string } }) {
               <div className={classes.codeCourse}>
                 <div className={classes.boxClassCourseTitle}>
                   <h3>{t('Class Code')}</h3>
-                  <MenuListComposition />
+                  <MenuListComposition course={course}/>
                 </div>
                 <br />
                 <h4 className={classes.code}>{course.classCode}</h4>
