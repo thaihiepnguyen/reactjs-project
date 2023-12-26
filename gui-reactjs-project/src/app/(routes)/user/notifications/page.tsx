@@ -12,7 +12,6 @@ import {getCookie} from "cookies-next";
 export default function Page() {
   const socketService = SocketService.instance();
   const [notifications, setNotifications] = useState([]);
-  const [notiDetail, setNotiDetail] = useState(0);
   const userId = getCookie('userId');
   const [notiDetail, setNotiDetail] = useState(0)
   const {t} = useTranslation();
