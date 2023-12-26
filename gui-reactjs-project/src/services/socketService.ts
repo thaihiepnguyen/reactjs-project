@@ -1,7 +1,10 @@
 import io, {Socket} from "socket.io-client"
 
 export const coursesEvent = 'subscribeCourses'
-
+export const MESSAGE_TYPE = {
+  COURSES: 1,
+  SCORES: 2
+}
 export default class SocketService {
   private static _instance: SocketService
   private _socket: Socket
@@ -17,9 +20,10 @@ export default class SocketService {
     return SocketService._instance
   }
 
-  public subscribeCourses(courseIds: number[]) {
+  public subscribeCourses(courseIds: number[], userId: number) {
     this._socket.emit(coursesEvent, {
-      courses: courseIds
+      courses: courseIds,
+      userId: userId
     })
   }
 

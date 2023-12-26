@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common";
-import {GatewayService} from "../gateway/gateway.service";
+import {GatewayService, MESSAGE_TYPE} from "../gateway/gateway.service";
 import {CourseService} from "../course/course.service";
 import {UserService} from "../user/user.service";
 import {InjectConnection} from "@nestjs/typeorm";
@@ -106,7 +106,16 @@ export class NotificationService {
   private _getMinutes(from: Date, to: Date) {
     return Math.abs((to.getTime() - from.getTime()) / 1000 / 60);
   }
-
+  /*
+   * Push a message to students that are in this course
+   *
+   * @param id is a course id
+   * @param teacherId
+   * @param message
+   * @param title
+   *
+   * Return null
+   */
   async pushCourses(id: number, teacherId: number, message: string, title: string) {
     const teacher = await this.userService.findUserById(teacherId)
     const sql =
@@ -145,6 +154,70 @@ export class NotificationService {
       title: title,
       time: 0,
     }
-    this.gatewayService.pushNotification(room, payload)
+    this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.COURSES)
+  }
+
+
+  async pushScores(
+    id: number,
+    gradeIds: number[],
+    title: string
+  ) {
+    if (!gradeIds || !gradeIds.length) {
+      return
+    }
+    const sql = `
+    SELECT
+      c.title as courseName,
+      u1.id as studentId,
+      u2.id as teacherId,
+      u1.fullname as studentName,
+      u2.fullname as teacherName,
+      s.score as score,
+      u2.avatar_url as teacherAvatar,
+      gc.name as gradeName
+    FROM grade_compositions gc, scores s, courses c, users u1, users u2
+    WHERE gc.id = s.grade_id
+    AND c.id = gc.course_id
+    AND u1.student_id = s.student_id
+    AND u2.id = s.teacher_id
+    AND gc.id IN (?);
+    `;
+    const rawData = await this.connection.query(sql, [gradeIds]);
+    const room = `room-${id}`;
+
+    const notiValues = rawData.map(item => {
+      const message = `Điểm ${item.gradeName} của bạn là: ${item.score}`;
+      return {
+        title: title,
+        content: `<h5>Thông báo từ lớp học ${item.courseName} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${item.teacherName}</h5>`,
+        from: item.teacherId,
+        to: item.studentId
+      }
+    });
+    await this.connection.getRepository(Notifications)
+      .createQueryBuilder()
+      .insert()
+      .values(notiValues)
+      .execute();
+
+    const payload = rawData.reduce((acc, cur) => {
+      const message = `Điểm ${cur.gradeName} của bạn là: ${cur.score} điểm`;
+      const item = {
+        avatarUrl: cur.teacherAvatar,
+        userName: cur.teacherName,
+        message: `<h5>Thông báo từ lớp học ${cur.courseName} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${cur.teacherName}</h5>`,
+        title: title,
+        time: 0,
+      }
+      if (!acc[cur.studentId]) {
+        acc[cur.studentId] = [item];
+      } else {
+        acc[cur.studentId].push(item);
+      }
+      return acc;
+    }, {});
+
+    this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.SCORES);
   }
 }

@@ -7,7 +7,6 @@ import { CourseService } from '../course/course.service';
 import {
   AddScoreByStudentCodeDto,
   ColumnDto,
-  CreateColumnDto,
   CreateUpdateColumnDto,
   DeleteScoreByStudentCodeDto,
   TScore,
@@ -18,6 +17,7 @@ import { Participants } from 'src/typeorm/entity/Participants';
 import { Scores } from 'src/typeorm/entity/Scores';
 import { ColumnsResponse, Row } from './score.typing';
 import * as xlsx from 'xlsx';
+import {NotificationService} from '../notification/notification.service';
 
 const N_COLUMNS_IGNORE = 2;
 const COLUMN_ID = 'studentId';
@@ -28,6 +28,7 @@ export class ScoreService {
     @InjectConnection()
     private readonly connection: Connection,
     private readonly courseService: CourseService,
+    private readonly notificationService: NotificationService
   ) {}
 
   /*
@@ -42,7 +43,7 @@ export class ScoreService {
     courseId: number,
     columns: ColumnDto[],
   ): Promise<TBaseDto<null>> {
-    if (!this.courseService.isCourseExist(courseId)) {
+    if (!await this.courseService.isCourseExist(courseId)) {
       return {
         message: 'The course is not existed',
         statusCode: 400,
@@ -561,6 +562,15 @@ export class ScoreService {
       };
     }
   }
+  /*
+   * Update scores of the student if record have already existed. Otherwise, create new scores
+   *
+   * @param teacherId
+   * @param addScoreByStudentCodes { studentCode; scores; oldStudentId }
+   * @param courseId
+   *
+   * Return null
+   */
   async updateScoresByStudentCode(
     teacherId: number,
     addScoreByStudentCodes: AddScoreByStudentCodeDto[],
@@ -580,7 +590,7 @@ export class ScoreService {
           data: null,
         };
       }
-      // Step 2: validate scores
+      // Step 2: Validate scores
       if (!addScoreByStudentCodes || !addScoreByStudentCodes.length) {
         return {
           message: 'The scores are invalid',
@@ -589,7 +599,7 @@ export class ScoreService {
         };
       }
 
-      // insert on duplicate
+      // Step 3: Insert on duplicate
       const N_COLUMNS = Object.keys(addScoreByStudentCodes[0].scores).length;
       let params = '(?, ?, ?, ?)';
       for (let i = 0; i < addScoreByStudentCodes.length * N_COLUMNS - 1; i++) {
@@ -687,7 +697,7 @@ export class ScoreService {
       });
 
     const createData = data?.filter((item) => typeof item.id === 'string');
-    const createPromises = runner.connection
+    const createPromises = runner.manager
       .getRepository(GradeCompositions)
       .createQueryBuilder()
       .insert()
@@ -719,5 +729,66 @@ export class ScoreService {
       statusCode: 200,
       data: [],
     };
+  }
+  /*
+   * Finalize score's columns of a course and notify to students that are in the course.
+   *
+   * @param id is a course id
+   * @param teacherId
+   * @param gradeIds are columns of this course
+   *
+   * Return null
+   */
+  async finalizeColumns(
+    id: number,
+    teacherId: number,
+    gradeIds: number[]
+  ): Promise<TBaseDto<null>> {
+    const runner = this.connection.createQueryRunner();
+
+    try {
+      // Step 1: The gradeIds must be in this course
+      const rawData = await runner.manager.getRepository(GradeCompositions)
+        .find({
+          where: {
+            courseId: id
+          }
+        });
+
+      const rawGradeIds = rawData.map(item => (item.id));
+      const gradeIndex = rawData.reduce((acc, cur) => {
+        acc[cur.id] = cur;
+        return acc;
+      }, {})
+
+      let isGradeValid = true;
+      gradeIds.forEach(item => {
+        if (!rawGradeIds.includes(item)) {
+          isGradeValid = false;
+        }
+      });
+      if (!isGradeValid) {
+        return {
+          message: 'gradeIds that you send to are incorrect',
+          statusCode: 400,
+          data: null
+        };
+      }
+
+      // Step 2: turn is_final columns
+      const sql = `
+        UPDATE grade_compositions
+        SET is_final = 1
+        WHERE id IN (?);
+      `;
+      await runner.manager.getRepository(GradeCompositions).query(sql, [gradeIds]);
+      // Step 3: notify to students who are in this course
+      await this.notificationService.pushScores(id, gradeIds, 'Thông báo điểm thi');
+
+    } catch (e) {
+      console.log(e);
+    } finally {
+      await runner.release();
+    }
   }
 }

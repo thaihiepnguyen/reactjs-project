@@ -403,14 +403,13 @@ export class CourseService {
 
   public async banStudent(teacherId: number, studentId: number, courseId: number): Promise<TBaseDto<null>> {
     // Step 1: courseId belongs to teacherId
-    if (!this.isTeacherInCourse(courseId, teacherId)) {
+    if (!await this.isTeacherInCourse(courseId, teacherId)) {
       return {
         message: 'the teacher must be in this course',
         statusCode: 400,
       }
     }
-    // Step 3: studentId has been in courseId or not 
-    console.log(studentId);
+    // Step 3: studentId has been in courseId or not
     const isStudentExisted = await this.connection.getRepository(Participants).exist({
       where: {
         courseId,
@@ -425,8 +424,7 @@ export class CourseService {
       };
     }
 
-    // Step 2: remove recode from participant
-
+    // Step 2: remove record from participant
     try {
       await this.connection.getRepository(Participants)
       .createQueryBuilder()

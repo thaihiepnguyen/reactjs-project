@@ -5,6 +5,7 @@ import classes from "./styles.module.scss";
 import SocketService from "@/services/socketService";
 import {useEffect} from "react";
 import axiosInstance from "@/app/routers/axios";
+import {getCookie} from "cookies-next";
 
 export default function SidebarLayout({children}: {
   children: React.ReactNode
@@ -15,7 +16,7 @@ export default function SidebarLayout({children}: {
       const response = await axiosInstance.get("/courses/user/enrolled-courses");
       const {message, data: courses, statusCode} = response.data
       if (statusCode === 200) {
-        socketService.subscribeCourses(courses.map(item => (item.id)))
+        socketService.subscribeCourses(courses.map(item => (item.id)), +getCookie('userId'))
       }
     }
     getCourses();

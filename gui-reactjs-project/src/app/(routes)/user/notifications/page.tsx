@@ -2,15 +2,18 @@
 
 import classes from './styles.module.scss'
 import {useEffect, useState} from "react";
-import SocketService from "@/services/socketService";
+import SocketService, {MESSAGE_TYPE} from "@/services/socketService";
 import NotificationItem from "@/app/components/NotificationItem";
 import axiosInstance from "@/app/routers/axios";
 import parse from 'html-react-parser';
 import { useTranslation } from 'next-i18next';
+import {getCookie} from "cookies-next";
 
 export default function Page() {
   const socketService = SocketService.instance();
   const [notifications, setNotifications] = useState([]);
+  const [notiDetail, setNotiDetail] = useState(0);
+  const userId = getCookie('userId');
   const [notiDetail, setNotiDetail] = useState(0)
   const {t} = useTranslation();
   useEffect(() => {
@@ -24,7 +27,12 @@ export default function Page() {
   }, [])
 
   socketService.listenCourses((message) => {
-    setNotifications([message, ...notifications])
+    if (message.type == MESSAGE_TYPE.COURSES) {
+      setNotifications([message.data, ...notifications]);
+    }
+    if (message.type == MESSAGE_TYPE.SCORES) {
+      setNotifications([...message.data[userId], ...notifications]);
+    }
   })
 
   return <>

@@ -9,6 +9,7 @@ import {UserModule} from "../user/user.module";
 @Module({
   providers: [NotificationService],
   controllers: [NotificationController],
-  imports: [GatewayModule, CourseModule, UserModule]
+  imports: [GatewayModule, CourseModule, UserModule],
+  exports: [NotificationService]
 })
 export class NotificationModule { }
