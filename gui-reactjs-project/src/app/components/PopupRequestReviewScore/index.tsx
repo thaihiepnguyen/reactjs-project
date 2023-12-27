@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Box, Dialog, Grid } from "@mui/material";
-import { memo, useMemo } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import classes from "./styles.module.scss";
@@ -14,27 +14,34 @@ import Button, { BtnType } from "../buttons/Button";
 import ErrorMessage from "../text/ErrorMessage";
 import axiosInstance from "@/app/routers/axios";
 import InputSearch from "../input/InputSearch";
-
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { setLoading } from "@/redux/reducers/loading";
+import Swal from "sweetalert2";
+import "react-chat-elements/dist/main.css";
+import { MessageList, MessageType } from "react-chat-elements";
 interface Props {
   isOpen: boolean;
   onCancel: () => void;
-  scoreId: string;
+  score: any;
+  onSendRequest: () => void;
 }
 
 interface DataForm {
-  reason: string;
+  message: string;
 }
 
 const PopupRequestReviewScore = memo((props: Props) => {
-  const { isOpen, onCancel, scoreId } = props;
-
+  const { user } = useAppSelector((state) => state.userReducer);
+  const { isOpen, onCancel, score, onSendRequest } = props;
+  const dispatch = useAppDispatch();
+  const messageListReferance = React.createRef();
+  const [messageList, setMessageList] = useState<MessageTyp[]>([]);
   const schema = useMemo(() => {
     return yup.object().shape({
-      reason: yup.string(),
+      message: yup.string().required(),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const {
     handleSubmit,
     register,
@@ -46,8 +53,54 @@ const PopupRequestReviewScore = memo((props: Props) => {
     mode: "onChange",
   });
 
+
+  useEffect(() => {
+    if (score?.messages?.length) {
+      setMessageList(
+        score?.messages?.map((message: any, index: number) => ({
+          id: index,
+          position: user?.id === message.from ? "right" : "left",
+          type: "text",
+          text: message.message,
+          title: user?.id === message.from ? "You" : "Teacher",
+          date: new Date(message.created_at),
+          notch: true,
+          focus: false,
+          titleColor: "black",
+          forwarded: false,
+          replyButton: false,
+          removeButton: false,
+          status: "waiting",
+          retracted: false,
+        }))
+      );
+    }
+  }, [score])
+  
   const onSubmit = (data: DataForm) => {
-    
+    dispatch(setLoading(true));
+    axiosInstance
+      .post(`/score/request-review/${score.id}`, data)
+      .then((response) => {
+        Swal.fire({
+          title: "Success",
+          text: response.data.message,
+          icon: "success",
+        });
+        onCancel();
+        onSendRequest();
+      })
+      .catch((error) => {
+        onCancel();
+        Swal.fire({
+          title: "Oops",
+          text: "There was an error",
+          icon: "error",
+        });
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
   };
 
   return (
@@ -59,8 +112,12 @@ const PopupRequestReviewScore = memo((props: Props) => {
         <ButtonCLose $backgroundColor="--eerie-black-5" $colorName="--eerie-black-40" onClick={onCancel} />
       </DialogTitleConfirm>
       <DialogContentConfirm dividers>
-        <Heading4 sx={{ mt: "8px !important" }}>Grade name: </Heading4>
-        <Heading4 sx={{ mt: "8px !important" }}>Score before review: </Heading4>
+        <Heading4 sx={{ mt: "8px !important" }}>
+          Grade name: <b>{score["Grade Item"]}</b>
+        </Heading4>
+        <Heading4 sx={{ mt: "8px !important" }}>
+          Score before review: <b>{score["Score"]}</b>
+        </Heading4>
         <Grid
           noValidate
           autoComplete="off"
@@ -68,19 +125,41 @@ const PopupRequestReviewScore = memo((props: Props) => {
           component={"form"}
           className={classes.emailsShareContainer}
         >
-          <InputSearch multiline={true} placeholder="Reason" width="100%" className={classes.searchInput} sx={{padding: '8px 16px !important'}} inputRef={register('reason')}/>
-        </Grid>
+          <Box sx={{ width: "100%" }}>
+            <InputSearch
+              multiline={true}
+              placeholder="Reason"
+              disabled={!score.acceptSendRequest}
+              width="100%"
+              className={classes.searchInput}
+              sx={{ padding: "8px 16px !important" }}
+              inputRef={register("message")}
+            />
+            {errors.message && <ErrorMessage>Please type your reason to review</ErrorMessage>}
 
-        <Button
-          type="submit"
-          btnType={BtnType.Primary}
-          className={classes.sendInviteBtn}
-          disabled={!isValid}
-          translation-key="project_share_send_invite"
-        >
-          <ParagraphSmall>Send review request</ParagraphSmall>
-        </Button>
-        {(errors.reason) && <ErrorMessage>Please type your reason to review</ErrorMessage>}
+            {!score.acceptSendRequest ? (
+              <ParagraphSmall sx={{ mt: "8px !important" }}>
+                Please wait for the instructor to respond to your previous request
+              </ParagraphSmall>
+            ) : (
+              <Button
+                type="submit"
+                btnType={BtnType.Primary}
+                className={classes.sendInviteBtn}
+                disabled={!isValid}
+                translation-key="project_share_send_invite"
+              >
+                <ParagraphSmall>Send review request</ParagraphSmall>
+              </Button>
+            )}
+          </Box>
+        </Grid>
+        <MessageList
+          className={classes.messageList}
+          referance={messageListReferance}
+          lockable={true}
+          dataSource={messageList}
+        ></MessageList>
       </DialogContentConfirm>
     </Dialog>
   );

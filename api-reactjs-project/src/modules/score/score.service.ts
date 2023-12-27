@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { TBaseDto } from 'src/app.dto';
 import { GradeCompositions } from 'src/typeorm/entity/GradeCompositions';
@@ -17,8 +17,10 @@ import { Participants } from 'src/typeorm/entity/Participants';
 import { Scores } from 'src/typeorm/entity/Scores';
 import { ColumnsResponse, Row } from './score.typing';
 import * as xlsx from 'xlsx';
-import {NotificationService} from '../notification/notification.service';
-import {AbsentPariticipants} from "../../typeorm/entity/AbsentPariticipants";
+import { NotificationService } from '../notification/notification.service';
+import { AbsentPariticipants } from '../../typeorm/entity/AbsentPariticipants';
+import { RequestReview } from 'src/typeorm/entity/RequestReview';
+import { RequestMessage } from 'src/typeorm/entity/RequestMessage';
 
 const N_COLUMNS_IGNORE = 2;
 const COLUMN_ID = 'studentId';
@@ -29,7 +31,7 @@ export class ScoreService {
     @InjectConnection()
     private readonly connection: Connection,
     private readonly courseService: CourseService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {}
 
   /*
@@ -44,7 +46,7 @@ export class ScoreService {
     courseId: number,
     columns: ColumnDto[],
   ): Promise<TBaseDto<null>> {
-    if (!await this.courseService.isCourseExist(courseId)) {
+    if (!(await this.courseService.isCourseExist(courseId))) {
       return {
         message: 'The course is not existed',
         statusCode: 400,
@@ -390,7 +392,7 @@ export class ScoreService {
       const scoreStudentIds = [
         ...new Set(scores.map((score) => score.scores_student_id)),
       ];
-      console.log(scores)
+      console.log(scores);
       const scoreData = scoreStudentIds.map((studentId: string) => {
         const scoreObj: any = {};
         let avg: number = 0;
@@ -400,7 +402,7 @@ export class ScoreService {
           ?.forEach((score) => {
             (scoreObj.fullname = score.users_fullname ?? ''),
               (scoreObj[score.grade_name] = score.scores_score);
-            avg += (score.scores_score * score.grade_scale) / 100; 
+            avg += (score.scores_score * score.grade_scale) / 100;
           });
         return {
           studentId: studentId,
@@ -430,8 +432,8 @@ export class ScoreService {
       return {
         message: e.message,
         statusCode: 400,
-        data: null
-      }
+        data: null,
+      };
     } finally {
       await runner.release();
     }
@@ -490,7 +492,13 @@ export class ScoreService {
     const valueParams = data.reduce((acc, cur) => {
       let curScores = [];
       valueColumns.forEach((item) => {
-        curScores = [...curScores, index[item] || 0, cur.studentId, userId, cur[item]];
+        curScores = [
+          ...curScores,
+          index[item] || 0,
+          cur.studentId,
+          userId,
+          cur[item],
+        ];
       });
       acc = [...acc, ...curScores];
       return acc;
@@ -536,7 +544,6 @@ export class ScoreService {
     const runner = this.connection.createQueryRunner();
     try {
       if (deleteScoreByStudentCodes.oldStudentId) {
-
         const deleteScore = await runner.manager
           .getRepository(Scores)
           .createQueryBuilder('scores')
@@ -553,7 +560,6 @@ export class ScoreService {
           .then((scores) => {
             return runner.connection.getRepository(Scores).remove(scores);
           });
-
       }
       return {
         message: 'Delete successfully',
@@ -690,16 +696,22 @@ export class ScoreService {
       .where('id NOT IN (:...ids) AND courseId = :courseId', { ids, courseId })
       .execute();
 
-    const notFinalizeBefore = await runner.manager.getRepository(GradeCompositions).find({
-      where: {
-        courseId: courseId,
-        isFinal: false
-      }
-    }) 
-      .then((data) => {
-        return data?.map(item => item.id)
+    const notFinalizeBefore = await runner.manager
+      .getRepository(GradeCompositions)
+      .find({
+        where: {
+          courseId: courseId,
+          isFinal: false,
+        },
       })
-    const finalizeGrade = data?.filter(grade => (!!grade.isFinal && notFinalizeBefore?.includes(grade?.id)) )?.map(grade => grade.id);
+      .then((data) => {
+        return data?.map((item) => item.id);
+      });
+    const finalizeGrade = data
+      ?.filter(
+        (grade) => !!grade.isFinal && notFinalizeBefore?.includes(grade?.id),
+      )
+      ?.map((grade) => grade.id);
     await this.finalizeColumns(courseId, userId, finalizeGrade);
     const updatePromises = data
       ?.filter((item) => typeof item.id === 'number')
@@ -759,23 +771,24 @@ export class ScoreService {
   async finalizeColumns(
     id: number,
     teacherId: number,
-    gradeIds: number[]
+    gradeIds: number[],
   ): Promise<TBaseDto<null>> {
     const runner = this.connection.createQueryRunner();
 
     try {
       // Step 1: The gradeIds must be in this course
-      const rawData = await runner.manager.getRepository(GradeCompositions)
+      const rawData = await runner.manager
+        .getRepository(GradeCompositions)
         .find({
           where: {
-            courseId: id
-          }
+            courseId: id,
+          },
         });
 
-      const rawGradeIds = rawData.map(item => (item.id));
+      const rawGradeIds = rawData.map((item) => item.id);
 
       let isGradeValid = true;
-      gradeIds.forEach(item => {
+      gradeIds.forEach((item) => {
         if (!rawGradeIds.includes(item)) {
           isGradeValid = false;
         }
@@ -784,7 +797,7 @@ export class ScoreService {
         return {
           message: 'gradeIds that you send to are incorrect',
           statusCode: 400,
-          data: null
+          data: null,
         };
       }
 
@@ -795,22 +808,27 @@ export class ScoreService {
         WHERE id IN (?);
       `;
 
-
-      await runner.manager.getRepository(GradeCompositions).query(sql, [gradeIds]);
+      await runner.manager
+        .getRepository(GradeCompositions)
+        .query(sql, [gradeIds]);
       // Step 3: notify to students who are in this course
-      await this.notificationService.pushScores(id, gradeIds, 'Thông báo điểm thi');
+      await this.notificationService.pushScores(
+        id,
+        gradeIds,
+        'Thông báo điểm thi',
+      );
       return {
         message: 'success',
         statusCode: 200,
-        data: null
-      }
+        data: null,
+      };
     } catch (e) {
       console.log(e);
       return {
         message: e.message,
         statusCode: 400,
-        data: null
-      }
+        data: null,
+      };
     } finally {
       await runner.release();
     }
@@ -824,74 +842,171 @@ export class ScoreService {
       },
       where: {
         id: userId,
-      }
-    })
+      },
+    });
     if (!user || !user.studentId) {
       return {
         scoreData: [],
-        data: []
-      }
+        data: [],
+      };
     }
-   
-    const gradeCompositions = await  runner.manager.getRepository(GradeCompositions).find({
-      select: {
-        id: true
-      },
-      where: {
-        courseId: courseId,
-      },
-      order: {
-        order: 'ASC',
-      },
-    })
+
+    const gradeCompositions = await runner.manager
+      .getRepository(GradeCompositions)
+      .find({
+        select: {
+          id: true,
+        },
+        where: {
+          courseId: courseId,
+        },
+        order: {
+          order: 'ASC',
+        },
+      });
 
     const gradeIds = gradeCompositions.map((grade) => grade.id);
-      const scores = await runner.manager
-        .getRepository(Scores)
-        .createQueryBuilder('scores')
-        .where('scores.grade_id IN (:...gradeIds) and scores.student_id = :studentId', { gradeIds, studentId: user.studentId })
-        .leftJoinAndSelect(
-          GradeCompositions,
-          'grade',
-          'grade.id = scores.grade_id',
-        )
-        .leftJoinAndSelect(
-          Users,
-          'users',
-          'users.id = scores.teacher_id',
-        )
-        .execute();
-      
-      let avg = 0;
-      let showAvg = true;
-      const scoreData = scores?.map((score) => {
-        if (showAvg) {
-          avg += score.scores_score * score.grade_scale / 100;
-        }
-        if (!score.grade_is_final) {
-          showAvg = false;
-        }
-        return ({
-          "id": score.scores_id,
-          "Grade Item": score.grade_name,
-          "Score": score.grade_is_final ? score.scores_score.toFixed(2) : "Not scored yet",
-          "Contribution to course total": score.grade_scale + "%",
-          "Teacher": score.users_fullname,
-          "disableReview": !score.grade_is_final
-        })
-      })
+    const scores = await runner.manager
+      .getRepository(Scores)
+      .createQueryBuilder('scores')
+      .where(
+        'scores.grade_id IN (:...gradeIds) and scores.student_id = :studentId',
+        { gradeIds, studentId: user.studentId },
+      )
+      .leftJoinAndSelect(
+        GradeCompositions,
+        'grade',
+        'grade.id = scores.grade_id',
+      )
+      .leftJoinAndSelect(Users, 'users', 'users.id = scores.teacher_id')
+      .leftJoinAndSelect(
+        RequestReview,
+        'requestReview',
+        'requestReview.score_id = scores.id',
+      )
+      .execute();
+
+    let avg = 0;
+    let showAvg = true;
+    const scoreData = [];
+
+    for (const score of scores) {
       if (showAvg) {
-        scoreData.push({
-          "Grade Item": "Total Score",
-          "Score": avg.toFixed(2),
-          "Contribution to course total": "100%",
-          "Teacher": "",
-          "disableReview": true
-        })
+        avg += (score.scores_score * score.grade_scale) / 100;
       }
+      if (!score.grade_is_final) {
+        showAvg = false;
+      }
+
+      const requestReview = await runner.manager
+        .getRepository(RequestReview)
+        .findOne({
+          where: {
+            scoreId: score.scores_id,
+          },
+          order: {
+            messages: {
+              order: 'ASC',
+            },
+          },
+          relations: {
+            messages: true,
+          },
+        });
+
+      scoreData.push({
+        id: score.scores_id,
+        'Grade Item': score.grade_name,
+        Score: score.grade_is_final
+          ? score.scores_score.toFixed(2)
+          : 'Not scored yet',
+        'Contribution to course total': score.grade_scale + '%',
+        Teacher: score.users_fullname,
+        disableReview: !score.grade_is_final,
+        acceptSendRequest: score.requestReview_accept_new_request !== 0,
+        messages: requestReview?.messages ?? [],
+      });
+    }
+
+    if (showAvg) {
+      scoreData.push({
+        'Grade Item': 'Total Score',
+        Score: avg.toFixed(2),
+        'Contribution to course total': '100%',
+        Teacher: '',
+        disableReview: true,
+      });
+    }
     return {
       scoreData: scoreData,
-      data: "success"
+      data: 'success',
+    };
+  }
+
+  public async requestReview(
+    userId: number,
+    message: string,
+    scoreId: number,
+  ): Promise<TBaseDto<any>> {
+    const runner = this.connection.createQueryRunner();
+
+    const score = await runner.manager.getRepository(Scores).findOne({
+      where: {
+        id: scoreId,
+      },
+    });
+
+    const existsRequest = await runner.manager
+      .getRepository(RequestReview)
+      .findOne({
+        where: {
+          scoreId: scoreId,
+        },
+        relations: {
+          messages: true,
+        },
+      });
+
+    if (existsRequest && !existsRequest.acceptNewRequest) {
+      throw new HttpException(
+        'This request aleady marked as final by teacher',
+        403,
+      );
     }
+
+    if (!existsRequest) {
+      const newRequest = new RequestReview();
+      newRequest.scoreId = scoreId;
+      await runner.manager.save(newRequest);
+
+      const newMessage = new RequestMessage();
+      newMessage.message = message;
+      newMessage.from = userId;
+      newMessage.request = newRequest;
+      newMessage.order = 0;
+      await runner.manager.save(newMessage);
+    }
+
+    if (existsRequest && existsRequest.acceptNewRequest) {
+      const newMessage = new RequestMessage();
+      newMessage.message = message;
+      newMessage.from = userId;
+      newMessage.request = existsRequest;
+      newMessage.order = existsRequest.messages.length;
+      await runner.manager.save(newMessage);
+      await runner.manager
+        .getRepository(RequestReview)
+        .update(
+          {
+            scoreId: scoreId,
+          },
+          {
+            acceptNewRequest: false,
+          },
+        );
+    }
+    return {
+      message: 'Resquest has been sent to teacher',
+    };
   }
 }

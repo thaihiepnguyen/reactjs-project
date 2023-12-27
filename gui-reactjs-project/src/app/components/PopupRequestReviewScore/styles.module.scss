@@ -150,6 +150,12 @@
   background-color: var(--cimigo-blue) !important;
   padding: 8px 16px !important;
   border-radius: 16px !important;
+  &[class~="Mui-disabled"] {
+    background-color: var(--cimigo-gray) !important;
+    p {
+      color: #fff !important;
+    }
+  }
   p {
     color: #fff;
     white-space: nowrap;
@@ -184,4 +190,8 @@
   textarea {
     border-radius: 0 !important;
   }
+}
+
+.messageList {
+  margin-top: 16px;
 }

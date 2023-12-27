@@ -2,10 +2,10 @@ import MaterialTable from "material-table";
 import classes from "./styles.module.scss";
 import { useTranslation } from "react-i18next";
 import { tableIcons } from "../TableIcon";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
 import axiosInstance from "@/app/routers/axios";
-import MapsUgcOutlinedIcon from '@mui/icons-material/MapsUgcOutlined';
+import MapsUgcOutlinedIcon from "@mui/icons-material/MapsUgcOutlined";
 import PopupRequestReviewScore from "../PopupRequestReviewScore";
 interface Props {
   courseId: number | string;
@@ -20,6 +20,16 @@ const StudentGradeTable = ({ courseId }: Props) => {
 
   const missingStudentId = useMemo(() => !user?.studentId, [user]);
 
+  const fetchData = useCallback((courseId: number | string) => {
+    axiosInstance
+      .get(`/score/my-score/${courseId}`)
+      .then((response) => {
+        if (response?.data?.scoreData?.length) {
+          setData(response?.data?.scoreData);
+        }
+      })
+      .catch((error) => {});
+  }, [courseId]);
   useEffect(() => {
     const titles = ["Grade Item", "Score", "Contribution to course total"];
     setColumns(
@@ -29,22 +39,17 @@ const StudentGradeTable = ({ courseId }: Props) => {
         editable: "never",
       }))
     );
-
-    axiosInstance.get(`/score/my-score/${courseId}`)
-    .then((response) => {
-      if (response?.data?.scoreData?.length) {
-        setData(response?.data?.scoreData)
-      }
-    })
-    .catch((error) => {
-
-    })
-    
+    fetchData(courseId)
   }, [courseId]);
 
   const onCloseRequesModal = () => {
     setRequestScore(null);
+  };
+
+  const onSendRequest = () => {
+    fetchData(courseId);
   }
+
   return (
     <div className={classes.rootTable}>
       <MaterialTable
@@ -60,7 +65,7 @@ const StudentGradeTable = ({ courseId }: Props) => {
           headerStyle: {
             backgroundColor: "var(--gray-10)",
           },
-          draggable: false
+          draggable: false,
         }}
         localization={{
           body: {
@@ -69,20 +74,23 @@ const StudentGradeTable = ({ courseId }: Props) => {
               : "No records to display2",
           },
         }}
-        actions={[(rowData: any) => {
-          return {
-            icon: () => (<MapsUgcOutlinedIcon sx={{color: "#333"}}/>),
-            tooltip: 'Request a review',
-            onClick: (event, rowData) => {
-              console.log(rowData);
-              setRequestScore(rowData.id);
-            },
-            hidden: rowData?.disableReview ?? true,
-          }
-        }]}
-       
+        actions={[
+          (rowData: any) => {
+            return {
+              icon: () => <MapsUgcOutlinedIcon sx={{ color: "#333" }} />,
+              tooltip: "Request a review",
+              onClick: (event, rowData) => {
+                console.log(rowData);
+                setRequestScore(rowData);
+              },
+              hidden: rowData?.disableReview ?? true,
+            };
+          },
+        ]}
       ></MaterialTable>
-      {!!requestScore && <PopupRequestReviewScore isOpen={!!requestScore} onCancel={onCloseRequesModal} scoreId={requestScore} />}
+      {!!requestScore && (
+        <PopupRequestReviewScore isOpen={!!requestScore} onCancel={onCloseRequesModal} score={requestScore} onSendRequest={onSendRequest} />
+      )}
     </div>
   );
 };
