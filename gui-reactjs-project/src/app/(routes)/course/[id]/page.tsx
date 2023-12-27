@@ -2,7 +2,18 @@
 import React, { useEffect, useState } from "react";
 import classes from "./styles.module.scss";
 import MenuListComposition from "@/app/components/MenuListComposition/page";
-import { Avatar, Button, ClickAwayListener, Divider, Grow, IconButton, MenuItem, MenuList, Paper, Popper } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  ClickAwayListener,
+  Divider,
+  Grow,
+  IconButton,
+  MenuItem,
+  MenuList,
+  Paper,
+  Popper,
+} from "@mui/material";
 import CreateNotificationForm from "@/app/components/CreateNotificationForm/page";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import axiosInstance from "@/app/routers/axios";
@@ -17,13 +28,14 @@ import Heading3 from "@/app/components/text/Heading3";
 import ParagraphSmall from "@/app/components/text/ParagraphSmall";
 import Heading4 from "@/app/components/text/Heading4";
 import { User } from "@/models/user";
-import { MoreHoriz, PeopleAltOutlined } from "@mui/icons-material";
+import { Download, MoreHoriz, PeopleAltOutlined } from "@mui/icons-material";
 import PopupInviteCourse from "@/app/components/PopupInviteCourse";
 import GradeManagementTable from "@/app/components/GradeManagementTable";
 import MoreHorizContainer from "@/app/components/MoreHorizContainer";
 import GradeTable from "@/app/components/GradeTable";
 import { useTranslation } from "next-i18next";
 import DownloadStudentListButton from "@/app/components/DownloadStudentListButton";
+import * as XLSX from "xlsx";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -35,13 +47,21 @@ function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
   return (
-    <div role="tabpanel" hidden={value !== index} id={`simple-tabpanel-${index}`} aria-labelledby={`simple-tab-${index}`} {...other}>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
 
 export default function Page({ params }: { params: { id: string } }) {
+  const headerExcel = ["Student ID", "Full name"];
+
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { user } = useAppSelector((state) => state.userReducer);
@@ -50,12 +70,11 @@ export default function Page({ params }: { params: { id: string } }) {
   const [course, setCourse] = useState<any>({});
   const [openMenuShare, setOpenMenuShare] = React.useState(false);
   const [isOpenModalShare, setIsOpenModalShare] = useState<boolean>(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const anchorRef = React.useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    
     getCourseDetail(params.id);
   }, []);
 
@@ -78,7 +97,6 @@ export default function Page({ params }: { params: { id: string } }) {
         dispatch(setLoading(false));
       });
   }
-
 
   function a11yProps(index: number) {
     return {
@@ -114,13 +132,25 @@ export default function Page({ params }: { params: { id: string } }) {
     setIsOpenModalShare(false);
   };
 
+  const handleExportToExcel = () => {
+    const data = [headerExcel];
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "sheet 1");
+    XLSX.writeFile(workbook, `${String(course.id).padStart(3, "0")}.xlsx`);
+  };
+
+  const onDownloadExcelTemplate = () => {
+    handleExportToExcel();
+  }
+
   return (
     <Box className={classes.root}>
       <Box className={classes.menu} sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" className={classes.tabWrapper}>
           <Tab label={t("Dashboard")} {...a11yProps(0)} />
           <Tab label={t("Classmate")} {...a11yProps(1)} />
-          <Tab label={t("Score")} {...a11yProps(2)} />
+          {user?.role?.name === "teacher" ? <Tab label={t("Grading")} {...a11yProps(2)} /> : null}
         </Tabs>
       </Box>
       <div className={classes.container}>
@@ -143,25 +173,25 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className={classes.leftSection}>
               <div className={classes.codeCourse}>
                 <div className={classes.boxClassCourseTitle}>
-                  <h3>{t('Class Code')}</h3>
-                  <MenuListComposition course={course}/>
+                  <h3>{t("Class Code")}</h3>
+                  <MenuListComposition course={course} />
                 </div>
                 <br />
                 <h4 className={classes.code}>{course.classCode}</h4>
               </div>
               <br />
               <div className={classes.deadline}>
-                <h3>{t('Deadline')}</h3>
+                <h3>{t("Deadline")}</h3>
                 <br />
-                <p style={{ color: "rgba(0,0,0,.549)" }}>{t('There is no deadline')}</p>
+                <p style={{ color: "rgba(0,0,0,.549)" }}>{t("There is no deadline")}</p>
                 <br />
-                <Button variant="text">{t('View excercises')}</Button>
+                <Button variant="text">{t("View excercises")}</Button>
               </div>
             </div>
             <div className={classes.rightSection}>
               {!showTable && (
                 <div className={classes.createNotificationDiv} onClick={handleClickCreationDiv}>
-                  <p>{t('Create notification for the class')}</p>
+                  <p>{t("Create notification for the class")}</p>
                   <AddCircleOutlineIcon />
                 </div>
               )}
@@ -178,7 +208,7 @@ export default function Page({ params }: { params: { id: string } }) {
           ) : null}
           <div className={classes.list}>
             <Divider>
-              <Heading3 $colorName="--eerie-black">{t('Teacher')}</Heading3>
+              <Heading3 $colorName="--eerie-black">{t("Teacher")}</Heading3>
             </Divider>
             {course?.teacherList?.map((teacher: User, teacherIdx: number) => (
               <div className={classes.infoWrapper} key={teacherIdx}>
@@ -195,11 +225,8 @@ export default function Page({ params }: { params: { id: string } }) {
             ))}
           </div>
           <Box className={classes.list} sx={{ mt: 4 }}>
-            <br/>
-            <DownloadStudentListButton />
-            <br/>
             <Divider>
-              <Heading3 $colorName="--eerie-black">{t('Students')}</Heading3>
+              <Heading3 $colorName="--eerie-black">{t("Students")}</Heading3>
             </Divider>
             {course?.studentList?.map((student: User, studentIdx: number) => (
               <div className={classes.wrapper}>
@@ -216,7 +243,11 @@ export default function Page({ params }: { params: { id: string } }) {
                 </div>
                 {user?.role?.name === "teacher" ? (
                   <div>
-                    <MoreHorizContainer studentId={student?.id} courseId={params.id} onBanStudent={() => getCourseDetail(params.id)}/>
+                    <MoreHorizContainer
+                      studentId={student?.id}
+                      courseId={params.id}
+                      onBanStudent={() => getCourseDetail(params.id)}
+                    />
                   </div>
                 ) : null}
               </div>
@@ -225,7 +256,7 @@ export default function Page({ params }: { params: { id: string } }) {
         </CustomTabPanel>
 
         <CustomTabPanel value={value} index={2}>
-            <GradeTable courseId={params.id}/>
+          <GradeTable courseId={params.id} />
         </CustomTabPanel>
       </div>
       <Popper
@@ -250,8 +281,24 @@ export default function Page({ params }: { params: { id: string } }) {
                   <MenuItem onClick={onShowModalShare}>
                     <Box display="flex" alignItems={"center"}>
                       <PeopleAltOutlined sx={{ marginRight: "13.5px" }} />
-                      <ParagraphSmall $fontWeight="400" $colorName="--gray-80" translation-key="project_header_menu_share_option">
-                        {t('Invite')}
+                      <ParagraphSmall
+                        $fontWeight="400"
+                        $colorName="--gray-80"
+                        translation-key="project_header_menu_share_option"
+                      >
+                        {t("Invite")}
+                      </ParagraphSmall>
+                    </Box>
+                  </MenuItem>
+                  <MenuItem onClick={onDownloadExcelTemplate}>
+                    <Box display="flex" alignItems={"center"}>
+                      <Download sx={{ marginRight: "13.5px" }} />
+                      <ParagraphSmall
+                        $fontWeight="400"
+                        $colorName="--gray-80"
+                        translation-key="project_header_menu_share_option"
+                      >
+                        {t("Download Template Student List")}
                       </ParagraphSmall>
                     </Box>
                   </MenuItem>
@@ -261,7 +308,7 @@ export default function Page({ params }: { params: { id: string } }) {
           </Grow>
         )}
       </Popper>
-      <PopupInviteCourse isOpen={isOpenModalShare} onCancel={onCloseShowModalShareProject} courseId={course.id}/>
+      <PopupInviteCourse isOpen={isOpenModalShare} onCancel={onCloseShowModalShareProject} courseId={course.id} />
     </Box>
   );
 }
