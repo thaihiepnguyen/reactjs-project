@@ -221,29 +221,6 @@ export class ScoreService {
         };
       }
 
-      // Step 3: if student have not had in this course yet, insert to absent participant table
-      const sql1 =
-        `
-      SELECT *
-        FROM participants p, users u
-      WHERE p.student_id = u.id
-      AND u.student_id = ?
-      AND u.is_valid = 1
-      AND p.course_id = ?`;
-
-      const rawData = await runner.manager.query(sql1, [studentCode, courseId]);
-
-      if (!rawData || !rawData.length) {
-        await runner.manager.getRepository(AbsentPariticipants)
-          .createQueryBuilder()
-          .insert()
-          .into(AbsentPariticipants)
-          .values([
-            { courseId, studentId: studentCode}
-          ])
-          .execute();
-      }
-
       // insert on duplicate
       let params = '(?, ?, ?, ?)';
       for (let i = 0; i < Object.keys(scores).length - 1; i++) {
