@@ -16,6 +16,11 @@ import ParagraphSmall from "../text/ParagraphSmall";
 import { setLoading } from "@/redux/reducers/loading";
 import { useTranslation } from "next-i18next";
 
+const ROLE_ID = {
+  STUDENT: 1,
+  TEACHER: 2
+}
+
 export const VALIDATION = {
   phone: /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/,
   password: /^(?=.*\d)(?=.*[A-Z]).{8,}$/
@@ -167,7 +172,7 @@ const EditProfile = () => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          {user?.roleId === 2 && 
+          {user?.roleId === ROLE_ID.STUDENT &&
           (<Inputs
             title={t("Student ID")}
             name="studentId"

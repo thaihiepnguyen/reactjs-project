@@ -59,7 +59,7 @@ export class NotificationService {
       userName: teacher.fullname,
       message: message,
       title: title,
-      time: 0,
+      time: `a new message`,
     }
     this.gatewayService.pushNotification(rooms, payload)
   }
@@ -106,11 +106,17 @@ export class NotificationService {
     }
   }
 
-  // Lệch múi giờ cmnr :))))
   private _getMinutes(from) {
     const sentTime = moment(from).add(7, "hours")
     const now = moment();
-    return now.diff(sentTime, 'minutes');
+    const diffMinutes = now.diff(sentTime, 'minutes');
+    if (diffMinutes <= 60) {
+      return `${diffMinutes} minutes ago`;
+    } else if (diffMinutes <= 1440) {
+      return `${now.diff(sentTime, 'hours')} hours ago`
+    } else {
+      return `${now.diff(sentTime, 'days')} days ago`
+    }
   }
   /*
    * Push a message to students that are in this course

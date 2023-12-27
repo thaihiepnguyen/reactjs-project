@@ -16,7 +16,7 @@ export default function NotificationItem(
       <div className={classes.messageContainer}>
         <h5>{userName}</h5>
         <p>{title}</p>
-        <span className={classes.minutes}> {time === 0 ? 'a new message' : `${time} minutes ago`}</span>
+        <span className={classes.minutes}> {time}</span>
       </div>
     </div>
   </>
