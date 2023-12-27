@@ -74,5 +74,7 @@
     "Name (Required)": "Tên (Bắt buộc)",
     "Description (Required)": "Mô tả (Bắt buộc)",
     "Class Code (Optional)": "Mã Lớp (Tùy chọn)",
-    "Add": "Thêm"
+    "Add": "Thêm",
+    "Students": "Sinh viên",
+    "Enroll a course": "Đăng ký khóa học"
 }

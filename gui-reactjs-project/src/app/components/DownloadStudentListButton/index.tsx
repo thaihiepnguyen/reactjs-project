@@ -6,14 +6,14 @@ import { Button } from "@mui/material";
 
 const headerExcel = ['Student ID', 'Full name']
 
-export default function DownloadStudentListButton() {
+export default function DownloadStudentListButton(filename: string) {
   const {t} = useTranslation();
   const handleExportToExcel = () => {
     const data = [headerExcel];
     const worksheet = XLSX.utils.aoa_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "sheet 1");
-    XLSX.writeFile(workbook, 'student_list_template.xlsx');
+    XLSX.writeFile(workbook, filename);
     }
        
   return (
