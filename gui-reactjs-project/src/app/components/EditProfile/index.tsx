@@ -83,16 +83,16 @@ const EditProfile = () => {
           .catch((e) => {
             dispatch(setUser(null));
           })
-          .finally(() => dispatch(setLoading(false)));
       })
       .catch((err) => {
         console.log(err);
         Swal.fire({
-          title: err,
-          text: "Oops!",
+          text: err.message,
+          title: "Oops!",
           icon: "error",
         });
-      });
+      })
+      .finally(() => dispatch(setLoading(false)));
   };
   useEffect(() => {
     if(user) {

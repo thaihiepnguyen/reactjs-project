@@ -1,0 +1,13 @@
+.rootTable {
+  table {
+    min-width: 1100px;
+    th:not(:last-child) {
+      text-align: left;
+      flex-direction: row !important;
+      min-width: 145px;
+    }
+    th:last-child {
+      min-width: 100px;
+    }
+  }
+}

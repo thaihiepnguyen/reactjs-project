@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { ForwardedRef, RefObject, forwardRef } from "react";
 
 import AddBox from "@material-ui/icons/AddBox";
 import ArrowDownward from "@material-ui/icons/ArrowDownward";
@@ -21,21 +21,21 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 export const tableIcons = {
-  Add: forwardRef((props, ref) => <AddIcon {...props} ref={ref} />),
-  Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-  Delete: forwardRef((props, ref) => <RemoveCircleOutlineIcon sx={{color: "red"}} {...props} ref={ref} />),
-  DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
-  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
-  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
-  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
-  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-  PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
-  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-  Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
-  SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
-  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
-  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
+  Add: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <AddIcon {...props} ref={ref} />),
+  Check: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <Check {...props} ref={ref} />),
+  Clear: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <Clear {...props} ref={ref} />),
+  Delete: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <RemoveCircleOutlineIcon sx={{color: "red"}} {...props} ref={ref} />),
+  DetailPanel: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <ChevronRight {...props} ref={ref} />),
+  Edit: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <Edit {...props} ref={ref} />),
+  Export: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <SaveAlt {...props} ref={ref} />),
+  Filter: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <FilterList {...props} ref={ref} />),
+  FirstPage: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <FirstPage {...props} ref={ref} />),
+  LastPage: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <LastPage {...props} ref={ref} />),
+  NextPage: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <ChevronRight {...props} ref={ref} />),
+  PreviousPage: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <ChevronLeft {...props} ref={ref} />),
+  ResetSearch: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <Clear {...props} ref={ref} />),
+  Search: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <Search {...props} ref={ref} />),
+  SortArrow: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <ArrowDownward {...props} ref={ref} />),
+  ThirdStateCheck: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <Remove {...props} ref={ref} />),
+  ViewColumn: forwardRef((props, ref: ForwardedRef<SVGSVGElement> ) => <ViewColumn {...props} ref={ref} />),
 };

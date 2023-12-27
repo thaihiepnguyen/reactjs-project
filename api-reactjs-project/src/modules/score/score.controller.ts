@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseInterceptors} from "@nestjs/common";
+import {Body, Controller, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors} from "@nestjs/common";
 import { ScoreService } from "./score.service";
 import { AddScoreByStudentCodeDto, AddScoreDto, CreateColumnDto, CreateUpdateColumnDto, DeleteScoreByStudentCodeDto } from "./score.dto";
 import { TBaseDto } from "src/app.dto";
@@ -6,6 +6,9 @@ import { MetaDataAuth } from "../auth/auth.decorator";
 import { ColumnsResponse } from "./score.typing";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
+import { RolesGuard } from "../auth/roles/roles.guard";
+import { Roles } from "../auth/roles/roles.decorator";
+import { Role } from "../auth/roles/role.enum";
 
 @Controller('/score')
 export class ScoreController {
@@ -118,5 +121,16 @@ export class ScoreController {
     @Body('gradeIds') gradeIds: number[],
   ): Promise<TBaseDto<null>> {
     return await this.scoreService.finalizeColumns(id, userId, gradeIds);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Student)
+  @Get('my-score/:courseId') //For students
+  async getScore(
+    @MetaDataAuth('userId') userId: number,
+    @Param('courseId', ParseIntPipe) courseId: number
+
+  ): Promise<TBaseDto<any>> {
+    return this.scoreService.studentGetCourse(userId, courseId);
   }
 }

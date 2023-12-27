@@ -827,4 +827,83 @@ export class ScoreService {
       await runner.release();
     }
   }
+
+  public async studentGetCourse(userId: number, courseId: number) {
+    const runner = this.connection.createQueryRunner();
+    const user = await runner.manager.getRepository(Users).findOne({
+      select: {
+        studentId: true,
+      },
+      where: {
+        id: userId,
+      }
+    })
+    if (!user || !user.studentId) {
+      return {
+        scoreData: [],
+        data: []
+      }
+    }
+   
+    const gradeCompositions = await  runner.manager.getRepository(GradeCompositions).find({
+      select: {
+        id: true
+      },
+      where: {
+        courseId: courseId,
+      },
+      order: {
+        order: 'ASC',
+      },
+    })
+
+    const gradeIds = gradeCompositions.map((grade) => grade.id);
+      const scores = await runner.manager
+        .getRepository(Scores)
+        .createQueryBuilder('scores')
+        .where('scores.grade_id IN (:...gradeIds) and scores.student_id = :studentId', { gradeIds, studentId: user.studentId })
+        .leftJoinAndSelect(
+          GradeCompositions,
+          'grade',
+          'grade.id = scores.grade_id',
+        )
+        .leftJoinAndSelect(
+          Users,
+          'users',
+          'users.id = scores.teacher_id',
+        )
+        .execute();
+      
+      let avg = 0;
+      let showAvg = true;
+      const scoreData = scores?.map((score) => {
+        if (showAvg) {
+          avg += score.scores_score * score.grade_scale / 100;
+        }
+        if (!score.grade_is_final) {
+          showAvg = false;
+        }
+        return ({
+          "id": score.scores_id,
+          "Grade Item": score.grade_name,
+          "Score": score.grade_is_final ? score.scores_score.toFixed(2) : "Not scored yet",
+          "Contribution to course total": score.grade_scale + "%",
+          "Teacher": score.users_fullname,
+          "disableReview": !score.grade_is_final
+        })
+      })
+      if (showAvg) {
+        scoreData.push({
+          "Grade Item": "Total Score",
+          "Score": avg.toFixed(2),
+          "Contribution to course total": "100%",
+          "Teacher": "",
+          "disableReview": true
+        })
+      }
+    return {
+      scoreData: scoreData,
+      data: "success"
+    }
+  }
 }

@@ -117,7 +117,7 @@ export class CourseController {
     return this.courseService.banStudent(userId, id, courseId);
   }
 
-  @Post('invite')
+  @Post('invite') //Public for everyone
   async inviteToCourse(
     @Body('emails') emails: string[],
     @Body('courseId') courseId: string

@@ -36,6 +36,7 @@ import GradeTable from "@/app/components/GradeTable";
 import { useTranslation } from "next-i18next";
 import DownloadStudentListButton from "@/app/components/DownloadStudentListButton";
 import * as XLSX from "xlsx";
+import StudentGradeTable from "@/app/components/StudentGradeTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -142,7 +143,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   const onDownloadExcelTemplate = () => {
     handleExportToExcel();
-  }
+  };
 
   return (
     <Box className={classes.root}>
@@ -151,6 +152,7 @@ export default function Page({ params }: { params: { id: string } }) {
           <Tab label={t("Dashboard")} {...a11yProps(0)} />
           <Tab label={t("Classmate")} {...a11yProps(1)} />
           {user?.role?.name === "teacher" ? <Tab label={t("Grading")} {...a11yProps(2)} /> : null}
+          {user?.role?.name === "student" ? <Tab label={t("Score")} {...a11yProps(2)} /> : null}
         </Tabs>
       </Box>
       <div className={classes.container}>
@@ -256,7 +258,8 @@ export default function Page({ params }: { params: { id: string } }) {
         </CustomTabPanel>
 
         <CustomTabPanel value={value} index={2}>
-          <GradeTable courseId={params.id} />
+          {user?.role?.name === "teacher" ? <GradeTable courseId={params.id} /> : null}
+          {user?.role?.name === "student" ? <StudentGradeTable courseId={params.id} /> : null}
         </CustomTabPanel>
       </div>
       <Popper

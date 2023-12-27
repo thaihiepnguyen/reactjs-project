@@ -81,6 +81,16 @@ export class UserService {
       if (data.avatarUrl && user.avatarUrl) {
         unlink(user.avatarUrl, () => {});
       }
+      if (data.studentId) {
+        const existsStudentId = await this.connection.getRepository(Users).findOne({
+          where: {
+            studentId: `${data.studentId}`,
+          }
+        })
+        if (existsStudentId && existsStudentId.id !== user.id) {
+          throw new HttpException("Student ID already exists", 404)
+        }
+      }
       await this.connection.getRepository(Users).update(user.id, {
         avatarUrl: data.avatarUrl,
         fullname: data.fullname,
