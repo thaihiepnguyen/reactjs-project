@@ -167,7 +167,7 @@ const EditProfile = () => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          {user?.role === 1 && 
+          {user?.roleId === 2 && 
           (<Inputs
             title={t("Student ID")}
             name="studentId"
