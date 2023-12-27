@@ -1,4 +1,4 @@
-import {Column, Entity, OneToOne, JoinColumn} from "typeorm";
+import {Column, Entity, OneToOne, JoinColumn, Unique} from "typeorm";
 import { EntityBase } from "../EntityBase";
 import { Roles } from "./Roles";
 

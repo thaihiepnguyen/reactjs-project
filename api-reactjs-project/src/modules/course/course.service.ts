@@ -9,7 +9,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { TBaseDto } from '../../app.dto';
 import { AuthService } from '../auth/auth.service';
 import { MailerService } from '@nestjs-modules/mailer';
+import * as xlsx from "xlsx";
+import {AbsentPariticipants} from "../../typeorm/entity/AbsentPariticipants";
 
+
+const COLUMN_STUDENT_ID = 'Student ID';
+const COLUMN_FULLNAME = 'Full name';
 @Injectable()
 export class CourseService {
   constructor(
@@ -113,7 +118,7 @@ export class CourseService {
       } catch (e) {
         console.log(e);
         return {
-          message: e,
+          message: e.message,
           data: null,
           statusCode: 400,
         };
@@ -154,7 +159,7 @@ export class CourseService {
             .execute();
         } catch (e) {
           return {
-            message: e,
+            message: e.message,
             data: null,
             statusCode: 400,
           };
@@ -502,6 +507,87 @@ export class CourseService {
 
     return {
       data: "success"
+    }
+  }
+
+  public async saveStudentList(file: Express.Multer.File, userId: number): Promise<TBaseDto<null>> {
+    const runner = this.connection.createQueryRunner();
+    try {
+      const workbook = xlsx.readFile(`uploads/template/${file.filename}`);
+      const courseId = +file.filename.split('.')[0];
+
+      // Step 1: the teacher must be in this courseId
+      if (!await this.isTeacherInCourse(courseId, userId)) {
+        return {
+          message: 'The teacher must be in this course',
+          statusCode: 400,
+          data: null
+        }
+      }
+
+      // Step 2: load data from sheets
+      let data = [];
+      const sheets = workbook.SheetNames;
+
+      for (let i = 0; i < sheets.length; i++) {
+        const temp = xlsx.utils.sheet_to_json(
+          workbook.Sheets[workbook.SheetNames[i]],
+        );
+        temp.forEach((res) => {
+          data.push(res);
+        });
+      }
+
+      const studentSheetIds = data.map(item => (item[COLUMN_STUDENT_ID]));
+
+      // Step 3: filter students who have not joined this course yet
+      const absentStudentIds = []
+
+      const sql = `
+        SELECT u.student_id as studentId
+          FROM participants p, users u
+        WHERE p.student_id = u.id
+          AND u.is_valid = 1
+          AND p.course_id = ?;
+      `
+
+      const studentIds = await runner.manager.query(sql, [courseId]);
+
+      const indexStudentIds = studentIds.reduce((acc, cur) => {
+        acc[cur.studentId] = true;
+        return acc;
+      }, {})
+
+      studentSheetIds.forEach(item => {
+        if (!indexStudentIds[item]) {
+          absentStudentIds.push({
+            studentId: item,
+            courseId: courseId
+          });
+        }
+      })
+
+      await runner.manager.getRepository(AbsentPariticipants)
+        .createQueryBuilder()
+        .insert()
+        .orIgnore()
+        .into(AbsentPariticipants)
+        .values(absentStudentIds)
+        .execute();
+
+      return {
+        message: 'success',
+        statusCode: 200,
+        data: null
+      }
+    } catch (e) {
+      return {
+        message: e.message,
+        statusCode: 400,
+        data: null
+      }
+    } finally {
+      await runner.release();
     }
   }
 }

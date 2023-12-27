@@ -18,6 +18,7 @@ import { Scores } from 'src/typeorm/entity/Scores';
 import { ColumnsResponse, Row } from './score.typing';
 import * as xlsx from 'xlsx';
 import {NotificationService} from '../notification/notification.service';
+import {AbsentPariticipants} from "../../typeorm/entity/AbsentPariticipants";
 
 const N_COLUMNS_IGNORE = 2;
 const COLUMN_ID = 'studentId';
@@ -75,7 +76,7 @@ export class ScoreService {
       };
     } catch (e) {
       return {
-        message: e,
+        message: e.message,
         statusCode: 400,
         data: null,
       };
@@ -220,6 +221,29 @@ export class ScoreService {
         };
       }
 
+      // Step 3: if student have not had in this course yet, insert to absent participant table
+      const sql1 =
+        `
+      SELECT *
+        FROM participants p, users u
+      WHERE p.student_id = u.id
+      AND u.student_id = ?
+      AND u.is_valid = 1
+      AND p.course_id = ?`;
+
+      const rawData = await runner.manager.query(sql1, [studentCode, courseId]);
+
+      if (!rawData || !rawData.length) {
+        await runner.manager.getRepository(AbsentPariticipants)
+          .createQueryBuilder()
+          .insert()
+          .into(AbsentPariticipants)
+          .values([
+            { courseId, studentId: studentCode}
+          ])
+          .execute();
+      }
+
       // insert on duplicate
       let params = '(?, ?, ?, ?)';
       for (let i = 0; i < Object.keys(scores).length - 1; i++) {
@@ -228,7 +252,7 @@ export class ScoreService {
 
       const index = await this._indexGrade(courseId);
 
-      const sql = `
+      const sql2 = `
         INSERT INTO scores (grade_id, student_id, teacher_id, score)
         VALUES
         ${params}
@@ -243,7 +267,7 @@ export class ScoreService {
         return acc;
       }, []);
 
-      await runner.manager.getRepository(Scores).query(sql, valueParams);
+      await runner.manager.getRepository(Scores).query(sql2, valueParams);
 
       const scoresList = await runner.manager
         .getRepository(Scores)
@@ -426,6 +450,11 @@ export class ScoreService {
       };
     } catch (e) {
       console.log(e);
+      return {
+        message: e.message,
+        statusCode: 400,
+        data: null
+      }
     } finally {
       await runner.release();
     }
@@ -493,7 +522,7 @@ export class ScoreService {
       await this.connection.getRepository(Scores).query(sql, valueParams);
     } catch (e) {
       return {
-        message: e,
+        message: e.message,
         statusCode: 200,
         data: null,
       };
@@ -789,6 +818,11 @@ export class ScoreService {
       }
     } catch (e) {
       console.log(e);
+      return {
+        message: e.message,
+        statusCode: 400,
+        data: null
+      }
     } finally {
       await runner.release();
     }

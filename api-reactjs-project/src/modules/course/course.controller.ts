@@ -1,4 +1,15 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards} from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put, UploadedFile,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import {Role} from "../auth/roles/role.enum";
 import {Roles} from "../auth/roles/roles.decorator";
 import {CourseService} from "./course.service";
@@ -6,7 +17,8 @@ import {MetaDataAuth} from "../auth/auth.decorator";
 import {TBaseDto} from "../../app.dto";
 import {EnrolledCoursesResponse, MyCoursesResponse} from "./course.typing";
 import {RolesGuard} from "../auth/roles/roles.guard";
-import { MailerService } from "@nestjs-modules/mailer";
+import {FileInterceptor} from "@nestjs/platform-express";
+import {diskStorage} from "multer";
 
 
 @Controller('courses')
@@ -111,5 +123,26 @@ export class CourseController {
     @Body('courseId') courseId: string
   ): Promise<TBaseDto<any>> {
     return this.courseService.inviteToCourse(emails, courseId);
+  }
+
+  @Post('/upload/template/file')
+  @UseInterceptors(FileInterceptor('course', {
+    storage: diskStorage({
+      destination: './uploads/template'
+      , filename: (req, file, cb) => {
+        cb(null, `${file.originalname}`)
+      }
+    })
+  }))
+  async uploadFile(@UploadedFile() file: Express.Multer.File, @MetaDataAuth('userId') userId: number) {
+    if (file) {
+      return this.courseService.saveStudentList(file, userId);
+    } else {
+      return {
+        message: 'upload file failed!',
+        statusCode: 400,
+        data: null
+      }
+    }
   }
 }
