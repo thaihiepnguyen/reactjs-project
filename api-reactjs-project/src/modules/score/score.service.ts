@@ -690,6 +690,17 @@ export class ScoreService {
       .where('id NOT IN (:...ids) AND courseId = :courseId', { ids, courseId })
       .execute();
 
+    const notFinalizeBefore = await runner.manager.getRepository(GradeCompositions).find({
+      where: {
+        courseId: courseId,
+        isFinal: false
+      }
+    }) 
+      .then((data) => {
+        return data?.map(item => item.id)
+      })
+    const finalizeGrade = data?.filter(grade => (!!grade.isFinal && notFinalizeBefore?.includes(grade?.id)) )?.map(grade => grade.id);
+    await this.finalizeColumns(courseId, userId, finalizeGrade);
     const updatePromises = data
       ?.filter((item) => typeof item.id === 'number')
       .map((item) => {

@@ -7,6 +7,7 @@ import {Connection, In} from "typeorm";
 import {Notifications} from "../../typeorm/entity/Notifications";
 import {TBaseDto} from "../../app.dto";
 import {Users} from "../../typeorm/entity/Users";
+import * as moment from "moment";
 
 @Injectable()
 export class NotificationService {
@@ -68,6 +69,9 @@ export class NotificationService {
       .find({
         where: {
           to: userId
+        },
+        order: {
+          createdAt: "DESC"
         }
       });
 
@@ -96,15 +100,17 @@ export class NotificationService {
         userName: index[item.from].fullname,
         message: item.content,
         title: item.title,
-        time: 1,
+        time: this._getMinutes(item.createdAt),
       })),
       statusCode: 200
     }
   }
 
   // Lệch múi giờ cmnr :))))
-  private _getMinutes(from: Date, to: Date) {
-    return Math.abs((to.getTime() - from.getTime()) / 1000 / 60);
+  private _getMinutes(from) {
+    const sentTime = moment(from).add(7, "hours")
+    const now = moment();
+    return now.diff(sentTime, 'minutes');
   }
   /*
    * Push a message to students that are in this course
