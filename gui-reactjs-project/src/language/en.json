@@ -74,5 +74,7 @@
     "Name (Required)": "Name (Required)",
     "Description (Required)": "Description (Required)",
     "Class Code (Optional)": "Class Code (Optional)",
-    "Add": "Add"
+    "Add": "Add",
+    "Students": "Students",
+    "Enroll a course": "Enroll a course"
 }

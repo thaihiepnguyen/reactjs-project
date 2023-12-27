@@ -8,12 +8,14 @@ import EnrollCoursesModal from "@/app/components/AddCourses/EnrollCourseModal";
 import { useAppSelector } from "@/redux/hook";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "next-i18next";
 
 export default function Page() {
   const router = useRouter();
   const { enrolledCourses: courses } = useAppSelector((state) => state.courseReducer);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const {t} = useTranslation();
 
   return (
     <>
@@ -36,7 +38,7 @@ export default function Page() {
             })}
           </>
         ) : null}
-        <AddCourses text={"Enroll a course"} openModel={() => setIsModalOpen(true)} />
+        <AddCourses text={t("Enroll a course")} openModel={() => setIsModalOpen(true)} />
       </div>
     </>
   );

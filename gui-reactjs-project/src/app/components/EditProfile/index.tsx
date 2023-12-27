@@ -167,15 +167,16 @@ const EditProfile = () => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Inputs
+          {user?.roleId === 2 && 
+          (<Inputs
             title={t("Student ID")}
             name="studentId"
             type="text"
             placeholder="Enter your student ID"
             inputRef={register("studentId")}
             errorMessage={errors.studentId?.message}
-            // disabled={!isStudentIdEnabled} // Enable/disable based on condition
-          />
+            // disabled={isStudentIdEnabled} // Enable/disable based on condition
+          />) }
           <Grid>
             <Button type="submit" variant="contained" children={t("Save change")} className={classes.btnSave} />
           </Grid>
