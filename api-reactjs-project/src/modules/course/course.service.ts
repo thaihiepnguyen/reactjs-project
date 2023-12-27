@@ -3,7 +3,7 @@ import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
 import { Users } from 'src/typeorm/entity/Users';
-import { Connection, In, Like, Repository } from 'typeorm';
+import {Connection, In, IsNull, Like, Not, Repository} from 'typeorm';
 import { EnrolledCoursesResponse, MyCoursesResponse } from './course.typing';
 import { v4 as uuidv4 } from 'uuid';
 import { TBaseDto } from '../../app.dto';
@@ -538,35 +538,75 @@ export class CourseService {
         });
       }
 
-      const studentSheetIds = data.map(item => (item[COLUMN_STUDENT_ID]));
-
       // Step 3: filter students who have not joined this course yet
-      const absentStudentIds = []
+      const studentSheetIds = data.map(item => (item[COLUMN_STUDENT_ID]));
+      const studentSheetIdsHaveStudentCode = [];
+      const studentIdsHaveStudentCode = await runner.manager.getRepository(Users)
+        .find({
+          where: {
+            studentId: Not(IsNull()),
+          },
+          select: {
+            studentId: true,
+            id: true,
+          }
+        });
 
-      const sql = `
-        SELECT u.student_id as studentId
-          FROM participants p, users u
-        WHERE p.student_id = u.id
-          AND u.is_valid = 1
-          AND p.course_id = ?;
-      `
-
-      const studentIds = await runner.manager.query(sql, [courseId]);
-
-      const indexStudentIds = studentIds.reduce((acc, cur) => {
-        acc[cur.studentId] = true;
+      const studentIdsHaveStudentCodeIndex = studentIdsHaveStudentCode.reduce((acc, cur) => {
+        acc[cur.studentId] = cur;
         return acc;
       }, {})
 
       studentSheetIds.forEach(item => {
-        if (!indexStudentIds[item]) {
+        if (studentIdsHaveStudentCodeIndex[item]) {
+          studentSheetIdsHaveStudentCode.push(studentIdsHaveStudentCodeIndex[item])
+        }
+      })
+
+      const sql = `
+        SELECT 
+          u.student_id as studentId,
+          u.id
+        FROM participants p, users u
+        WHERE p.student_id = u.id
+        AND u.is_valid = 1
+        AND p.student_id is not null
+        AND p.course_id = ?;
+      `;
+
+      const students = await runner.manager.query(sql, [courseId]);
+      const indexStudentIds = students.reduce((acc, cur) => {
+        acc[cur.studentId] = true;
+        return acc;
+      }, {})
+      const studentSheetIdsHaveStudentCodeAndUnJoined = [];
+      studentSheetIdsHaveStudentCode.forEach(item => {
+        if (!indexStudentIds[item.studentId]) {
+          studentSheetIdsHaveStudentCodeAndUnJoined.push({
+            courseId: courseId,
+            studentId: item.id
+          })
+        }
+      })
+
+      await runner.manager.getRepository(Participants)
+        .createQueryBuilder()
+        .insert()
+        .into(Participants)
+        .insert()
+        .orIgnore()
+        .values(studentSheetIdsHaveStudentCodeAndUnJoined)
+        .execute();
+
+      const absentStudentIds = []
+      studentSheetIds.forEach(item => {
+        if (!studentIdsHaveStudentCodeIndex[item]) {
           absentStudentIds.push({
             studentId: item,
             courseId: courseId
           });
         }
       })
-
       await runner.manager.getRepository(AbsentPariticipants)
         .createQueryBuilder()
         .insert()
