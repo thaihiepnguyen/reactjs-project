@@ -59,6 +59,7 @@
 }
 
 .sidebarButton {
+  display: flex;
   position: absolute;
   right: 0;
   top: 3.6rem;
@@ -73,5 +74,8 @@
   cursor: pointer;
   transform: translateX(50%);
   font-size: 1.1rem;
+  svg {
+    width: 21px !important
+  }
 }
 
