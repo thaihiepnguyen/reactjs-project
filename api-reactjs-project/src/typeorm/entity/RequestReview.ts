@@ -25,7 +25,7 @@ export class RequestReview extends EntityBase{
   @Column("tinyint", {
     name: "isFinal",
     default: () => 0,
-  })
+  })  
   isFinal: boolean;
 
   @OneToMany(() => RequestMessage, (message) => message.request)

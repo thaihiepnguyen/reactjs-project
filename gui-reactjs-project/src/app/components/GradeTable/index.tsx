@@ -147,7 +147,14 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
                   placeholder={props?.columnDef?.title}
                   type={props?.columnDef?.type == "numeric" ? "number" : "text"}
                   value={props.value}
-                  onChange={(e) => props.onChange(e.target.value)}
+                  onChange={(e) => {
+                    let value = e.target.value;
+                    if (props?.columnDef?.type == "numeric") {
+                      if (+value > 10) value = "10";
+                      if (+value < 0) value = "0"
+                    }
+                    return props.onChange(value)
+                  }}
                   inputProps={{
                     min: 0,
                     max: 10,

@@ -392,7 +392,6 @@ export class ScoreService {
       const scoreStudentIds = [
         ...new Set(scores.map((score) => score.scores_student_id)),
       ];
-      console.log(scores);
       const scoreData = scoreStudentIds.map((studentId: string) => {
         const scoreObj: any = {};
         let avg: number = 0;
@@ -922,7 +921,7 @@ export class ScoreService {
           : 'Not scored yet',
         'Contribution to course total': score.grade_scale + '%',
         Teacher: score.users_fullname,
-        disableReview: !score.grade_is_final,
+        disableReview: !score.grade_is_final || !!requestReview?.isFinal,
         acceptSendRequest: score.requestReview_accept_new_request !== 0,
         messages: requestReview?.messages ?? [],
       });
@@ -967,9 +966,15 @@ export class ScoreService {
         },
       });
 
-    if (existsRequest && !existsRequest.acceptNewRequest) {
+    if (existsRequest && existsRequest.isFinal) {
       throw new HttpException(
         'This request aleady marked as final by teacher',
+        403,
+      );
+    }
+    if (existsRequest && !existsRequest.acceptNewRequest) {
+      throw new HttpException(
+        'Please wait for the instructor to respond to your previous request',
         403,
       );
     }

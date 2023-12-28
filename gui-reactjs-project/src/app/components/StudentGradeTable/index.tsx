@@ -2,7 +2,7 @@ import MaterialTable from "material-table";
 import classes from "./styles.module.scss";
 import { useTranslation } from "react-i18next";
 import { tableIcons } from "../TableIcon";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "@/redux/hook";
 import axiosInstance from "@/app/routers/axios";
 import MapsUgcOutlinedIcon from "@mui/icons-material/MapsUgcOutlined";
@@ -11,25 +11,33 @@ interface Props {
   courseId: number | string;
 }
 
-const StudentGradeTable = ({ courseId }: Props) => {
+const StudentGradeTable = memo(({ courseId }: Props) => {
   const { t } = useTranslation();
   const [columns, setColumns] = useState<any>([]);
+  const [tableLoading, setTableLoading] = useState<boolean>(false);
   const [requestScore, setRequestScore] = useState<any>(null);
   const [data, setData] = useState<any>([]);
   const { user } = useAppSelector((state) => state.userReducer);
 
   const missingStudentId = useMemo(() => !user?.studentId, [user]);
 
-  const fetchData = useCallback((courseId: number | string) => {
-    axiosInstance
-      .get(`/score/my-score/${courseId}`)
-      .then((response) => {
-        if (response?.data?.scoreData?.length) {
-          setData(response?.data?.scoreData);
-        }
-      })
-      .catch((error) => {});
-  }, [courseId]);
+  const fetchData = useCallback(
+    (courseId: number | string) => {
+      setTableLoading(true);
+      axiosInstance
+        .get(`/score/my-score/${courseId}`)
+        .then((response) => {
+          if (response?.data?.scoreData?.length) {
+            setData(response?.data?.scoreData);
+          }
+        })
+        .catch((error) => {})
+        .finally(() => {
+          setTableLoading(false);
+        });
+    },
+    [courseId]
+  );
   useEffect(() => {
     const titles = ["Grade Item", "Score", "Contribution to course total"];
     setColumns(
@@ -39,7 +47,7 @@ const StudentGradeTable = ({ courseId }: Props) => {
         editable: "never",
       }))
     );
-    fetchData(courseId)
+    fetchData(courseId);
   }, [courseId]);
 
   const onCloseRequesModal = () => {
@@ -48,12 +56,13 @@ const StudentGradeTable = ({ courseId }: Props) => {
 
   const onSendRequest = () => {
     fetchData(courseId);
-  }
+  };
 
   return (
     <div className={classes.rootTable}>
       <MaterialTable
         title={t("Your score")}
+        isLoading={tableLoading}
         icons={tableIcons}
         columns={columns}
         data={data}
@@ -70,8 +79,10 @@ const StudentGradeTable = ({ courseId }: Props) => {
         localization={{
           body: {
             emptyDataSourceMessage: missingStudentId
-              ? "It looks like you don't have a student ID number yet. Please configure your student ID in your profile to see your scores"
-              : "No records to display2",
+              ? t(
+                  "It looks like you don't have a student ID number yet. Please configure your student ID in your profile to see your scores"
+                )
+              : t("No records to display"),
           },
         }}
         actions={[
@@ -89,10 +100,15 @@ const StudentGradeTable = ({ courseId }: Props) => {
         ]}
       ></MaterialTable>
       {!!requestScore && (
-        <PopupRequestReviewScore isOpen={!!requestScore} onCancel={onCloseRequesModal} score={requestScore} onSendRequest={onSendRequest} />
+        <PopupRequestReviewScore
+          isOpen={!!requestScore}
+          onCancel={onCloseRequesModal}
+          score={requestScore}
+          onSendRequest={onSendRequest}
+        />
       )}
     </div>
   );
-};
+})
 
 export default StudentGradeTable;
