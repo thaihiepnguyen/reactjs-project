@@ -89,15 +89,15 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
   return (
     <div className={classes.rootTable}>
       <MaterialTable
-        title={t("Your score")}
+        title={t("Request List")}
         isLoading={tableLoading}
         icons={tableIcons}
         columns={columns}
         data={data}
         options={{
           actionsColumnIndex: -1,
-          pageSize: 20,
-          pageSizeOptions: [20, 30, 50],
+          pageSize: 10,
+          pageSizeOptions: [10, 30, 50],
           exportButton: true,
           headerStyle: {
             backgroundColor: "var(--gray-10)",
