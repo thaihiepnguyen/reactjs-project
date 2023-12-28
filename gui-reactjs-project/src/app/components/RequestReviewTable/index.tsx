@@ -69,7 +69,7 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
         title: col.title,
         field: col.field,
         editable: "never",
-        render: col.title === "Date" ? (rowData: any) => moment(rowData.createdAt).format("DD-MM-YYYY HH:mm") : false,
+        render: col.title === "Date" ? (rowData: any) => moment(rowData.createdAt).add(7, "hours").format("DD-MM-YYYY HH:mm") : false,
         customSort: col.title === "Date" ? (a: any, b: any) => {
           return moment(a.createdAt).diff(moment(b.createdAt), "minutes")
         } : false,
