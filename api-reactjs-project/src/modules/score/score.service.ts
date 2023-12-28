@@ -917,7 +917,7 @@ export class ScoreService {
         id: score.scores_id,
         'Grade Item': score.grade_name,
         Score: score.grade_is_final
-          ? score.scores_score.toFixed(2)
+          ? score.scores_score
           : 'Not scored yet',
         'Contribution to course total': score.grade_scale + '%',
         Teacher: score.users_fullname,
