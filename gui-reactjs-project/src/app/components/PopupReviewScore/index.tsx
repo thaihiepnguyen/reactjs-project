@@ -20,6 +20,7 @@ import Swal from "sweetalert2";
 import "react-chat-elements/dist/main.css";
 import { MessageList, MessageType } from "react-chat-elements";
 import { Switch } from "@material-ui/core";
+import moment from "moment";
 
 interface Props {
   isOpen: boolean;
@@ -69,7 +70,7 @@ const PopupReviewScore = memo((props: Props) => {
           type: "text",
           text: message.message,
           title: user?.id === message.from ? "You" : "Student",
-          date: new Date(message.created_at),
+          date: moment(message.createdAt).add(7, "hours").toDate(),
           notch: true,
           focus: false,
           titleColor: "black",
@@ -89,29 +90,29 @@ const PopupReviewScore = memo((props: Props) => {
 
   const onSubmit = (data: DataForm) => {
     console.log(data);
-    // dispatch(setLoading(true));
-    // axiosInstance
-    //   .post(`/score/request-review/${score.id}`, data)
-    //   .then((response) => {
-    //     Swal.fire({
-    //       title: "Success",
-    //       text: response.data.message,
-    //       icon: "success",
-    //     });
-    //     onCancel();
-    //     onSendRequest();
-    //   })
-    //   .catch((error) => {
-    //     onCancel();
-    //     Swal.fire({
-    //       title: "Oops",
-    //       text: "There was an error",
-    //       icon: "error",
-    //     });
-    //   })
-    //   .finally(() => {
-    //     dispatch(setLoading(false));
-    //   });
+    dispatch(setLoading(true));
+    axiosInstance
+      .post(`/score/accept-request-review/${score?.score?.id}`, data)
+      .then((response) => {
+        Swal.fire({
+          title: "Success",
+          text: "Score has been updated successfully",
+          icon: "success",
+        });
+        onCancel();
+        onSendRequest();
+      })
+      .catch((error) => {
+        onCancel();
+        Swal.fire({
+          title: "Oops",
+          text: "There was an error",
+          icon: "error",
+        });
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
   };
 
   console.log(errors);
@@ -147,7 +148,7 @@ const PopupReviewScore = memo((props: Props) => {
                 placeholder={"New score"}
                 type={"number"}
                 inputRef={register('score')}
-              
+                disabled={score.isFinal || score.acceptNewRequest}
                 inputProps={{
                   min: 0,
                   max: 10,
@@ -159,7 +160,7 @@ const PopupReviewScore = memo((props: Props) => {
             <InputSearch
               multiline={true}
               placeholder="Feedback"
-              disabled={score.acceptNewRequest}
+              disabled={score.isFinal || score.acceptNewRequest}
               width="100%"
               className={classes.searchInput}
               sx={{ padding: "8px 16px !important" }}
@@ -173,9 +174,9 @@ const PopupReviewScore = memo((props: Props) => {
               name="isFinal"
               defaultValue={false}
               render={({ field: { onChange, onBlur, value, ref } }) => (
-                <Stack direction={"row"} spacing={0.5} alignItems={"center"} sx={{ mt: "8px !important" }}>
-                  <Switch onChange={onChange} onBlur={onBlur} value={value} disabled={score.acceptNewRequest} />
+                <Stack direction={"row"} spacing={0.5} alignItems={"center"} sx={{ mt: "8px !important" }} justifyContent={"right"}>
                   <ParagraphSmall>Mark as final</ParagraphSmall>
+                  <Switch onChange={onChange} onBlur={onBlur} value={value} disabled={score.isFinal || score.acceptNewRequest} color="primary" />
                 </Stack>
               )}
             />
@@ -186,7 +187,7 @@ const PopupReviewScore = memo((props: Props) => {
               </ParagraphSmall>
             ) : null}
 
-            {!score.isFinal && !!score.acceptNewRequest ? (
+            {!score.isFinal && score.acceptNewRequest ? (
               <ParagraphSmall sx={{ mt: "8px !important" }}>
                 You have already response this request. Please wait until student raise a new request.
               </ParagraphSmall>
@@ -205,6 +206,7 @@ const PopupReviewScore = memo((props: Props) => {
             ) : null}
           </Box>
         </Grid>
+        <Heading4 sx={{fontWeight: "bold !important"}}>Reponse history:</Heading4>
         <MessageList
           className={classes.messageList}
           referance={messageListReferance}

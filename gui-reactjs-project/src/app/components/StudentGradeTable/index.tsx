@@ -75,6 +75,12 @@ const StudentGradeTable = memo(({ courseId }: Props) => {
             backgroundColor: "var(--gray-10)",
           },
           draggable: false,
+          rowStyle: rowData => {
+            return {
+              backgroundColor: (rowData["Grade Item"] === "Total Score") ? '#EEE' : '#FFF',
+              fontWeight: (rowData["Grade Item"] === "Total Score") ? "bold" : 400,
+            }
+          }
         }}
         localization={{
           body: {
@@ -87,6 +93,7 @@ const StudentGradeTable = memo(({ courseId }: Props) => {
         }}
         actions={[
           (rowData: any) => {
+            console.log(rowData)
             return {
               icon: () => <MapsUgcOutlinedIcon sx={{ color: "#333" }} />,
               tooltip: "Request a review",

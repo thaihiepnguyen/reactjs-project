@@ -9,9 +9,11 @@ import MapsUgcOutlinedIcon from "@mui/icons-material/MapsUgcOutlined";
 import PopupRequestReviewScore from "../PopupRequestReviewScore";
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import PopupReviewScore from "../PopupReviewScore";
+import moment from "moment";
 interface Props {
   courseId: number | string;
 }
+
 
 const RequestReviewTable = memo(({ courseId }: Props) => {
   const { t } = useTranslation();
@@ -37,6 +39,7 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
     },
     [courseId]
   );
+
   useEffect(() => {
     const titles = [
       {
@@ -55,12 +58,21 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
         title: "Score before review",
         field: "score.score",
       },
+      {
+        title: "Date",
+        field: "score.createdAt",
+
+      },
     ];
     setColumns(
       titles?.map((col) => ({
         title: col.title,
         field: col.field,
         editable: "never",
+        render: col.title === "Date" ? (rowData: any) => moment(rowData.createdAt).format("DD-MM-YYYY HH:mm") : false,
+        customSort: col.title === "Date" ? (a: any, b: any) => {
+          return moment(a.createdAt).diff(moment(b.createdAt), "minutes")
+        } : false,
       }))
     );
     fetchData(courseId);

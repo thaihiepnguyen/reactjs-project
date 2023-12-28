@@ -921,9 +921,10 @@ export class ScoreService {
           : 'Not scored yet',
         'Contribution to course total': score.grade_scale + '%',
         Teacher: score.users_fullname,
-        disableReview: !score.grade_is_final || !!requestReview?.isFinal,
+        disableReview: !score.grade_is_final,
         acceptSendRequest: score.requestReview_accept_new_request !== 0,
         messages: requestReview?.messages ?? [],
+        disableSendRequest: !!requestReview?.isFinal,
       });
     }
 
@@ -1033,11 +1034,59 @@ export class ScoreService {
       where: {
         scoreId: In(listScoreIds)
       },
+      order: {
+        messages: {
+          order: "ASC"
+        }
+      },
       relations: ['score', 'messages', 'score.grade', 'score.student']
     })
     return {
       message: "success",
       data: listRequestReview
+    }
+  }
+  public async teacherAcceptRequest(
+    userId: number,
+    scoreId: number,
+    isFinal: boolean,
+    message: string,
+    score: number,
+  ): Promise<TBaseDto<any>> {
+    const runner = this.connection.createQueryRunner();
+
+    const requestReview = await runner.manager.getRepository(RequestReview).findOne({
+      where: {
+        scoreId: scoreId
+      },
+      relations: {
+        messages: true
+      }
+    })
+    await runner.manager.getRepository(RequestReview).update({
+      id: requestReview.id
+    }, {
+      isFinal: isFinal,
+      acceptNewRequest: isFinal ? false : true
+    })
+
+    await runner.manager.getRepository(Scores).update({
+      id: scoreId
+    }, {
+      score: score
+    })
+
+    const newMessage = new RequestMessage();
+    newMessage.message = message;
+    newMessage.from = userId;
+    newMessage.request = requestReview;
+    newMessage.order = requestReview.messages.length;
+    await runner.manager.save(newMessage);
+
+
+   
+    return {
+      message: "Success"
     }
   }
 }

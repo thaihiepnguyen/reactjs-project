@@ -19,6 +19,8 @@ import { setLoading } from "@/redux/reducers/loading";
 import Swal from "sweetalert2";
 import "react-chat-elements/dist/main.css";
 import { MessageList, MessageType } from "react-chat-elements";
+import moment from "moment";
+
 interface Props {
   isOpen: boolean;
   onCancel: () => void;
@@ -35,7 +37,7 @@ const PopupRequestReviewScore = memo((props: Props) => {
   const { isOpen, onCancel, score, onSendRequest } = props;
   const dispatch = useAppDispatch();
   const messageListReferance = React.createRef();
-  const [messageList, setMessageList] = useState<MessageTyp[]>([]);
+  const [messageList, setMessageList] = useState<MessageType[]>([]);
   const schema = useMemo(() => {
     return yup.object().shape({
       message: yup.string().required(),
@@ -53,7 +55,6 @@ const PopupRequestReviewScore = memo((props: Props) => {
     mode: "onChange",
   });
 
-
   useEffect(() => {
     if (score?.messages?.length) {
       setMessageList(
@@ -63,7 +64,7 @@ const PopupRequestReviewScore = memo((props: Props) => {
           type: "text",
           text: message.message,
           title: user?.id === message.from ? "You" : "Teacher",
-          date: new Date(message.created_at),
+          date: moment(message.createdAt).add(7, "hours").toDate(),
           notch: true,
           focus: false,
           titleColor: "black",
@@ -75,8 +76,8 @@ const PopupRequestReviewScore = memo((props: Props) => {
         }))
       );
     }
-  }, [score])
-  
+  }, [score]);
+
   const onSubmit = (data: DataForm) => {
     dispatch(setLoading(true));
     axiosInstance
@@ -137,11 +138,19 @@ const PopupRequestReviewScore = memo((props: Props) => {
             />
             {errors.message && <ErrorMessage>Please type your reason to review</ErrorMessage>}
 
-            {!score.acceptSendRequest ? (
+            {!score.acceptSendRequest && !score.disableSendRequest ? (
               <ParagraphSmall sx={{ mt: "8px !important" }}>
                 Please wait for the instructor to respond to your previous request
               </ParagraphSmall>
-            ) : (
+            ) : null}
+
+            {score.disableSendRequest ? (
+              <ParagraphSmall sx={{ mt: "8px !important" }}>
+                This request marked as final. This is become readonly
+              </ParagraphSmall>
+            ) : null}
+
+            {score.acceptSendRequest && !score.disableSendRequest ? (
               <Button
                 type="submit"
                 btnType={BtnType.Primary}
@@ -151,9 +160,10 @@ const PopupRequestReviewScore = memo((props: Props) => {
               >
                 <ParagraphSmall>Send review request</ParagraphSmall>
               </Button>
-            )}
+            ) : null}
           </Box>
         </Grid>
+        <Heading4 sx={{fontWeight: "bold !important"}}>Request history:</Heading4>
         <MessageList
           className={classes.messageList}
           referance={messageListReferance}
