@@ -37,6 +37,7 @@ import { useTranslation } from "next-i18next";
 import DownloadStudentListButton from "@/app/components/DownloadStudentListButton";
 import * as XLSX from "xlsx";
 import StudentGradeTable from "@/app/components/StudentGradeTable";
+import RequestReviewTable from "@/app/components/RequestReviewTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -153,6 +154,7 @@ export default function Page({ params }: { params: { id: string } }) {
           <Tab label={t("Classmate")} {...a11yProps(1)} />
           {user?.role?.name === "teacher" ? <Tab label={t("Grading")} {...a11yProps(2)} /> : null}
           {user?.role?.name === "student" ? <Tab label={t("Score")} {...a11yProps(2)} /> : null}
+          {user?.role?.name === "teacher" ? <Tab label={t("Request review")} {...a11yProps(3)} /> : null}
         </Tabs>
       </Box>
       <div className={classes.container}>
@@ -260,6 +262,10 @@ export default function Page({ params }: { params: { id: string } }) {
         <CustomTabPanel value={value} index={2}>
           {user?.role?.name === "teacher" ? <GradeTable courseId={params.id} /> : null}
           {user?.role?.name === "student" ? <StudentGradeTable courseId={params.id} /> : null}
+        </CustomTabPanel>
+
+        <CustomTabPanel value={value} index={3}>
+          {user?.role?.name === "teacher" ? <RequestReviewTable courseId={params.id} /> : null}
         </CustomTabPanel>
       </div>
       <Popper

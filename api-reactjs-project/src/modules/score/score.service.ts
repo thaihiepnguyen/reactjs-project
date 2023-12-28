@@ -1014,4 +1014,30 @@ export class ScoreService {
       message: 'Resquest has been sent to teacher',
     };
   }
+  public async getRequestReview(
+    userId: number,
+    scoreId: number,
+  ): Promise<TBaseDto<any>> {
+    const runner = this.connection.createQueryRunner();
+
+    const listScoreIds = await runner.manager.getRepository(Scores).find({
+      where: {
+        grade: {
+          courseId: scoreId,
+        }
+      }
+    })
+    .then(result => result?.map(result => result.id))
+
+    const listRequestReview = await runner.manager.getRepository(RequestReview).find({
+      where: {
+        scoreId: In(listScoreIds)
+      },
+      relations: ['score', 'messages', 'score.grade', 'score.student']
+    })
+    return {
+      message: "success",
+      data: listRequestReview
+    }
+  }
 }

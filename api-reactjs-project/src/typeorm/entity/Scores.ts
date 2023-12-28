@@ -1,6 +1,7 @@
 import {Column, Entity, JoinColumn, OneToOne} from "typeorm";
 import { EntityBase } from "../EntityBase";
 import { GradeCompositions } from "./GradeCompositions";
+import { Users } from "./Users";
 
 @Entity('scores', {schema: 'QLHSSV_DB'})
 export class Scores extends EntityBase{
@@ -32,4 +33,8 @@ export class Scores extends EntityBase{
   @OneToOne(() => GradeCompositions)
   @JoinColumn({name: 'grade_id'})
   grade: GradeCompositions
+
+  @OneToOne(() => Users)
+  @JoinColumn({name: "student_id", referencedColumnName: "studentId"})
+  student: Users
 }

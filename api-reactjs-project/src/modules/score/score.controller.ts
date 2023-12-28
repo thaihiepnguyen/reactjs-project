@@ -146,4 +146,15 @@ export class ScoreController {
 
     return this.scoreService.requestReview(userId, message, scoreId);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(Role.Teacher)
+  @Get('request-review/:scoreId') //For students
+  async getRequestReview(
+    @MetaDataAuth('userId') userId: number,
+    @Param('scoreId', ParseIntPipe) scoreId: number,
+  ): Promise<TBaseDto<any>> {
+    
+    return this.scoreService.getRequestReview(userId, scoreId);
+  }
 }
