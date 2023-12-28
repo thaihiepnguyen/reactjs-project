@@ -8,6 +8,7 @@ import {Notifications} from "../../typeorm/entity/Notifications";
 import {TBaseDto} from "../../app.dto";
 import {Users} from "../../typeorm/entity/Users";
 import * as moment from "moment";
+import {RequestReview} from "../../typeorm/entity/RequestReview";
 
 @Injectable()
 export class NotificationService {
@@ -231,5 +232,25 @@ export class NotificationService {
     }, {});
 
     this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.SCORES);
+  }
+
+  async pushRequestReview(id: number, scoreId: number, teacherIds: string) {
+    const room = `room-${id}`;
+    const data = await this.connection.getRepository(RequestReview).findOne({
+      where: {
+        scoreId: scoreId
+      },
+      order: {
+        messages: {
+          order: "ASC"
+        }
+      },
+      relations: ['score', 'messages', 'score.grade', 'score.student']
+    })
+    const payload = {
+      [teacherIds]: data
+    };
+
+    this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.REQUEST_REVIEW)
   }
 }

@@ -136,26 +136,27 @@ export class ScoreController {
 
   @UseGuards(RolesGuard)
   @Roles(Role.Student)
-  @Post('request-review/:scoreId') //For students
+  @Post('request-review/:id/:scoreId') //For students
   async requestReview(
     @MetaDataAuth('userId') userId: number,
+    @Param('id', ParseIntPipe) id: number,
     @Param('scoreId', ParseIntPipe) scoreId: number,
     @Body('message') message: string,
 
   ): Promise<TBaseDto<any>> {
 
-    return this.scoreService.requestReview(userId, message, scoreId);
+    return this.scoreService.requestReview(id, userId, message, scoreId);
   }
 
   @UseGuards(RolesGuard)
   @Roles(Role.Teacher)
-  @Get('request-review/:scoreId') //For students
+  @Get('request-review/:courseId') //For students
   async getRequestReview(
     @MetaDataAuth('userId') userId: number,
-    @Param('scoreId', ParseIntPipe) scoreId: number,
+    @Param('courseId', ParseIntPipe) courseId: number,
   ): Promise<TBaseDto<any>> {
 
-    return this.scoreService.getRequestReview(userId, scoreId);
+    return this.scoreService.getRequestReview(userId, courseId);
   }
 
   @UseGuards(RolesGuard)

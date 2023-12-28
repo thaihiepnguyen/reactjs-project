@@ -112,6 +112,7 @@ const StudentGradeTable = memo(({ courseId }: Props) => {
           onCancel={onCloseRequesModal}
           score={requestScore}
           onSendRequest={onSendRequest}
+          courseId={courseId}
         />
       )}
     </div>

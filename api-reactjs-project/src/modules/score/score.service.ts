@@ -944,17 +944,21 @@ export class ScoreService {
   }
 
   public async requestReview(
+    id: number,
     userId: number,
     message: string,
     scoreId: number,
   ): Promise<TBaseDto<any>> {
     const runner = this.connection.createQueryRunner();
 
-    const score = await runner.manager.getRepository(Scores).findOne({
+    const teacherIds = await runner.manager.getRepository(Courses).findOne({
       where: {
-        id: scoreId,
+        id: id,
       },
-    });
+      select: {
+        teacherIds: true
+      }
+    }). then(data => (data.teacherIds));
 
     const existsRequest = await runner.manager
       .getRepository(RequestReview)
@@ -990,7 +994,8 @@ export class ScoreService {
       newMessage.from = userId;
       newMessage.request = newRequest;
       newMessage.order = 0;
-      await runner.manager.save(newMessage);
+      await runner.manager.save(newMessage)
+      await this.notificationService.pushRequestReview(id, scoreId, teacherIds);
     }
 
     if (existsRequest && existsRequest.acceptNewRequest) {
@@ -1017,14 +1022,14 @@ export class ScoreService {
   }
   public async getRequestReview(
     userId: number,
-    scoreId: number,
+    courseId: number,
   ): Promise<TBaseDto<any>> {
     const runner = this.connection.createQueryRunner();
 
     const listScoreIds = await runner.manager.getRepository(Scores).find({
       where: {
         grade: {
-          courseId: scoreId,
+          courseId: courseId,
         }
       }
     })

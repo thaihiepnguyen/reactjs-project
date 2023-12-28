@@ -26,6 +26,7 @@ interface Props {
   onCancel: () => void;
   score: any;
   onSendRequest: () => void;
+  courseId: number
 }
 
 interface DataForm {
@@ -34,7 +35,7 @@ interface DataForm {
 
 const PopupRequestReviewScore = memo((props: Props) => {
   const { user } = useAppSelector((state) => state.userReducer);
-  const { isOpen, onCancel, score, onSendRequest } = props;
+  const { isOpen, onCancel, score, onSendRequest, courseId } = props;
   const dispatch = useAppDispatch();
   const messageListReferance = React.createRef();
   const [messageList, setMessageList] = useState<MessageType[]>([]);
@@ -81,7 +82,7 @@ const PopupRequestReviewScore = memo((props: Props) => {
   const onSubmit = (data: DataForm) => {
     dispatch(setLoading(true));
     axiosInstance
-      .post(`/score/request-review/${score.id}`, data)
+      .post(`/score/request-review/${courseId}/${score.id}`, data)
       .then((response) => {
         Swal.fire({
           title: "Success",

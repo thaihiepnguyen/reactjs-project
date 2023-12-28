@@ -3,7 +3,8 @@ import io, {Socket} from "socket.io-client"
 export const coursesEvent = 'subscribeCourses'
 export const MESSAGE_TYPE = {
   COURSES: 1,
-  SCORES: 2
+  SCORES: 2,
+  REQUEST_REVIEW: 3
 }
 export default class SocketService {
   private static _instance: SocketService

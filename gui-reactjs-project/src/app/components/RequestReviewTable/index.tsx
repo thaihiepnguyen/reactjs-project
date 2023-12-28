@@ -10,6 +10,8 @@ import PopupRequestReviewScore from "../PopupRequestReviewScore";
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import PopupReviewScore from "../PopupReviewScore";
 import moment from "moment";
+import SocketService, {MESSAGE_TYPE} from "@/services/socketService";
+import {getCookie} from "cookies-next";
 interface Props {
   courseId: number | string;
 }
@@ -39,6 +41,15 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
     },
     [courseId]
   );
+  const socketService = SocketService.instance();
+  const userId = getCookie('userId');
+  socketService.listenCourses((message) => {
+    if (message.type == MESSAGE_TYPE.REQUEST_REVIEW) {
+      if(Object.keys(message.data).length > 0 && Object.keys(message.data)[0].includes('' + userId)) {
+        setData([Object.values(message.data)[0], ...data]);
+      }
+    }
+  })
 
   useEffect(() => {
     const titles = [

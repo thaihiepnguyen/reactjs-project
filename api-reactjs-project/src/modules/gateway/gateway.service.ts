@@ -13,7 +13,8 @@ import {TMessageResponse} from "./gateway.typing";
 
 export const MESSAGE_TYPE = {
   COURSES: 1,
-  SCORES: 2
+  SCORES: 2,
+  REQUEST_REVIEW: 3,
 }
 @WebSocketGateway({ cors: true })
 export class GatewayService implements OnModuleInit {
