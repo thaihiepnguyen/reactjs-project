@@ -33,10 +33,10 @@ export default function SidebarLayout({children}: {
         socketService.subscribeCourses(courses.map(item => (item.id)), user.id)
       }
     }
-    if (user?.role?.id === ROLE.STUDENT) {
+    if (user?.role?.name === "student") {
       getEnrollCourses();
     }
-    if (user?.role?.id === ROLE.TEACHER) {
+    if (user?.role?.name === "teacher") {
       getMyCourses();
     }
   }, []);
