@@ -15,6 +15,7 @@ export const MESSAGE_TYPE = {
   COURSES: 1,
   SCORES: 2,
   REQUEST_REVIEW: 3,
+  REQUEST_REVIEW_MESSAGE: 4,
 }
 @WebSocketGateway({ cors: true })
 export class GatewayService implements OnModuleInit {

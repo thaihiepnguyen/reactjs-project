@@ -4,7 +4,8 @@ export const coursesEvent = 'subscribeCourses'
 export const MESSAGE_TYPE = {
   COURSES: 1,
   SCORES: 2,
-  REQUEST_REVIEW: 3
+  REQUEST_REVIEW: 3,
+  REQUEST_REVIEW_MESSAGE: 4,
 }
 export default class SocketService {
   private static _instance: SocketService

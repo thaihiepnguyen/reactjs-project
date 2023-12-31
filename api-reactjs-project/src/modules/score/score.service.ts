@@ -973,7 +973,7 @@ export class ScoreService {
 
     if (existsRequest && existsRequest.isFinal) {
       throw new HttpException(
-        'This request aleady marked as final by teacher',
+        'This request already marked as final by teacher',
         403,
       );
     }
@@ -994,7 +994,7 @@ export class ScoreService {
       newMessage.from = userId;
       newMessage.request = newRequest;
       newMessage.order = 0;
-      await runner.manager.save(newMessage)
+      await runner.manager.save(newMessage);
       await this.notificationService.pushRequestReview(id, scoreId, teacherIds);
     }
 
@@ -1004,7 +1004,7 @@ export class ScoreService {
       newMessage.from = userId;
       newMessage.request = existsRequest;
       newMessage.order = existsRequest.messages.length;
-      await runner.manager.save(newMessage);
+      const newRecord = await runner.manager.save(newMessage);
       await runner.manager
         .getRepository(RequestReview)
         .update(
@@ -1015,7 +1015,9 @@ export class ScoreService {
             acceptNewRequest: false,
           },
         );
+      await this.notificationService.pushMessageRequestReview(id, scoreId, newRecord.id);
     }
+
     return {
       message: 'Resquest has been sent to teacher',
     };
@@ -1052,6 +1054,7 @@ export class ScoreService {
     }
   }
   public async teacherAcceptRequest(
+    id: number,
     userId: number,
     scoreId: number,
     isFinal: boolean,
@@ -1088,6 +1091,7 @@ export class ScoreService {
     newMessage.order = requestReview.messages.length;
     await runner.manager.save(newMessage);
 
+    // await this.notificationService.pushAcceptRequest()
 
    
     return {

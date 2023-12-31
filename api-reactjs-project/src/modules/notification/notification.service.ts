@@ -9,6 +9,7 @@ import {TBaseDto} from "../../app.dto";
 import {Users} from "../../typeorm/entity/Users";
 import * as moment from "moment";
 import {RequestReview} from "../../typeorm/entity/RequestReview";
+import {RequestMessage} from "../../typeorm/entity/RequestMessage";
 
 @Injectable()
 export class NotificationService {
@@ -251,6 +252,40 @@ export class NotificationService {
       [teacherIds]: data
     };
 
-    this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.REQUEST_REVIEW)
+    this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.REQUEST_REVIEW);
   }
+
+  async pushMessageRequestReview(id: number, scoreId: number, messageId: number) {
+    const room = `room-${id}`;
+
+    const message = await this.connection.getRepository(RequestMessage).findOne({
+      where: {
+        id: messageId
+      }
+    })
+
+    const requestReviewId = await this.connection.getRepository(RequestReview).findOne({
+      where: {
+        scoreId: scoreId
+      },
+      select: {
+        id: true
+      }
+    }).then(data => (data.id))
+
+    const payload = {
+      [requestReviewId]: message
+    };
+    this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.REQUEST_REVIEW_MESSAGE);
+  }
+
+  // async pushAcceptRequest(id: number, scoreId: number, studentId: number) {
+  //   const room = `room-${id}`;
+  //
+  //   const payload = {
+  //     [studentId]: data
+  //   }
+  //
+  //   this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.REQUEST_REVIEW);
+  // }
 }

@@ -161,15 +161,16 @@ export class ScoreController {
 
   @UseGuards(RolesGuard)
   @Roles(Role.Teacher)
-  @Post('accept-request-review/:scoreId') //For students
+  @Post('accept-request-review/:id/:scoreId') //For students
   async teacherAcceptRequest(
     @MetaDataAuth('userId') userId: number,
+    @Param('id', ParseIntPipe) id: number,
     @Param('scoreId', ParseIntPipe) scoreId: number,
     @Body('isFinal') isFinal: boolean,
     @Body('message') message: string,
     @Body('score') score: number,
   ): Promise<TBaseDto<any>> {
     
-    return this.scoreService.teacherAcceptRequest(userId, scoreId, isFinal, message, score);
+    return this.scoreService.teacherAcceptRequest(id, userId, scoreId, isFinal, message, score);
   }
 }

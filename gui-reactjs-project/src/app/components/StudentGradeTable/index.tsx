@@ -98,7 +98,6 @@ const StudentGradeTable = memo(({ courseId }: Props) => {
               icon: () => <MapsUgcOutlinedIcon sx={{ color: "#333" }} />,
               tooltip: "Request a review",
               onClick: (event, rowData) => {
-                console.log(rowData);
                 setRequestScore(rowData);
               },
               hidden: rowData?.disableReview ?? true,

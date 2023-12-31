@@ -8,7 +8,6 @@ import { DialogTitleConfirm } from "../dialogs/DialogTitle";
 import Heading4 from "../text/Heading4";
 import ButtonCLose from "../buttons/ButtonClose";
 import { DialogContentConfirm } from "../dialogs/DialogContent";
-import InputTag from "../InputTag";
 import ParagraphSmall from "../text/ParagraphSmall";
 import Button, { BtnType } from "../buttons/Button";
 import ErrorMessage from "../text/ErrorMessage";
@@ -21,12 +20,14 @@ import "react-chat-elements/dist/main.css";
 import { MessageList, MessageType } from "react-chat-elements";
 import { Switch } from "@material-ui/core";
 import moment from "moment";
+import SocketService, {MESSAGE_TYPE} from "@/services/socketService";
 
 interface Props {
   isOpen: boolean;
   onCancel: () => void;
   score: any;
   onSendRequest: () => void;
+  courseId: number;
 }
 
 interface DataForm {
@@ -37,11 +38,41 @@ interface DataForm {
 
 const PopupReviewScore = memo((props: Props) => {
   const { user } = useAppSelector((state) => state.userReducer);
-  const { isOpen, onCancel, score, onSendRequest } = props;
+  const { isOpen, onCancel, score, onSendRequest, courseId } = props;
   const dispatch = useAppDispatch();
   const messageListReferance = React.createRef();
   const [messageList, setMessageList] = useState<MessageType[]>([]);
-
+  const socketService = SocketService.instance();
+  console.log(score.id)
+  socketService.listenCourses((message) => {
+    if (message.type == MESSAGE_TYPE.REQUEST_REVIEW_MESSAGE) {
+      console.log('starting....')
+      console.log(message.data)
+      console.log(Object.keys(message.data)[0])
+      if (Object.keys(message.data)[0] == score.id) {
+        const newMessage = Object.values(message.data)[0];
+        console.log(newMessage)
+        setMessageList(prevState => {
+          return [...prevState, {
+            id: prevState.length,
+            position: user?.id === newMessage.from ? "right" : "left",
+            type: "text",
+            text: newMessage.message,
+            title: user?.id === newMessage.from ? "You" : "Student",
+            date: moment(newMessage.createdAt).add(7, "hours").toDate(),
+            notch: true,
+            focus: false,
+            titleColor: "black",
+            forwarded: false,
+            replyButton: false,
+            removeButton: false,
+            status: "waiting",
+            retracted: false,
+          }]
+        })
+      }
+    }
+  })
   const schema = useMemo(() => {
     return yup.object().shape({
       score: yup.number().typeError("Please type new score").min(0, "Score must be more than or equal 0").max(10, "Score must be less than or equal 10").required("Please type new score"),
@@ -89,10 +120,9 @@ const PopupReviewScore = memo((props: Props) => {
   }, [score]);
 
   const onSubmit = (data: DataForm) => {
-    console.log(data);
     dispatch(setLoading(true));
     axiosInstance
-      .post(`/score/accept-request-review/${score?.score?.id}`, data)
+      .post(`/score/accept-request-review/${courseId}/${score?.score?.id}`, data)
       .then((response) => {
         Swal.fire({
           title: "Success",

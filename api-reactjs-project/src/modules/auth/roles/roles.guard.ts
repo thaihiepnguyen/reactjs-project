@@ -1,17 +1,17 @@
-import {Injectable, CanActivate, ExecutionContext, UnauthorizedException, ForbiddenException} from '@nestjs/common';
+import {Injectable, CanActivate, ExecutionContext, ForbiddenException} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Role } from './role.enum';
 import { ROLES_KEY } from './roles.decorator';
 import { JwtService } from '@nestjs/jwt';
 
-const ROLES_MAAPING = {
+const ROLES_MAPPING = {
   1: [Role.Student],
   2: [Role.Teacher],
   3: [Role.Admin],
   4: [Role.Guest],
 }
 
-const ROLES_MAAPING_REVERSE = {
+const ROLES_MAPPING_REVERSE = {
   [Role.Student]: 1,
   [Role.Teacher]: 2,
   [Role.Admin]: 3,
@@ -29,7 +29,7 @@ export class RolesGuard implements CanActivate {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
-    ]).map(item => ROLES_MAAPING_REVERSE[item]);
+    ]).map(item => ROLES_MAPPING_REVERSE[item]);
     if (!requiredRoles) {
       return true;
     }

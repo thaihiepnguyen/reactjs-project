@@ -122,7 +122,6 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
               icon: () => <RateReviewOutlinedIcon sx={{ color: "#333" }} />,
               tooltip: "View Detail",
               onClick: (event, rowData) => {
-                console.log(rowData);
                 setRequestScore(rowData);
               },
             };
@@ -135,6 +134,7 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
           onCancel={onCloseRequesModal}
           score={requestScore}
           onSendRequest={onSendRequest}
+          courseId={courseId}
         />
       )}
     </div>
