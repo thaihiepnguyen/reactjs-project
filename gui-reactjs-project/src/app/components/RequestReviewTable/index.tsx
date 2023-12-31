@@ -24,6 +24,8 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
   const [requestScore, setRequestScore] = useState<any>(null);
   const [data, setData] = useState<any>([]);
 
+  const { user } = useAppSelector((state) => state.userReducer);
+
   const fetchData = useCallback(
     (courseId: number | string) => {
       setTableLoading(true);
@@ -42,10 +44,9 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
     [courseId]
   );
   const socketService = SocketService.instance();
-  const userId = getCookie('userId');
   socketService.listenCourses((message) => {
     if (message.type == MESSAGE_TYPE.REQUEST_REVIEW) {
-      if(Object.keys(message.data).length > 0 && Object.keys(message.data)[0].includes('' + userId)) {
+      if(Object.keys(message.data).length > 0 && Object.keys(message.data)[0].includes('' + user.id)) {
         setData([Object.values(message.data)[0], ...data]);
       }
     }

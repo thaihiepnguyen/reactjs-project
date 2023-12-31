@@ -6,6 +6,7 @@ import SocketService from "@/services/socketService";
 import {useEffect} from "react";
 import axiosInstance from "@/app/routers/axios";
 import {getCookie} from "cookies-next";
+import {useAppSelector} from "@/redux/hook";
 
 const ROLE = {
   STUDENT: 1,
@@ -15,26 +16,27 @@ const ROLE = {
 export default function SidebarLayout({children}: {
   children: React.ReactNode
 }) {
+  const { user } = useAppSelector((state) => state.userReducer);
   const socketService = SocketService.instance();
   useEffect(() => {
     async function getEnrollCourses() {
       const response = await axiosInstance.get("/courses/user/enrolled-courses");
       const {message, data: courses, statusCode} = response.data
       if (statusCode === 200) {
-        socketService.subscribeCourses(courses.map(item => (item.id)), +getCookie('userId'))
+        socketService.subscribeCourses(courses.map(item => (item.id)), user.id)
       }
     }
     async function getMyCourses() {
       const response = await axiosInstance.get("/courses/user/my-courses");
       const {message, data: courses, statusCode} = response.data
       if (statusCode === 200) {
-        socketService.subscribeCourses(courses.map(item => (item.id)), +getCookie('userId'))
+        socketService.subscribeCourses(courses.map(item => (item.id)), user.id)
       }
     }
-    if (JSON.parse(getCookie('role') as string).id === ROLE.STUDENT) {
+    if (user?.role?.id === ROLE.STUDENT) {
       getEnrollCourses();
     }
-    if (JSON.parse(getCookie('role') as string).id === ROLE.TEACHER) {
+    if (user?.role?.id === ROLE.TEACHER) {
       getMyCourses();
     }
   }, []);
