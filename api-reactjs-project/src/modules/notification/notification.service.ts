@@ -317,4 +317,63 @@ export class NotificationService {
       MESSAGE_TYPE.ACCEPT_REQUEST_REVIEW,
     );
   }
+
+  async pushNotificationRequestReview(
+    id: number,
+    scoreId: number,
+    teacherIds: string,
+    message: string,
+  ) {
+    const room = `room-${id}`;
+    const sql = `
+      SELECT s.score,
+             u1.id as studentId,
+             u1.fullname as studentName,
+             u2.id as teacherId,
+             u2.fullname as teacherName,
+             u1.avatar_url as studentAvatar,
+             gc.name as gradeName,
+             c.title
+      FROM scores s, users u1, users u2, grade_compositions gc, courses c
+      WHERE s.student_id = u1.student_id
+        AND s.teacher_id = u2.id
+        AND gc.id = s.grade_id
+        AND gc.course_id = c.id
+        AND s.id = ?;`;
+
+    const rawData = await this.connection.query(sql, [scoreId]);
+    if (!rawData || !rawData.length) {
+      return;
+    }
+    const data = rawData[0];
+
+    const payload = {
+      [teacherIds]: {
+        avatarUrl: data.studentAvatar,
+        userName: data.studentName,
+        message: `<h5>Thông báo xin được phúc khảo điểm ở lớp ${data.title} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${data.studentName}</h5>`,
+        title: `Thông báo xin được phúc khảo ${data.gradeName}`,
+        time: 0,
+      },
+    };
+    await this.connection
+      .getRepository(Notifications)
+      .createQueryBuilder()
+      .insert()
+      .values([
+        {
+          title: `Thông báo xin được phúc khảo ${data.gradeName}`,
+          content: `<h5>Thông báo xin được phúc khảo điểm ở lớp ${data.title} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${data.studentName}</h5>`,
+          from: data.studentId,
+          to: data.teacherId,
+        },
+      ])
+      .execute();
+
+    this.gatewayService.pushNotification(
+      room,
+      payload,
+      MESSAGE_TYPE.NOTIFICATION_REQUEST_REVIEW,
+    );
+  }
 }

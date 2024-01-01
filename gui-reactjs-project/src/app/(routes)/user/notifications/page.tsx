@@ -38,6 +38,13 @@ export default function Page() {
         setNotifications([newMessage, ...notifications]);
       }
     }
+    if (message.type == MESSAGE_TYPE.NOTIFICATION_REQUEST_REVIEW) {
+      const teacherIds = Object.keys(message.data)[0];
+      if (teacherIds.includes('' + user?.id)) {
+        const newMessage = Object.values(message.data)[0];
+        setNotifications([newMessage, ...notifications]);
+      }
+    }
   })
 
   return <>

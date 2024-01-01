@@ -1014,6 +1014,12 @@ export class ScoreService {
         },
       );
     }
+    await this.notificationService.pushNotificationRequestReview(
+      id,
+      scoreId,
+      teacherIds,
+      message,
+    );
     return {
       message: 'Resquest has been sent to teacher',
     };

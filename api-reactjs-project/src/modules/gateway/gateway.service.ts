@@ -16,6 +16,7 @@ export const MESSAGE_TYPE = {
   SCORES: 2,
   REQUEST_REVIEW: 3,
   ACCEPT_REQUEST_REVIEW: 4,
+  NOTIFICATION_REQUEST_REVIEW: 5,
 };
 @WebSocketGateway({ cors: true })
 export class GatewayService implements OnModuleInit {

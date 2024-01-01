@@ -6,6 +6,7 @@ export const MESSAGE_TYPE = {
   SCORES: 2,
   REQUEST_REVIEW: 3,
   ACCEPT_REQUEST_REVIEW: 4,
+  NOTIFICATION_REQUEST_REVIEW: 5,
 }
 export default class SocketService {
   private static _instance: SocketService
