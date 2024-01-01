@@ -7,7 +7,7 @@ export default function NotificationItem(
 ) {
   return <>
     <div className={classes.notificationItemContainer} onClick={()  => onClick(index)}>
-      <div className={classes.avatarContainer}>
+      <div>
         <Avatar>
           <img style={{ width: '100%', height: '100%', objectFit: 'cover' }} src={`${avatarUrl}`}></img>
         </Avatar>

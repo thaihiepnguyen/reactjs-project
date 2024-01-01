@@ -42,37 +42,6 @@ const PopupReviewScore = memo((props: Props) => {
   const dispatch = useAppDispatch();
   const messageListReferance = React.createRef();
   const [messageList, setMessageList] = useState<MessageType[]>([]);
-  const socketService = SocketService.instance();
-  console.log(score.id)
-  socketService.listenCourses((message) => {
-    if (message.type == MESSAGE_TYPE.REQUEST_REVIEW_MESSAGE) {
-      console.log('starting....')
-      console.log(message.data)
-      console.log(Object.keys(message.data)[0])
-      if (Object.keys(message.data)[0] == score.id) {
-        const newMessage = Object.values(message.data)[0];
-        console.log(newMessage)
-        setMessageList(prevState => {
-          return [...prevState, {
-            id: prevState.length,
-            position: user?.id === newMessage.from ? "right" : "left",
-            type: "text",
-            text: newMessage.message,
-            title: user?.id === newMessage.from ? "You" : "Student",
-            date: moment(newMessage.createdAt).add(7, "hours").toDate(),
-            notch: true,
-            focus: false,
-            titleColor: "black",
-            forwarded: false,
-            replyButton: false,
-            removeButton: false,
-            status: "waiting",
-            retracted: false,
-          }]
-        })
-      }
-    }
-  })
   const schema = useMemo(() => {
     return yup.object().shape({
       score: yup.number().typeError("Please type new score").min(0, "Score must be more than or equal 0").max(10, "Score must be less than or equal 10").required("Please type new score"),

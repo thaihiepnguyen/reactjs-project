@@ -46,9 +46,49 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
   const socketService = SocketService.instance();
   socketService.listenCourses((message) => {
     if (message.type == MESSAGE_TYPE.REQUEST_REVIEW) {
-      if(Object.keys(message.data).length > 0 && Object.keys(message.data)[0].includes('' + user.id)) {
+      if(message.data && Object.keys(message.data).length > 0 && Object.keys(message.data)[0].includes('' + user.id)) {
         setData([Object.values(message.data)[0], ...data]);
       }
+    }
+    if (message.type == MESSAGE_TYPE.REQUEST_REVIEW_MESSAGE) {
+      if(message.data && Object.keys(message.data).length > 0) {
+        const requestReviewId = Object.keys(message.data)[0];
+        const requestMessageValue = Object.values(message.data)[0];
+
+        setData(prev => (
+          prev.map(item => (
+            item.id == requestReviewId ? {
+              ...item,
+              messages: [...item.messages, requestMessageValue]
+            }: item
+          ))
+        ))
+      }
+
+
+
+
+    //   if (Object.keys(message.data)[0] == score.id) {
+    //     const newMessage = Object.values(message.data)[0];
+    //     console.log(newMessage)
+    //     setMessageList(prevState => {
+    //       return [...prevState, {
+    //         id: prevState.length,
+    //         position: user?.id === newMessage.from ? "right" : "left",
+    //         type: "text",
+    //         text: newMessage.message,
+    //         title: user?.id === newMessage.from ? "You" : "Student",
+    //         date: moment(newMessage.createdAt).add(7, "hours").toDate(),
+    //         notch: true,
+    //         focus: false,
+    //         titleColor: "black",
+    //         forwarded: false,
+    //         replyButton: false,
+    //         removeButton: false,
+    //         status: "waiting",
+    //         retracted: false,
+    //       }]
+    //     })
     }
   })
 

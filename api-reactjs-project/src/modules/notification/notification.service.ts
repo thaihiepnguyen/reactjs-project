@@ -278,14 +278,4 @@ export class NotificationService {
     };
     this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.REQUEST_REVIEW_MESSAGE);
   }
-
-  // async pushAcceptRequest(id: number, scoreId: number, studentId: number) {
-  //   const room = `room-${id}`;
-  //
-  //   const payload = {
-  //     [studentId]: data
-  //   }
-  //
-  //   this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.REQUEST_REVIEW);
-  // }
 }
