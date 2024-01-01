@@ -9,7 +9,7 @@ import Logout from '@mui/icons-material/Logout';
 import { useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { setUser } from "@/redux/reducers/user";
-import { getCookies, setCookie, deleteCookie, getCookie } from 'cookies-next';
+import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation'
 import { signOut } from "next-auth/react"
 import Link from "next/link";

@@ -2,16 +2,12 @@ import MaterialTable from "material-table";
 import classes from "./styles.module.scss";
 import { useTranslation } from "react-i18next";
 import { tableIcons } from "../TableIcon";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { useAppSelector } from "@/redux/hook";
+import { memo, useCallback, useEffect, useState } from "react";
 import axiosInstance from "@/app/routers/axios";
-import MapsUgcOutlinedIcon from "@mui/icons-material/MapsUgcOutlined";
-import PopupRequestReviewScore from "../PopupRequestReviewScore";
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import PopupReviewScore from "../PopupReviewScore";
 import moment from "moment";
 import SocketService, {MESSAGE_TYPE} from "@/services/socketService";
-import {getCookie} from "cookies-next";
 interface Props {
   courseId: number | string;
 }
@@ -42,10 +38,10 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
     [courseId]
   );
   const socketService = SocketService.instance();
-  const userId = getCookie('userId');
+  const { user } = useAppSelector((state) => state.userReducer);
   socketService.listenCourses((message) => {
     if (message.type == MESSAGE_TYPE.REQUEST_REVIEW) {
-      if(Object.keys(message.data).length > 0 && Object.keys(message.data)[0].includes('' + userId)) {
+      if(Object.keys(message.data).length > 0 && Object.keys(message.data)[0].includes('' + user?.id)) {
         setData([Object.values(message.data)[0], ...data]);
       }
     }

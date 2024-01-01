@@ -5,14 +5,13 @@ import {useEffect, useState} from "react";
 import SocketService, {MESSAGE_TYPE} from "@/services/socketService";
 import NotificationItem from "@/app/components/NotificationItem";
 import axiosInstance from "@/app/routers/axios";
-import parse from 'html-react-parser';
 import { useTranslation } from 'next-i18next';
-import {getCookie} from "cookies-next";
+import {useAppSelector} from "@/redux/hook";
 
 export default function Page() {
+  const { user } = useAppSelector((state) => state.userReducer);
   const socketService = SocketService.instance();
   const [notifications, setNotifications] = useState([]);
-  const userId = getCookie('userId');
   const [notiDetail, setNotiDetail] = useState(0)
   const {t} = useTranslation();
   useEffect(() => {
@@ -30,7 +29,7 @@ export default function Page() {
       setNotifications([message.data, ...notifications]);
     }
     if (message.type == MESSAGE_TYPE.SCORES) {
-      setNotifications([...message.data[userId], ...notifications]);
+      setNotifications([...message.data[user?.id], ...notifications]);
     }
   })
 

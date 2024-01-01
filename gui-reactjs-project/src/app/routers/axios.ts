@@ -20,7 +20,6 @@ axiosInstance.interceptors.request.use(
     const userName = getCookie('userName');
     const role = getCookie('role');
 
-    console.log(token)
     if (token) {
       config.headers['Authorization'] = `Bearer ${token.accessToken}`;
     }
@@ -45,7 +44,6 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => {
-    console.log(response)
     if(response?.data?.data?.token) {
       setCookie('token', JSON.stringify(response.data.data.token))
       setCookie('userId', response.data.data.user.id)
