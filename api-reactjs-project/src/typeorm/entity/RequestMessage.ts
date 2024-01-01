@@ -1,31 +1,31 @@
-import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
-import {EntityBase} from "../EntityBase";
-import { RequestReview } from "./RequestReview";
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { EntityBase } from '../EntityBase';
+import { RequestReview } from './RequestReview';
 
-@Entity('request_message', {schema: 'QLHSSV_DB'})
-export class RequestMessage extends EntityBase{
-  @Column("int", {
-    name: "request_id",
+@Entity('request_message', { schema: 'QLHSSV_DB' })
+export class RequestMessage extends EntityBase {
+  @Column('int', {
+    name: 'request_id',
   })
   requestId: number;
 
-  @Column("int", {
-    name: "from"
+  @Column('int', {
+    name: 'from',
   })
   from: number;
 
-  @Column("varchar", {
+  @Column('varchar', {
     length: 255,
-    name: "message"
+    name: 'message',
   })
   message: string;
 
-  @Column("int", {
-    name: "order"
+  @Column('int', {
+    name: 'order',
   })
   order: number;
 
   @ManyToOne(() => RequestReview, (request) => request.messages)
-  @JoinColumn({ name: "request_id" })
-  request: RequestReview
+  @JoinColumn({ name: 'request_id' })
+  request: RequestReview;
 }

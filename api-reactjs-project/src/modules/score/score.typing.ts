@@ -1,13 +1,13 @@
 export interface Row {
-  id: number,
-  fullname: string
+  id: number;
+  fullname: string;
 }
 
 export interface ColumnsResponse {
-  rows: Row[],
-  columns: string[],
-  scales: number[],
-  fileName: string,
-  grade: any,
-  scores: any
+  rows: Row[];
+  columns: string[];
+  scales: number[];
+  fileName: string;
+  grade: any;
+  scores: any;
 }

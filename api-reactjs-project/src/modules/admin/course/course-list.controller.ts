@@ -1,24 +1,30 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query } from "@nestjs/common";
-import { CourseListService } from "./course-list.service";
-import { TBaseDto } from "src/app.dto";
-import { Roles } from "src/modules/auth/roles/roles.decorator";
-import { Role } from "src/modules/auth/roles/role.enum";
-
-
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { CourseListService } from './course-list.service';
+import { TBaseDto } from 'src/app.dto';
+import { Roles } from 'src/modules/auth/roles/roles.decorator';
+import { Role } from 'src/modules/auth/roles/role.enum';
 
 @Controller('/admin/course')
 @Roles(Role.Admin)
 export class CourseListController {
-  constructor(
-    private readonly courseListSerivce: CourseListService,
-  ) {}
+  constructor(private readonly courseListSerivce: CourseListService) {}
 
   @Get('/all')
-  async getAll(@Query('page', ParseIntPipe) page: number): Promise<TBaseDto<any>> {
+  async getAll(
+    @Query('page', ParseIntPipe) page: number,
+  ): Promise<TBaseDto<any>> {
     return {
       statusCode: 200,
       data: await this.courseListSerivce.getAll(page),
-      message: 'Get all courses successfully!'
+      message: 'Get all courses successfully!',
     };
   }
 
@@ -33,7 +39,7 @@ export class CourseListController {
   @Put('/putActive/:courseId')
   async active(
     @Body('isActive') isActive: boolean,
-    @Param('courseId', ParseIntPipe) courseId: number
+    @Param('courseId', ParseIntPipe) courseId: number,
   ): Promise<TBaseDto<null>> {
     return this.courseListSerivce.putActive(courseId, isActive);
   }

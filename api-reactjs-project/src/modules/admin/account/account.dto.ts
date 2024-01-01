@@ -1,4 +1,10 @@
-import {IsBoolean, IsEmail, IsNumber, IsOptional, IsString} from "class-validator";
+import {
+  IsBoolean,
+  IsEmail,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class ActiveAccountDto {
   @IsBoolean()
@@ -37,7 +43,7 @@ export class UpdateAccountDto {
 
   @IsString()
   @IsOptional()
-  avatarUrl: string | undefined
+  avatarUrl: string | undefined;
 
   @IsString()
   @IsOptional()
@@ -51,4 +57,3 @@ export class UpdateAccountDto {
   @IsOptional()
   roleId: number | undefined;
 }
-

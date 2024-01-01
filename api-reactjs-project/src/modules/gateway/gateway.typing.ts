@@ -1,4 +1,4 @@
 export interface TMessageResponse {
-  type: number
-  data: any
+  type: number;
+  data: any;
 }

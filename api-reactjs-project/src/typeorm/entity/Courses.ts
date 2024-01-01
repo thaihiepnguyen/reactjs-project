@@ -1,41 +1,41 @@
-import {Column, Entity} from "typeorm";
-import {EntityBase} from "../EntityBase";
+import { Column, Entity } from 'typeorm';
+import { EntityBase } from '../EntityBase';
 
-@Entity('courses', {schema: 'QLHSSV_DB'})
-export class Courses extends EntityBase{
-  @Column("tinyint", {
-    name: "is_valid",
+@Entity('courses', { schema: 'QLHSSV_DB' })
+export class Courses extends EntityBase {
+  @Column('tinyint', {
+    name: 'is_valid',
     default: () => "'0'",
   })
-  isValid: boolean
+  isValid: boolean;
 
-  @Column("tinyint", {
-    name: "is_active",
+  @Column('tinyint', {
+    name: 'is_active',
     default: () => "'0'",
   })
-  isActive: boolean
+  isActive: boolean;
 
-  @Column("varchar", {
+  @Column('varchar', {
     length: 255,
-    name: "title"
+    name: 'title',
   })
   title: string;
 
-  @Column("varchar", {
+  @Column('varchar', {
     length: 255,
-    name: "description"
+    name: 'description',
   })
   description: string;
 
-  @Column("varchar", {
+  @Column('varchar', {
     length: 255,
-    name: "teacher_ids"
+    name: 'teacher_ids',
   })
   teacherIds: string;
 
-  @Column("varchar", {
+  @Column('varchar', {
     length: 255,
-    name: "class_code"
+    name: 'class_code',
   })
   classCode: string;
 }

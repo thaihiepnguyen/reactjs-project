@@ -1,17 +1,17 @@
-import { Column, Entity } from "typeorm";
-import { EntityBase } from "../EntityBase";
+import { Column, Entity } from 'typeorm';
+import { EntityBase } from '../EntityBase';
 
-@Entity('email_teamplates', {schema: 'QLHSSV_DB'})
+@Entity('email_teamplates', { schema: 'QLHSSV_DB' })
 export class EmailTemplates extends EntityBase {
-  @Column("varchar", {
+  @Column('varchar', {
     length: 255,
-    name: "name"
+    name: 'name',
   })
   name: string;
 
-  @Column("varchar", {
+  @Column('varchar', {
     length: 255,
-    name: "content"
+    name: 'content',
   })
   content: string;
 }

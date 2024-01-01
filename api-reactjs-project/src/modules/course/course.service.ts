@@ -1,17 +1,20 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectConnection } from '@nestjs/typeorm';
 import { Courses } from 'src/typeorm/entity/Courses';
 import { Participants } from 'src/typeorm/entity/Participants';
 import { Users } from 'src/typeorm/entity/Users';
-import {Connection, In, IsNull, Like, Not, Repository} from 'typeorm';
+import { Connection, In, IsNull, Like, Not } from 'typeorm';
 import { EnrolledCoursesResponse, MyCoursesResponse } from './course.typing';
 import { v4 as uuidv4 } from 'uuid';
 import { TBaseDto } from '../../app.dto';
 import { AuthService } from '../auth/auth.service';
 import { MailerService } from '@nestjs-modules/mailer';
-import * as xlsx from "xlsx";
-import {AbsentPariticipants} from "../../typeorm/entity/AbsentPariticipants";
-
+import * as xlsx from 'xlsx';
+import { AbsentPariticipants } from '../../typeorm/entity/AbsentPariticipants';
 
 const COLUMN_STUDENT_ID = 'Student ID';
 const COLUMN_FULLNAME = 'Full name';
@@ -22,7 +25,6 @@ export class CourseService {
     private readonly connection: Connection,
     private authService: AuthService,
     private readonly mailerService: MailerService,
-
   ) {}
 
   async getEnrolledCourses(userId: number): Promise<EnrolledCoursesResponse[]> {
@@ -194,7 +196,7 @@ export class CourseService {
         lastModify: this._formatDate(item.updatedAt),
         isActive: item.isActive,
         id: item.id,
-        teacherIds: item.teacherIds
+        teacherIds: item.teacherIds,
       };
     });
   }
@@ -212,7 +214,7 @@ export class CourseService {
       if (!course || !course.isValid || !course.isActive) {
         return {
           status: false,
-          msg: "Course not found"
+          msg: 'Course not found',
         };
       }
 
@@ -220,19 +222,19 @@ export class CourseService {
       const user = await runner.manager.getRepository(Users).findOne({
         where: {
           id: userId,
-          isValid: true
+          isValid: true,
         },
         select: {
-          studentId: true
-        }
-      })
+          studentId: true,
+        },
+      });
 
       if (!user || !user.studentId) {
         return {
           status: false,
-          msg: "You must add student id at your profile",
+          msg: 'You must add student id at your profile',
           data: course.id,
-        }
+        };
       }
 
       const userRole = await this.authService.getRole(userId);
@@ -250,23 +252,25 @@ export class CourseService {
         } else {
           return {
             status: false,
-            msg: "You have already enrolled this course",
+            msg: 'You have already enrolled this course',
             data: course.id,
           };
         }
       }
       if (userRole.role.name === 'student') {
-        const alreadyJoin = await runner.manager.getRepository(Participants).findOne({
-          where: {
-            courseId: course.id,
-            studentId: userId
-          }
-        })
+        const alreadyJoin = await runner.manager
+          .getRepository(Participants)
+          .findOne({
+            where: {
+              courseId: course.id,
+              studentId: userId,
+            },
+          });
 
         if (alreadyJoin) {
           return {
             status: false,
-            msg: "You have already enrolled this course",
+            msg: 'You have already enrolled this course',
             data: course.id,
           };
         }
@@ -286,7 +290,7 @@ export class CourseService {
 
       return {
         status: true,
-        msg: "Enrolled course successfully",
+        msg: 'Enrolled course successfully',
         data: course.id,
       };
     } catch (e) {
@@ -298,19 +302,19 @@ export class CourseService {
     }
   }
 
-  async removeCourse(userId:number, id: number): Promise<TBaseDto<null>> {
+  async removeCourse(userId: number, id: number): Promise<TBaseDto<null>> {
     try {
       const course = await this.connection.getRepository(Courses).findOne({
         where: {
-          id: id
-        }
-      })
+          id: id,
+        },
+      });
       if (course && course.teacherIds.indexOf(`${userId}`) === 0) {
         await this.connection.getRepository(Courses).update(id, {
           isValid: false,
         });
       } else {
-        const newIds = course?.teacherIds?.replace(`, ${userId}`,'')
+        const newIds = course?.teacherIds?.replace(`, ${userId}`, '');
         await this.connection.getRepository(Courses).update(id, {
           teacherIds: newIds,
         });
@@ -360,31 +364,33 @@ export class CourseService {
     });
     if (!course) {
       throw new ForbiddenException({
-        message: 'This course not found!'
+        message: 'This course not found!',
       });
     }
 
-    const participants = await this.connection.getRepository(Participants).find({
-      where: {
-        courseId: course.id,
-      },
-      select: {
-        studentId: true
-      }
-    });
+    const participants = await this.connection
+      .getRepository(Participants)
+      .find({
+        where: {
+          courseId: course.id,
+        },
+        select: {
+          studentId: true,
+        },
+      });
 
-    const studentIds = participants.map(item => item.studentId);
-    const teacherIds = course.teacherIds?.split(", ")?.map(idStr => +idStr);
+    const studentIds = participants.map((item) => item.studentId);
+    const teacherIds = course.teacherIds?.split(', ')?.map((idStr) => +idStr);
 
     if (!teacherIds.includes(userId) && !studentIds.includes(userId)) {
       throw new ForbiddenException({
-        message: 'Maybe you have not joined this course!'
+        message: 'Maybe you have not joined this course!',
       });
     }
 
     if (!course.isActive) {
       throw new ForbiddenException({
-        message: 'This course is blocked by admin!'
+        message: 'This course is blocked by admin!',
       });
     }
 
@@ -392,19 +398,18 @@ export class CourseService {
     //   throw new ForbiddenException("Maybe you aren't a teacher of this course!");
     // }
 
-
     const [teacherList, studentList] = await Promise.all([
       this.connection.getRepository(Users).find({
         where: {
-          id: In(teacherIds)
-        }
+          id: In(teacherIds),
+        },
       }),
       this.connection.getRepository(Users).find({
         where: {
-          id: In(studentIds)
-        }
-      })
-    ])
+          id: In(studentIds),
+        },
+      }),
+    ]);
 
     return {
       message: 'success',
@@ -412,39 +417,47 @@ export class CourseService {
       data: {
         ...course,
         teacherList: teacherList,
-        studentList: studentList
+        studentList: studentList,
       },
     };
   }
 
   public async isCourseExist(id: number): Promise<boolean> {
-    return await this.connection.getRepository(Courses).exist({ where: { id: id }})
+    return await this.connection
+      .getRepository(Courses)
+      .exist({ where: { id: id } });
   }
 
   public async isTeacherInCourse(id: number, teacherId: number) {
     return await this.connection.getRepository(Courses).exist({
       where: {
         id: id,
-        teacherIds: Like(`%${teacherId}%`)
-      }
-    })
+        teacherIds: Like(`%${teacherId}%`),
+      },
+    });
   }
 
-  public async banStudent(teacherId: number, studentId: number, courseId: number): Promise<TBaseDto<null>> {
+  public async banStudent(
+    teacherId: number,
+    studentId: number,
+    courseId: number,
+  ): Promise<TBaseDto<null>> {
     // Step 1: courseId belongs to teacherId
-    if (!await this.isTeacherInCourse(courseId, teacherId)) {
+    if (!(await this.isTeacherInCourse(courseId, teacherId))) {
       return {
         message: 'the teacher must be in this course',
         statusCode: 400,
-      }
+      };
     }
     // Step 3: studentId has been in courseId or not
-    const isStudentExisted = await this.connection.getRepository(Participants).exist({
-      where: {
-        courseId,
-        studentId
-      }
-    });
+    const isStudentExisted = await this.connection
+      .getRepository(Participants)
+      .exist({
+        where: {
+          courseId,
+          studentId,
+        },
+      });
 
     if (!isStudentExisted) {
       return {
@@ -455,22 +468,23 @@ export class CourseService {
 
     // Step 2: remove record from participant
     try {
-      await this.connection.getRepository(Participants)
-      .createQueryBuilder()
-      .delete()
-      .from(Participants)
-      .where("courseId = :courseId", { courseId })
-      .andWhere("studentId = :studentId", { studentId })
-      .execute();
+      await this.connection
+        .getRepository(Participants)
+        .createQueryBuilder()
+        .delete()
+        .from(Participants)
+        .where('courseId = :courseId', { courseId })
+        .andWhere('studentId = :studentId', { studentId })
+        .execute();
       return {
         message: 'success',
-        statusCode: 200
-      }
-    } catch(e) {
+        statusCode: 200,
+      };
+    } catch (e) {
       return {
         message: e,
-        statusCode: 400
-      }
+        statusCode: 400,
+      };
     }
   }
 
@@ -479,54 +493,59 @@ export class CourseService {
 
     const course = await runner.connection.getRepository(Courses).findOne({
       where: {
-        id: +courseId
-      }
+        id: +courseId,
+      },
     });
 
     if (!course) {
-      throw new NotFoundException('Course not found')
+      throw new NotFoundException('Course not found');
     }
-    
 
-
-
-    const rawData = await runner.connection.query(`SELECT * FROM email_templates WHERE id = 3`);
+    const rawData = await runner.connection.query(
+      `SELECT * FROM email_templates WHERE id = 3`,
+    );
     const content = rawData[0].content;
 
     if (!content) {
-      throw new NotFoundException('Email template not found')
+      throw new NotFoundException('Email template not found');
     }
-    const html = content.replace('$courseName$', course.title).replace("$url$", process.env.CLIENT_URL).replace("classCode",course.classCode);
+    const html = content
+      .replace('$courseName$', course.title)
+      .replace('$url$', process.env.CLIENT_URL)
+      .replace('classCode', course.classCode);
 
     await this.mailerService.sendMail({
       to: emails,
-      from: process.env.USER_NODEMAILER, 
+      from: process.env.USER_NODEMAILER,
       subject: `Invitation to ${course.title} course`,
       html: html,
     });
 
     return {
-      data: "success"
-    }
+      data: 'success',
+    };
   }
 
-  public async saveStudentList(file: Express.Multer.File, userId: number): Promise<TBaseDto<null>> {
+  public async saveStudentList(
+    file: Express.Multer.File,
+    userId: number,
+  ): Promise<TBaseDto<null>> {
     const runner = this.connection.createQueryRunner();
     try {
       const workbook = xlsx.readFile(`uploads/template/${file.filename}`);
       const courseId = +file.filename.split('.')[0];
 
       // Step 1: the teacher must be in this courseId
-      if (!await this.isTeacherInCourse(courseId, userId)) {
+      if (!(await this.isTeacherInCourse(courseId, userId))) {
         return {
           message: 'The teacher must be in this course',
           statusCode: 400,
-          data: null
-        }
+          data: null,
+        };
       }
 
       // Step 2: load data from sheets
-      let data = [];
+      const data = [];
       const sheets = workbook.SheetNames;
 
       for (let i = 0; i < sheets.length; i++) {
@@ -539,9 +558,10 @@ export class CourseService {
       }
 
       // Step 3: filter students who have not joined this course yet
-      const studentSheetIds = data.map(item => (item[COLUMN_STUDENT_ID]));
+      const studentSheetIds = data.map((item) => item[COLUMN_STUDENT_ID]);
       const studentSheetIdsHaveStudentCode = [];
-      const studentIdsHaveStudentCode = await runner.manager.getRepository(Users)
+      const studentIdsHaveStudentCode = await runner.manager
+        .getRepository(Users)
         .find({
           where: {
             studentId: Not(IsNull()),
@@ -549,19 +569,24 @@ export class CourseService {
           select: {
             studentId: true,
             id: true,
-          }
+          },
         });
 
-      const studentIdsHaveStudentCodeIndex = studentIdsHaveStudentCode.reduce((acc, cur) => {
-        acc[cur.studentId] = cur;
-        return acc;
-      }, {})
+      const studentIdsHaveStudentCodeIndex = studentIdsHaveStudentCode.reduce(
+        (acc, cur) => {
+          acc[cur.studentId] = cur;
+          return acc;
+        },
+        {},
+      );
 
-      studentSheetIds.forEach(item => {
+      studentSheetIds.forEach((item) => {
         if (studentIdsHaveStudentCodeIndex[item]) {
-          studentSheetIdsHaveStudentCode.push(studentIdsHaveStudentCodeIndex[item])
+          studentSheetIdsHaveStudentCode.push(
+            studentIdsHaveStudentCodeIndex[item],
+          );
         }
-      })
+      });
 
       const sql = `
         SELECT 
@@ -578,18 +603,19 @@ export class CourseService {
       const indexStudentIds = students.reduce((acc, cur) => {
         acc[cur.studentId] = true;
         return acc;
-      }, {})
+      }, {});
       const studentSheetIdsHaveStudentCodeAndUnJoined = [];
-      studentSheetIdsHaveStudentCode.forEach(item => {
+      studentSheetIdsHaveStudentCode.forEach((item) => {
         if (!indexStudentIds[item.studentId]) {
           studentSheetIdsHaveStudentCodeAndUnJoined.push({
             courseId: courseId,
-            studentId: item.id
-          })
+            studentId: item.id,
+          });
         }
-      })
+      });
 
-      await runner.manager.getRepository(Participants)
+      await runner.manager
+        .getRepository(Participants)
         .createQueryBuilder()
         .insert()
         .into(Participants)
@@ -598,16 +624,17 @@ export class CourseService {
         .values(studentSheetIdsHaveStudentCodeAndUnJoined)
         .execute();
 
-      const absentStudentIds = []
-      studentSheetIds.forEach(item => {
+      const absentStudentIds = [];
+      studentSheetIds.forEach((item) => {
         if (!studentIdsHaveStudentCodeIndex[item]) {
           absentStudentIds.push({
             studentId: item,
-            courseId: courseId
+            courseId: courseId,
           });
         }
-      })
-      await runner.manager.getRepository(AbsentPariticipants)
+      });
+      await runner.manager
+        .getRepository(AbsentPariticipants)
         .createQueryBuilder()
         .insert()
         .orIgnore()
@@ -618,14 +645,14 @@ export class CourseService {
       return {
         message: 'success',
         statusCode: 200,
-        data: null
-      }
+        data: null,
+      };
     } catch (e) {
       return {
         message: e.message,
         statusCode: 400,
-        data: null
-      }
+        data: null,
+      };
     } finally {
       await runner.release();
     }

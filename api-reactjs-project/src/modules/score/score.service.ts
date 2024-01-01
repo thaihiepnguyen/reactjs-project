@@ -18,7 +18,6 @@ import { Scores } from 'src/typeorm/entity/Scores';
 import { ColumnsResponse, Row } from './score.typing';
 import * as xlsx from 'xlsx';
 import { NotificationService } from '../notification/notification.service';
-import { AbsentPariticipants } from '../../typeorm/entity/AbsentPariticipants';
 import { RequestReview } from 'src/typeorm/entity/RequestReview';
 import { RequestMessage } from 'src/typeorm/entity/RequestMessage';
 
@@ -445,7 +444,7 @@ export class ScoreService {
     const workbook = xlsx.readFile(`uploads/score/${file.filename}`);
 
     // Step 1: load data from sheets
-    let data = [];
+    const data = [];
     const sheets = workbook.SheetNames;
 
     for (let i = 0; i < sheets.length; i++) {
@@ -916,9 +915,7 @@ export class ScoreService {
       scoreData.push({
         id: score.scores_id,
         'Grade Item': score.grade_name,
-        Score: score.grade_is_final
-          ? score.scores_score
-          : 'Not scored yet',
+        Score: score.grade_is_final ? score.scores_score : 'Not scored yet',
         'Contribution to course total': score.grade_scale + '%',
         Teacher: score.users_fullname,
         disableReview: !score.grade_is_final,
@@ -951,14 +948,17 @@ export class ScoreService {
   ): Promise<TBaseDto<any>> {
     const runner = this.connection.createQueryRunner();
 
-    const teacherIds = await runner.manager.getRepository(Courses).findOne({
-      where: {
-        id: id,
-      },
-      select: {
-        teacherIds: true
-      }
-    }). then(data => (data.teacherIds));
+    const teacherIds = await runner.manager
+      .getRepository(Courses)
+      .findOne({
+        where: {
+          id: id,
+        },
+        select: {
+          teacherIds: true,
+        },
+      })
+      .then((data) => data.teacherIds);
 
     const existsRequest = await runner.manager
       .getRepository(RequestReview)
@@ -994,7 +994,7 @@ export class ScoreService {
       newMessage.from = userId;
       newMessage.request = newRequest;
       newMessage.order = 0;
-      await runner.manager.save(newMessage)
+      await runner.manager.save(newMessage);
       await this.notificationService.pushRequestReview(id, scoreId, teacherIds);
     }
 
@@ -1005,16 +1005,14 @@ export class ScoreService {
       newMessage.request = existsRequest;
       newMessage.order = existsRequest.messages.length;
       await runner.manager.save(newMessage);
-      await runner.manager
-        .getRepository(RequestReview)
-        .update(
-          {
-            scoreId: scoreId,
-          },
-          {
-            acceptNewRequest: false,
-          },
-        );
+      await runner.manager.getRepository(RequestReview).update(
+        {
+          scoreId: scoreId,
+        },
+        {
+          acceptNewRequest: false,
+        },
+      );
     }
     return {
       message: 'Resquest has been sent to teacher',
@@ -1026,30 +1024,34 @@ export class ScoreService {
   ): Promise<TBaseDto<any>> {
     const runner = this.connection.createQueryRunner();
 
-    const listScoreIds = await runner.manager.getRepository(Scores).find({
-      where: {
-        grade: {
-          courseId: courseId,
-        }
-      }
-    })
-    .then(result => result?.map(result => result.id))
+    const listScoreIds = await runner.manager
+      .getRepository(Scores)
+      .find({
+        where: {
+          grade: {
+            courseId: courseId,
+          },
+        },
+      })
+      .then((result) => result?.map((result) => result.id));
 
-    const listRequestReview = await runner.manager.getRepository(RequestReview).find({
-      where: {
-        scoreId: In(listScoreIds)
-      },
-      order: {
-        messages: {
-          order: "ASC"
-        }
-      },
-      relations: ['score', 'messages', 'score.grade', 'score.student']
-    })
+    const listRequestReview = await runner.manager
+      .getRepository(RequestReview)
+      .find({
+        where: {
+          scoreId: In(listScoreIds),
+        },
+        order: {
+          messages: {
+            order: 'ASC',
+          },
+        },
+        relations: ['score', 'messages', 'score.grade', 'score.student'],
+      });
     return {
-      message: "success",
-      data: listRequestReview
-    }
+      message: 'success',
+      data: listRequestReview,
+    };
   }
   public async teacherAcceptRequest(
     userId: number,
@@ -1060,26 +1062,34 @@ export class ScoreService {
   ): Promise<TBaseDto<any>> {
     const runner = this.connection.createQueryRunner();
 
-    const requestReview = await runner.manager.getRepository(RequestReview).findOne({
-      where: {
-        scoreId: scoreId
+    const requestReview = await runner.manager
+      .getRepository(RequestReview)
+      .findOne({
+        where: {
+          scoreId: scoreId,
+        },
+        relations: {
+          messages: true,
+        },
+      });
+    await runner.manager.getRepository(RequestReview).update(
+      {
+        id: requestReview.id,
       },
-      relations: {
-        messages: true
-      }
-    })
-    await runner.manager.getRepository(RequestReview).update({
-      id: requestReview.id
-    }, {
-      isFinal: isFinal,
-      acceptNewRequest: isFinal ? false : true
-    })
+      {
+        isFinal: isFinal,
+        acceptNewRequest: isFinal ? false : true,
+      },
+    );
 
-    await runner.manager.getRepository(Scores).update({
-      id: scoreId
-    }, {
-      score: score
-    })
+    await runner.manager.getRepository(Scores).update(
+      {
+        id: scoreId,
+      },
+      {
+        score: score,
+      },
+    );
 
     const newMessage = new RequestMessage();
     newMessage.message = message;
@@ -1088,10 +1098,8 @@ export class ScoreService {
     newMessage.order = requestReview.messages.length;
     await runner.manager.save(newMessage);
 
-
-   
     return {
-      message: "Success"
-    }
+      message: 'Success',
+    };
   }
 }

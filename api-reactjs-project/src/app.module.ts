@@ -1,9 +1,14 @@
-import {DynamicModule, MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
-import {TypeOrmModule} from "@nestjs/typeorm";
-import {AuthMiddleware} from "./modules/auth/auth.middleware";
-import {MailerModule} from "@nestjs-modules/mailer";
-import {ConfigModule} from "@nestjs/config";
-import * as process from "process";
+import {
+  DynamicModule,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthMiddleware } from './modules/auth/auth.middleware';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { ConfigModule } from '@nestjs/config';
+import * as process from 'process';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CourseController } from './modules/course/course.controller';
@@ -33,20 +38,20 @@ export class AppModule implements NestModule {
             host: process.env.HOST_NODEMAILER,
             auth: {
               user: process.env.USER_NODEMAILER,
-              pass: process.env.PASS_NODEMAILER
-            }
-          }
+              pass: process.env.PASS_NODEMAILER,
+            },
+          },
         }),
         ConfigModule.forRoot({
           isGlobal: true,
         }),
         ServeStaticModule.forRoot({
           rootPath: join(__dirname, '..', 'uploads'),
-          serveRoot: '/uploads/'
+          serveRoot: '/uploads/',
         }),
-        ...modules
-      ]
-    }
+        ...modules,
+      ],
+    };
   }
   configure(consumer: MiddlewareConsumer): any {
     consumer
@@ -57,7 +62,7 @@ export class AppModule implements NestModule {
         ScoreController,
         NotificationController,
         AccountController,
-        CourseListController
-      )
+        CourseListController,
+      );
   }
 }

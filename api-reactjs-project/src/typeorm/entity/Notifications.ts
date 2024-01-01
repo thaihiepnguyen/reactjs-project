@@ -1,34 +1,34 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import { EntityBase } from "../EntityBase";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { EntityBase } from '../EntityBase';
 
-@Entity('notifications', {schema: 'QLHSSV_DB'})
+@Entity('notifications', { schema: 'QLHSSV_DB' })
 export class Notifications extends EntityBase {
-  @Column("tinyint", {
-    name: "is_valid",
+  @Column('tinyint', {
+    name: 'is_valid',
     default: () => "'0'",
   })
-  isValid: boolean
+  isValid: boolean;
 
-  @Column("varchar", {
+  @Column('varchar', {
     length: 255,
-    name: "title"
+    name: 'title',
   })
   title: string;
 
-  @Column("text", {
-    name: "content"
+  @Column('text', {
+    name: 'content',
   })
   content: string;
 
   @Column({
-    type: "int",
-    name: "from"
+    type: 'int',
+    name: 'from',
   })
   from: number;
 
   @Column({
-    type: "int",
-    name: "to"
+    type: 'int',
+    name: 'to',
   })
   to: number;
 }
