@@ -973,7 +973,7 @@ export class ScoreService {
 
     if (existsRequest && existsRequest.isFinal) {
       throw new HttpException(
-        'This request aleady marked as final by teacher',
+        'This request already marked as final by teacher',
         403,
       );
     }
@@ -1055,6 +1055,7 @@ export class ScoreService {
   }
   public async teacherAcceptRequest(
     userId: number,
+    courseId: number,
     scoreId: number,
     isFinal: boolean,
     message: string,
@@ -1097,6 +1098,14 @@ export class ScoreService {
     newMessage.request = requestReview;
     newMessage.order = requestReview.messages.length;
     await runner.manager.save(newMessage);
+
+    // notify
+    await this.notificationService.pushNotificationAcceptRequest(
+      courseId,
+      scoreId,
+      message,
+      score,
+    );
 
     return {
       message: 'Success',

@@ -8,6 +8,7 @@ import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import PopupReviewScore from "../PopupReviewScore";
 import moment from "moment";
 import SocketService, {MESSAGE_TYPE} from "@/services/socketService";
+import { useAppSelector } from "@/redux/hook";
 interface Props {
   courseId: number | string;
 }
@@ -130,6 +131,7 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
           onCancel={onCloseRequesModal}
           score={requestScore}
           onSendRequest={onSendRequest}
+          courseId={courseId}
         />
       )}
     </div>

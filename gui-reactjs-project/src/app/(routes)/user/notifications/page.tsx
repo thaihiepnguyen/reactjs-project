@@ -31,6 +31,13 @@ export default function Page() {
     if (message.type == MESSAGE_TYPE.SCORES) {
       setNotifications([...message.data[user?.id], ...notifications]);
     }
+    if (message.type == MESSAGE_TYPE.ACCEPT_REQUEST_REVIEW) {
+      const userId = Object.keys(message.data)[0];
+      if (userId == user?.id) {
+        const newMessage = Object.values(message.data)[0];
+        setNotifications([newMessage, ...notifications]);
+      }
+    }
   })
 
   return <>
@@ -47,7 +54,7 @@ export default function Page() {
                 title={item.title}
                 avatarUrl={item.avatarUrl}
                 userName={item.userName}
-                time={item.time}
+                time={item.time || 'a new message'}
               />
             </div>
           })
