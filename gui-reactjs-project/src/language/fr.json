@@ -85,5 +85,7 @@
     "This notification is used for:": "Cette notification est utilisée pour:",
     "Notify to all students in class": "Notifier à tous les étudiants dans la classe",
     "Create": "Créer",
-    "Cancel": "Annuler"
+    "Cancel": "Annuler",
+    "Forgot Password": "Mot de passe oublié",
+    "Reset Password": "Réinitialiser le mot de passe"
 }

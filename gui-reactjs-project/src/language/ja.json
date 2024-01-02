@@ -85,5 +85,7 @@
     "This notification is used for:":"この通知は使用されます：",
     "Notify to all students in class": "クラスのすべての学生に通知する",
     "Create": "作成する",
-    "Cancel": "キャンセル"
+    "Cancel": "キャンセル",
+    "Forgot Password": "パスワードを忘れました",
+    "Reset Password": "パスワードをリセット"
 }

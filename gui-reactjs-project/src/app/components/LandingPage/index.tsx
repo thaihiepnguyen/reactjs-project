@@ -112,7 +112,7 @@ const LandingPage = () => {
             <img src="./images/up-arrow-icon.svg" alt="" />
             <h3>{t('Quality')}</h3>
             <p>
-              {t('We deliver high quality content that will impact in your profesional life.')}
+              {t('landing_page_description2')}
             </p>
           </div>
           <div className={classes.footer__image}>
@@ -124,7 +124,7 @@ const LandingPage = () => {
             <img src="./images/up-arrow-icon.svg" alt="" />
             <h3>{t('Quality')}</h3>
             <p>
-              {t('We deliver high quality content that will impact in your profesional life.')}
+              {t('landing_page_description2')}
             </p>
           </div>
           <div className={classes.footer__image}>

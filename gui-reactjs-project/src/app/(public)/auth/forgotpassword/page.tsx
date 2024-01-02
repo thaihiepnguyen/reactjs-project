@@ -6,6 +6,7 @@ import CircularProgress from '@/app/components/CircularProgress';
 import Swal from 'sweetalert2';
 import { useAppDispatch } from '@/redux/hook';
 import { setLoading } from '@/redux/reducers/loading';
+import { useTranslation } from 'next-i18next';
 
 function ForgotPasswordForm() {
   const dispatch = useAppDispatch();
@@ -13,6 +14,7 @@ function ForgotPasswordForm() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(false);
+  const {t} = useTranslation();
 
   const handleEmailChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setEmail(event.target.value);
@@ -68,7 +70,7 @@ function ForgotPasswordForm() {
   return (
     <Container maxWidth="sm">
       <Typography variant="h4" align="center" gutterBottom>
-        Forgot Password
+        {t('Forgot Password')}
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
@@ -87,7 +89,7 @@ function ForgotPasswordForm() {
           </Typography>
         )}
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          Reset Password
+          {t('Reset Password')}
         </Button>
         {successMessage && (
           <Typography variant="body2" sx={{ my: 2 }} color="#4caf50">
