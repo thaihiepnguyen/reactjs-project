@@ -57,6 +57,7 @@
     "Classmate": "Camarade de classe",
     "Score": "Score",
     "Grading": "Évaluation",
+    "Request review": "Demander une révision", 
     "There is no deadline": "Il n'y a pas de date limite",
     "View exercises": "Voir les exercices",
     "Teacher": "Enseignant",
@@ -80,5 +81,9 @@
     "Enroll": "Inscrire",
     "Class Code (Required)": "Code de classe (Requis)",
     "Classroom": "Salle de classe",
-    "Last update at": "Dernière mise à jour le"
+    "Last update at": "Dernière mise à jour le",
+    "This notification is used for:": "Cette notification est utilisée pour:",
+    "Notify to all students in class": "Notifier à tous les étudiants dans la classe",
+    "Create": "Créer",
+    "Cancel": "Annuler"
 }

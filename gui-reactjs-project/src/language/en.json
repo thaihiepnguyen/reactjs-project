@@ -58,6 +58,7 @@
     "Score": "Score",
     "Grading": "Grading",
     "There is no deadline": "There is no deadline",
+    "Request review": "Request review",
     "View excercises": "View excercises",
     "Teacher": "Teacher",
     "Student": "Student",
@@ -80,5 +81,9 @@
     "Enroll": "Enroll",
     "Class Code (Required)": "Class Code (Required)",
     "Classroom": "Classroom",
-    "Last update at": "Last update at"
+    "Last update at": "Last update at",
+    "This notification is used for:" : "This notification is used for:",
+    "Notify to all students in class": "Notify to all students in class",
+    "Create": "Create",
+    "Cancel": "Canel"
 }

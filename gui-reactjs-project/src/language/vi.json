@@ -81,5 +81,9 @@
     "Enroll": "Tham gia",
     "Class Code (Required)": "Mã lớp (Bắt buộc)",
     "Classroom": "Lớp học",
-    "Last update at": "Cập nhật lần cuối lúc"
+    "Last update at": "Cập nhật lần cuối lúc",
+    "This notification is used for:": "Thông báo này được sử dụng cho:",
+    "Notify to all students in class": "Thông báo đến tất cả học sinh trong lớp",
+    "Create": "Tạo",
+    "Cancel": "Hủy"
 }

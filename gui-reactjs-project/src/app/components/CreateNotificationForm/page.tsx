@@ -6,8 +6,10 @@ import { Create } from '@mui/icons-material';
 import axiosInstance from "@/app/routers/axios";
 import Swal from 'sweetalert2';
 import Editor from '../Editor';
+import { useTranslation } from 'next-i18next';
 
 export default function CreateNotificationForm({onHideForm, id}){
+    const {t} = useTranslation();
     const [notificationData, setNotifictionData] = useState({
       title: '',
       content: ''
@@ -46,9 +48,9 @@ export default function CreateNotificationForm({onHideForm, id}){
 
     return (
       <div className={classes.container}>
-        <h4>This notification is used for:</h4>
+        <h4>{t("This notification is used for:")}</h4>
         <br/>
-        <Checkbox checked disabled />Notify to all students in class
+        <Checkbox checked disabled />{t("Notify to all students in class")}
         <br/><br/>
         <form
           onSubmit={handleSubmit}
@@ -79,9 +81,9 @@ export default function CreateNotificationForm({onHideForm, id}){
             variant="contained"
             type="submit"
             >
-            Create
+            {t("Create")}
           </Button>
-          <Button variant="outlined" onClick={onHideForm}>Cancel</Button>
+          <Button variant="outlined" onClick={onHideForm}>{t("Cancel")}</Button>
         </Stack>
         </form>
       </div>
