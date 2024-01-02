@@ -3,13 +3,15 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useState, useEffect } from 'react';
-import { USA, VN } from '@/assets';
+import { USA, VN, FR } from '@/assets';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 // Load the translation files
 import enTranslation from '../../../../src/language/en.json';
 import viTranslation from '../../../../src/language/vi.json';
+import frTranslation from '../../../../src/language/fr.json';
+
 
 // Initialize i18n instance
 i18n.use(initReactI18next).init({
@@ -18,10 +20,11 @@ i18n.use(initReactI18next).init({
   resources: {
     en: { translation: enTranslation },
     vi: { translation: viTranslation },
+    fr: { translation: frTranslation },
   },
 });
 
-const menu = ['EN', 'VI'];
+const menu = ['EN', 'VI', 'FR'];
 
 const LanguageSwitcher = () => {
   const isBrowser = typeof window !== 'undefined';
@@ -58,25 +61,24 @@ const LanguageSwitcher = () => {
   useEffect(() => {
     if (isBrowser) {
       localStorage.setItem('selectedLanguage', selectedIndex);
-      i18n.changeLanguage(selectedIndex === 0 ? 'en' : 'vi');
+      i18n.changeLanguage(selectedIndex === 0 ? 'en' : selectedIndex === 1 ? 'vi' : 'fr');
     }
   }, [selectedIndex, isBrowser]);
 
   return (
     <div>
       <Button
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
+        id="fade-button"
+        aria-controls={open ? 'fade-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
-        style={{width: 'auto'}}
       >
         <div style={{margin: "0 2px"}}>{menu[selectedIndex]}</div>
-        {selectedIndex === 0 ? <USA/> : <VN/>}
+        {selectedIndex === 0 ? <USA/> : selectedIndex === 1 ? <VN/> : <FR/>}
       </Button>
       <Menu
-        id="basic-menu"
+        id="fade-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
@@ -84,8 +86,9 @@ const LanguageSwitcher = () => {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={() => handleMenuItemClick(0, 'en')}>EN</MenuItem>
-        <MenuItem onClick={() => handleMenuItemClick(1, 'vi')}>VI</MenuItem>
+        <MenuItem style={{width: '5rem'}} onClick={() => handleMenuItemClick(0, 'en')}><USA/>EN</MenuItem>
+        <MenuItem style={{width: '5rem'}} onClick={() => handleMenuItemClick(1, 'vi')}><VN/>VI</MenuItem>
+        <MenuItem style={{width: '5rem'}} onClick={() => handleMenuItemClick(2, 'fr')}><FR/>FR</MenuItem>
       </Menu>
     </div>
   );
