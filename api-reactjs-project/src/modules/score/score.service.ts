@@ -410,18 +410,23 @@ export class ScoreService {
         };
       });
 
-      const absentStudentList = await runner.manager.getRepository(AbsentPariticipants).find({
-        select: {
-          studentId: true,
-        },
-        where: {
-          courseId: id,
-          studentId: Not(IsNull()),
-        },
-      }).then((data) => data.map((item) => ({
-        studentId: item.studentId,
-        fullname: ""
-      })))
+      const absentStudentList = await runner.manager
+        .getRepository(AbsentPariticipants)
+        .find({
+          select: {
+            studentId: true,
+          },
+          where: {
+            courseId: id,
+            studentId: Not(IsNull()),
+          },
+        })
+        .then((data) =>
+          data.map((item) => ({
+            studentId: item.studentId,
+            fullname: '',
+          })),
+        );
 
       return {
         message: 'success',
@@ -429,7 +434,7 @@ export class ScoreService {
         data: {
           rows: [...students, ...absentStudentList] as unknown as Row[],
           columns: [
-            COLUMN_ID, 
+            COLUMN_ID,
             COLUMN_FULLNAME,
             ...grades.map((item) => item.name),
           ],
@@ -481,13 +486,13 @@ export class ScoreService {
 
     const nColumns = Object.keys(data[0]).length - N_COLUMNS_IGNORE;
     const nStudents = data.length;
-    let params = '(?, ?, ?, ?)';
+    let n_params = '(?, ?, ?, ?)';
     for (let i = 0; i < nColumns - 1; i++) {
-      params = params.concat(', ', '(?, ?, ?, ?)');
+      n_params = n_params.concat(', ', '(?, ?, ?, ?)');
     }
-
+    let params: string = n_params;
     for (let i = 0; i < nStudents - 1; i++) {
-      params = params.concat(', ', '(?, ?, ?, ?)');
+      params = params.concat(', ', n_params);
     }
 
     const index = await this._indexGrade(courseId);
@@ -706,7 +711,7 @@ export class ScoreService {
       .delete()
       .from(GradeCompositions)
       .where('id NOT IN (:...ids) AND courseId = :courseId', { ids, courseId })
-      .execute(); 
+      .execute();
 
     const notFinalizeBefore = await runner.manager
       .getRepository(GradeCompositions)
@@ -724,9 +729,9 @@ export class ScoreService {
         (grade) => !!grade.isFinal && notFinalizeBefore?.includes(grade?.id),
       )
       ?.map((grade) => grade.id);
-      if(finalizeGrade?.length > 0) {
-        await this.finalizeColumns(courseId, userId, finalizeGrade);
-      }
+    if (finalizeGrade?.length > 0) {
+      await this.finalizeColumns(courseId, userId, finalizeGrade);
+    }
     const updatePromises = data
       ?.filter((item) => typeof item.id === 'number')
       .map((item) => {
@@ -825,7 +830,7 @@ export class ScoreService {
       await runner.manager
         .getRepository(GradeCompositions)
         .query(sql, [gradeIds]);
-      // Step 3: notify to students who are in this course  
+      // Step 3: notify to students who are in this course
       await this.notificationService.pushScores(
         id,
         gradeIds,
