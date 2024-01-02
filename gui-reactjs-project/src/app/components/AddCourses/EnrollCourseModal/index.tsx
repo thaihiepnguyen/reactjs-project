@@ -7,8 +7,10 @@ import axiosInstance from "@/app/routers/axios";
 import Swal from "sweetalert2";
 import { useAppDispatch } from "@/redux/hook";
 import { getEnrolledCourse, getMyCourse } from "@/redux/reducers/courses";
+import { useTranslation } from "next-i18next";
 
 export default function EnrollCoursesModal(props) {
+  const {t} = useTranslation();
   const { closeModel } = props;
   const dispatch = useAppDispatch();
   const [courseData, setCourseData] = useState({
@@ -50,12 +52,12 @@ export default function EnrollCoursesModal(props) {
         onSubmit={handleSubmit}
         autoComplete="off"
       >
-        <h3 style={{ padding: 10 }}>Enroll a course</h3>
+        <h3 style={{ padding: 10 }}>{t("Enroll a course")}</h3>
         <div>
           <TextField
             id="classCode"
             required
-            label="Class Code (Required)"
+            label={t("Class Code (Required)")}
             margin="normal"
             fullWidth
             value={courseData.classCode}
@@ -64,7 +66,7 @@ export default function EnrollCoursesModal(props) {
         </div>
         <div style={{ marginTop: 24 }}>
           <Button type="submit" variant="outlined">
-            Enroll
+            {t('Enroll')}
           </Button>
         </div>
       </form>

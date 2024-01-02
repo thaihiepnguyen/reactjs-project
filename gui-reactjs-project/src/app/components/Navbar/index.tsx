@@ -21,7 +21,7 @@ export default function Navbar() {
       <div>
         <Link href={routes.home} className={classes.home}>
           <BrandingWatermarkRounded style={{ marginRight: 10 }} />
-          Classroom
+          {t("Classroom")}
         </Link>
       </div>
       {!user ? (

@@ -25,7 +25,7 @@ export default function Page() {
         {courses?.length ? (
           <>
             {courses.map((course, index) => {
-              return (
+              return (  
                 <MyCoursesItem
                   key={index}
                   title={course.title}

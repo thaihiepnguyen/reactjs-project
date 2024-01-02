@@ -10,8 +10,10 @@ import { Router } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/redux/hook";
+import { useTranslation } from "next-i18next";
 
 export default function MyCoursesItem(props) {
+  const {t} = useTranslation();
   const { title, description, lastModify, id, isActive, teacherIds } = props;
   const { user } = useAppSelector((state) => state.userReducer);
   const router = useRouter();
@@ -51,7 +53,7 @@ export default function MyCoursesItem(props) {
         <div className={classes.classInformation}>
           <div className={classes.classDate}>
             <AccessTimeFilledOutlined />
-            <span className={classes.classDateText}>Last update at {lastModify}</span>
+            <span className={classes.classDateText}>{t("Last update at")} {lastModify}</span>
           </div>
         </div>
       </div>
