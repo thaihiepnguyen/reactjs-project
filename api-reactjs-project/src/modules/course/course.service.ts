@@ -398,7 +398,7 @@ export class CourseService {
     //   throw new ForbiddenException("Maybe you aren't a teacher of this course!");
     // }
 
-    const [teacherList, studentList] = await Promise.all([
+    const [teacherList, studentList, absentStudentList] = await Promise.all([
       this.connection.getRepository(Users).find({
         where: {
           id: In(teacherIds),
@@ -407,6 +407,11 @@ export class CourseService {
       this.connection.getRepository(Users).find({
         where: {
           id: In(studentIds),
+        },
+      }),
+      this.connection.getRepository(AbsentPariticipants).find({
+        where: {
+          courseId: course.id,
         },
       }),
     ]);
@@ -418,6 +423,7 @@ export class CourseService {
         ...course,
         teacherList: teacherList,
         studentList: studentList,
+        absentStudentList: absentStudentList,
       },
     };
   }

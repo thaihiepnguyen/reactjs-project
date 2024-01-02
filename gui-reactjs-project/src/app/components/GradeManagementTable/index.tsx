@@ -105,7 +105,7 @@ const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSa
     const reorderedItems = Array.from(items);
     const [reorderedItem] = reorderedItems.splice(result.source.index, 1);
     reorderedItems.splice(result.destination.index, 0, reorderedItem);
-
+    setItems(reorderedItems);
     // Sett new header for the xls file
     const headers = ["studentId", "fullname", ...reorderedItems.map((obj) => obj.name)];
     setHeaderExcelFile(headers);
@@ -117,8 +117,7 @@ const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSa
         const { isEditing, ...updatedItem } = item;
         return updatedItem;
       });
-
-      console.log(updatedData)
+      
       dispatch(setLoading(true));
       const response = await axiosInstance.post(`/score/create-update-columns/${courseId}`, updatedData);
       dispatch(setLoading(false));
@@ -127,7 +126,7 @@ const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSa
       } else {
         throw new Error("Failed to fetch data");
       }
-    } catch (error) {
+    } catch (error) { 
       console.error("Error fetching data:", error);
     }
   };
@@ -227,7 +226,7 @@ const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSa
       return;
     }
     // Convert the array of objects to an array of arrays
-    const dataArray = studentList?.map((item) => [item.id, item.fullname]) || [];
+    const dataArray = studentList?.map((item) => [item.studentId, item.fullname]) || [];
     dataArray?.unshift(headerExcelFile);
     const worksheet = XLSX.utils.aoa_to_sheet(dataArray);
     const workbook = XLSX.utils.book_new();
@@ -371,7 +370,7 @@ const GradeManagementTable = memo(({ courseId, isOpen, onCancel, scoreData, onSa
                 onClick={handleExportToExcel}
                 className={classes.saveBtn}
               >
-                Download Transcript
+                Download Transcript Template
               </CustomBtn>
             ) : (
               ""

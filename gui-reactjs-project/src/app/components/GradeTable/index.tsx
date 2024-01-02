@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Input, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { Box, Button, IconButton, Input, Stack, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import { SetupTable } from "../Table/SetupTable";
 import classes from "./styles.module.scss";
 import SubTitle from "../text/SubTitle";
@@ -16,6 +16,8 @@ import axiosInstance from "@/app/routers/axios";
 import { useAppDispatch } from "@/redux/hook";
 import { setLoading } from "@/redux/reducers/loading";
 import { useTranslation } from "next-i18next";
+import UploadIcon from "@mui/icons-material/Upload";
+import PopupUploadExcel from "../PopupUploadExcel";
 
 interface GradeTableProps {
   courseId: string;
@@ -25,11 +27,12 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
   const dispatch = useAppDispatch();
   const [scoreData, setScoreData] = useState<any>(null);
   const [showGradeSetup, setShowGradeSetup] = useState<boolean>(false);
+  const [showUploadExel, setShowUploadExcel] = useState<boolean>(false);
   const [columns, setColumns] = useState<any>([]);
   const [tableLoading, setTableLoading] = useState<boolean>(false);
 
   const [data, setData] = useState([]);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   function capitalizeFirstLetter(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -91,11 +94,19 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
     setShowGradeSetup(false);
   };
 
+  const onShowUpload = () => {
+    setShowUploadExcel(true);
+  };
+
+  const onCloseUpload = () => {
+    setShowUploadExcel(false);
+  };
+
   const onSaveGradeComposition = async () => {
     await fetchDataForGradeManagementTable();
   };
 
-  function move(src, dest, arr) {
+  function move(src: any, dest: any, arr: any) {
     // Ensure src and dest are within the valid range of array indices
     if (src < 0 || src >= arr.length || dest < 0 || dest >= arr.length) {
       return arr.slice();
@@ -108,9 +119,11 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
     return newArray;
   }
 
-  const onChangeOrder = async (src, dest) => {
-    if (src - 2 < 0 || dest - 2 < 0 || src - 2 >= scoreData?.grade?.length || dest - 2>= scoreData?.grade?.length) return;
+  const onChangeOrder = async (src: any, dest: any) => {
+    if (src - 2 < 0 || dest - 2 < 0 || src - 2 >= scoreData?.grade?.length || dest - 2 >= scoreData?.grade?.length)
+      return;
     const newOrder = move(src - 2, dest - 2, scoreData?.grade);
+    console.log(newOrder);
     try {
       dispatch(setLoading(true));
       const response = await axiosInstance.post(`/score/create-update-columns/${courseId}`, newOrder);
@@ -125,11 +138,44 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
     }
   };
 
+  const onUploadStudentScore = (data: FormData) => {
+    dispatch(setLoading(true));
+    axiosInstance
+      .post("/score/upload/file", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        Swal.fire({
+          title: "Success!",
+          text: "Upload student score successfully",
+          icon: "success",
+        });
+        onSaveGradeComposition();
+      })
+      .catch((err) => {
+        Swal.fire({
+          title: "Error!",
+          text: "Something error",
+          icon: "error",
+        });
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
+  };
+
   return (
     <>
-      <IconButton className={classes.iconMore} sx={{ display: "block", ml: "auto" }} onClick={onShowGradeSetup}>
-        <MoreHoriz />
-      </IconButton>
+      <Stack direction={"row"} className={classes.iconMore}>
+        <IconButton sx={{ display: "block", ml: "auto" }} onClick={onShowGradeSetup}>
+          <MoreHoriz />
+        </IconButton>
+        <IconButton sx={{ display: "block", ml: "auto" }} onClick={onShowUpload}>
+          <UploadIcon />
+        </IconButton>
+      </Stack>
 
       <div className={classes.rootTable}>
         <MaterialTable
@@ -151,9 +197,9 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
                     let value = e.target.value;
                     if (props?.columnDef?.type == "numeric") {
                       if (+value > 10) value = "10";
-                      if (+value < 0) value = "0"
+                      if (+value < 0) value = "0";
                     }
-                    return props.onChange(value)
+                    return props.onChange(value);
                   }}
                   inputProps={{
                     min: 0,
@@ -176,7 +222,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
               return new Promise((resolve, reject) => {
                 const field = columnDef.field ?? "";
                 const newData = { ...rowData, [field]: newValue };
-                const { studentId, fullname, tableData, avg,  ...scores } = newData;
+                const { studentId, fullname, tableData, avg, ...scores } = newData;
                 if (!studentId || Object.keys(scores).length != scoreData?.grade?.length) {
                   Swal.fire({
                     title: "Oops",
@@ -205,7 +251,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
           editable={{
             onRowAdd: (newData) => {
               return new Promise((resolve, reject) => {
-                const { studentId, fullname, avg,  ...scores } = newData;
+                const { studentId, fullname, avg, ...scores } = newData;
                 if (!studentId || Object.keys(scores).length != scoreData?.grade?.length) {
                   Swal.fire({
                     title: "Oops",
@@ -231,7 +277,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
 
             onRowUpdate: (newData: any, oldData: any) => {
               return new Promise((resolve, reject) => {
-                const { studentId, fullname, avg,  ...scores } = newData;
+                const { studentId, fullname, avg, ...scores } = newData;
                 if (!studentId || Object.keys(scores).length != scoreData?.grade?.length) {
                   Swal.fire({
                     title: "Oops",
@@ -246,7 +292,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
                     scores: scores,
                     oldStudentId: oldData?.studentId !== newData?.studentId ? oldData?.studentId : "",
                   })
-                  
+
                   .then((response) => {
                     setData(response.data.data);
                     resolve(response);
@@ -262,7 +308,7 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
                 axiosInstance
                   .post(`/score/delete-score`, {
                     oldStudentId: oldData?.studentId,
-                    courseId: courseId
+                    courseId: courseId,
                   })
                   .then((response) => {
                     const dataDelete = [...data];
@@ -286,6 +332,15 @@ const GradeTable = memo(({ courseId }: GradeTableProps) => {
           onCancel={onCloseGradeSetup}
           scoreData={scoreData}
           onSave={onSaveGradeComposition}
+        />
+      ) : null}
+      {showUploadExel ? (
+        <PopupUploadExcel
+          isOpen={showUploadExel}
+          onCancel={onCloseUpload}
+          title={t("Upload Student Score")}
+          onUpload={onUploadStudentScore}
+          name="score"
         />
       ) : null}
     </>

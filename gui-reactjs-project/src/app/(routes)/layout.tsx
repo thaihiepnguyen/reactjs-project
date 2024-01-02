@@ -33,6 +33,9 @@ export default function SidebarLayout({children}: {
     if (user?.role?.name === "teacher") {
       getMyCourses();
     }
+    return () => {
+      socketService.close();
+    }
   }, []);
   return <div className={classes.sidebarLayout}>
     <Sidebar></Sidebar>

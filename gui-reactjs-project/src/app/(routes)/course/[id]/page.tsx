@@ -38,6 +38,8 @@ import DownloadStudentListButton from "@/app/components/DownloadStudentListButto
 import * as XLSX from "xlsx";
 import StudentGradeTable from "@/app/components/StudentGradeTable";
 import RequestReviewTable from "@/app/components/RequestReviewTable";
+import UploadIcon from "@mui/icons-material/Upload";
+import PopupUploadExcel from "@/app/components/PopupUploadExcel";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -71,6 +73,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [showTable, setShowTable] = useState(false);
   const [course, setCourse] = useState<any>({});
   const [openMenuShare, setOpenMenuShare] = React.useState(false);
+  const [openMenuUploadStudent, setOpenMenuUploadStudent] = React.useState(false);
   const [isOpenModalShare, setIsOpenModalShare] = useState<boolean>(false);
   const { t } = useTranslation();
 
@@ -134,6 +137,14 @@ export default function Page({ params }: { params: { id: string } }) {
     setIsOpenModalShare(false);
   };
 
+  const onShowModalUploadStudent = () => {
+    setOpenMenuUploadStudent(true);
+  };
+
+  const onCloseShowModalUploadStudent = () => {
+    setOpenMenuUploadStudent(false);
+  };
+
   const handleExportToExcel = () => {
     const data = [headerExcel];
     const worksheet = XLSX.utils.aoa_to_sheet(data);
@@ -146,6 +157,33 @@ export default function Page({ params }: { params: { id: string } }) {
     handleExportToExcel();
   };
 
+  const onUploadStudentList = (data: FormData) => {
+    dispatch(setLoading(true));
+    axiosInstance
+      .post("/courses/upload/template/file", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        Swal.fire({
+          title: "Success!",
+          text: "Upload student list successfully",
+          icon: "success",
+        });
+        getCourseDetail(params.id);
+      })
+      .catch((err) => {
+        Swal.fire({
+          title: "Error!",
+          text: "Something error",
+          icon: "error",
+        });
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
+  };
   return (
     <Box className={classes.root}>
       <Box className={classes.menu} sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -215,7 +253,7 @@ export default function Page({ params }: { params: { id: string } }) {
               <Heading3 $colorName="--eerie-black">{t("Teacher")}</Heading3>
             </Divider>
             {course?.teacherList?.map((teacher: User, teacherIdx: number) => (
-              <div className={classes.infoWrapper} key={teacherIdx}>
+              <div className={classes.infoWrapper} key={`teacher${teacherIdx}`}>
                 <div className={classes.personalImage}>
                   <Avatar>{teacher?.avatarUrl ? <img src={teacher.avatarUrl} alt=""></img> : "T"}</Avatar>
                 </div>
@@ -233,8 +271,8 @@ export default function Page({ params }: { params: { id: string } }) {
               <Heading3 $colorName="--eerie-black">{t("Students")}</Heading3>
             </Divider>
             {course?.studentList?.map((student: User, studentIdx: number) => (
-              <div className={classes.wrapper}>
-                <div className={classes.infoWrapper} key={studentIdx}>
+              <div className={classes.wrapper} key={`student${studentIdx}`}>
+                <div className={classes.infoWrapper} >
                   <div className={classes.personalImage}>
                     <Avatar>{student?.avatarUrl ? <img src={student.avatarUrl} alt=""></img> : "T"}</Avatar>
                   </div>
@@ -254,6 +292,27 @@ export default function Page({ params }: { params: { id: string } }) {
                     />
                   </div>
                 ) : null}
+              </div>
+            ))}
+          </Box>
+
+          <Box className={classes.list} sx={{ mt: 4 }}>
+            <Divider>
+              <Heading3 $colorName="--eerie-black">{t("Non-participating students")}</Heading3>
+            </Divider>
+            {course?.absentStudentList?.map((student: User, studentIdx: number) => (
+              <div className={classes.wrapper} key={`student2${studentIdx}`}>
+                <div className={classes.infoWrapper}>
+                  <div className={classes.personalImage}>
+                    <Avatar>S</Avatar>
+                  </div>
+                  <div className={classes.personalInfo}>
+                    <Heading4 $colorName="--eerie-black" className={classes.name}>
+                     
+                    </Heading4>
+                    <ParagraphSmall> {student.studentId}</ParagraphSmall>
+                  </div>
+                </div>
               </div>
             ))}
           </Box>
@@ -311,6 +370,18 @@ export default function Page({ params }: { params: { id: string } }) {
                       </ParagraphSmall>
                     </Box>
                   </MenuItem>
+                  <MenuItem onClick={onShowModalUploadStudent}>
+                    <Box display="flex" alignItems={"center"}>
+                      <UploadIcon sx={{ marginRight: "13.5px" }} />
+                      <ParagraphSmall
+                        $fontWeight="400"
+                        $colorName="--gray-80"
+                        translation-key="project_header_menu_share_option"
+                      >
+                        {t("Upload Student List")}
+                      </ParagraphSmall>
+                    </Box>
+                  </MenuItem>
                 </MenuList>
               </ClickAwayListener>
             </Paper>
@@ -318,6 +389,13 @@ export default function Page({ params }: { params: { id: string } }) {
         )}
       </Popper>
       <PopupInviteCourse isOpen={isOpenModalShare} onCancel={onCloseShowModalShareProject} courseId={course.id} />
+      <PopupUploadExcel
+        isOpen={openMenuUploadStudent}
+        onCancel={onCloseShowModalUploadStudent}
+        title={t("Upload Student List")}
+        onUpload={onUploadStudentList}
+        name="course"
+      />
     </Box>
   );
 }
