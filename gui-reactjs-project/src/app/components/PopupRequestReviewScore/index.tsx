@@ -26,7 +26,7 @@ interface Props {
   onCancel: () => void;
   score: any;
   onSendRequest: () => void;
-  courseId: number
+  courseId: number | string;
 }
 
 interface DataForm {

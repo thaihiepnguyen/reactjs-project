@@ -26,7 +26,7 @@ export default class SocketService {
   public subscribeCourses(courseIds: number[], userId: number) {
     this._socket.emit(coursesEvent, {
       courses: courseIds,
-      userId: userId
+      userId: userId  
     })
   }
 
