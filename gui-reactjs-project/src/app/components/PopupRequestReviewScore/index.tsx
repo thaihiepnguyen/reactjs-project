@@ -118,7 +118,7 @@ const PopupRequestReviewScore = memo((props: Props) => {
           Grade name: <b>{score["Grade Item"]}</b>
         </Heading4>
         <Heading4 sx={{ mt: "8px !important" }}>
-          Score before review: <b>{score["Score"]}</b>
+          Current Score: <b>{score["Score"]}</b>
         </Heading4>
         <Grid
           noValidate
@@ -164,7 +164,7 @@ const PopupRequestReviewScore = memo((props: Props) => {
             ) : null}
           </Box>
         </Grid>
-        <Heading4 sx={{fontWeight: "bold !important"}}>Request history:</Heading4>
+        <Heading4 sx={{ fontWeight: "bold !important" }}>Request history:</Heading4>
         <MessageList
           className={classes.messageList}
           referance={messageListReferance}

@@ -1,3 +1,4 @@
+'use client'
 import MaterialTable from "material-table";
 import classes from "./styles.module.scss";
 import { useTranslation } from "react-i18next";
@@ -9,6 +10,9 @@ import PopupReviewScore from "../PopupReviewScore";
 import moment from "moment";
 import SocketService, {MESSAGE_TYPE} from "@/services/socketService";
 import { useAppSelector } from "@/redux/hook";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 interface Props {
   courseId: number | string;
 }
@@ -20,7 +24,20 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
   const [tableLoading, setTableLoading] = useState<boolean>(false);
   const [requestScore, setRequestScore] = useState<any>(null);
   const [data, setData] = useState<any>([]);
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const scoreIdOpen = searchParams.get('scoreId')
 
+  useEffect(() => {
+    if (data?.length && scoreIdOpen) {
+      const scoreOpen = data?.find((item: any) => +item.scoreId === +scoreIdOpen);
+      if (scoreOpen) {
+        router.replace(pathname)
+        setRequestScore(scoreOpen)
+      }
+    }
+  }, [scoreIdOpen, data])
   const fetchData = useCallback(
     (courseId: number | string) => {
       setTableLoading(true);
@@ -63,7 +80,7 @@ const RequestReviewTable = memo(({ courseId }: Props) => {
         field: "score.grade.name",
       },
       {
-        title: "Score before review",
+        title: "Current Score",
         field: "score.score",
       },
       {

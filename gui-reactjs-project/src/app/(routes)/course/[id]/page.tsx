@@ -40,6 +40,7 @@ import StudentGradeTable from "@/app/components/StudentGradeTable";
 import RequestReviewTable from "@/app/components/RequestReviewTable";
 import UploadIcon from "@mui/icons-material/Upload";
 import PopupUploadExcel from "@/app/components/PopupUploadExcel";
+import { useSearchParams } from 'next/navigation'
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -77,11 +78,25 @@ export default function Page({ params }: { params: { id: string } }) {
   const [isOpenModalShare, setIsOpenModalShare] = useState<boolean>(false);
   const { t } = useTranslation();
 
+  const searchParams = useSearchParams()
+  const tab = searchParams.get('tab')
+
   const anchorRef = React.useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     getCourseDetail(params.id);
   }, []);
+
+  useEffect(() => {
+    switch (tab) {
+      case 'score':
+        setValue(2)
+        break;
+      case 'request-review':
+        setValue(3)
+        break;
+    }
+  }, [tab]);
 
   function getCourseDetail(id: string) {
     dispatch(setLoading(true));

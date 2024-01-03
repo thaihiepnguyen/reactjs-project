@@ -39,7 +39,7 @@ export class NotificationController {
   async pushCourses(
     @Body('title') title: string,
     @Body('content') message: string,
-    @Body('id', ParseIntPipe) id: number,
+    @Body('id', ParseIntPipe) id: number, 
     @MetaDataAuth('userId') userId: number,
   ): Promise<TBaseDto<any>> {
     await this.notificationService.pushCourses(id, userId, message, title);
@@ -54,6 +54,6 @@ export class NotificationController {
   async getNotifications(
     @MetaDataAuth('userId') userId: number,
   ): Promise<TBaseDto<any>> {
-    return this.notificationService.getNotifications(userId);
+    return this.notificationService.getNotifications(userId); 
   }
 }

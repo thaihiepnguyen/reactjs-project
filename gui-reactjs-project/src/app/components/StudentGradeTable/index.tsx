@@ -7,6 +7,10 @@ import { useAppSelector } from "@/redux/hook";
 import axiosInstance from "@/app/routers/axios";
 import MapsUgcOutlinedIcon from "@mui/icons-material/MapsUgcOutlined";
 import PopupRequestReviewScore from "../PopupRequestReviewScore";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+
 interface Props {
   courseId: number | string;
 }
@@ -20,6 +24,11 @@ const StudentGradeTable = memo(({ courseId }: Props) => {
   const { user } = useAppSelector((state) => state.userReducer);
 
   const missingStudentId = useMemo(() => !user?.studentId, [user]);
+
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const scoreIdOpen = searchParams.get('scoreId')
 
   const fetchData = useCallback(
     (courseId: number | string) => {
@@ -38,6 +47,7 @@ const StudentGradeTable = memo(({ courseId }: Props) => {
     },
     [courseId]
   );
+  
   useEffect(() => {
     const titles = ["Grade Item", "Score", "Contribution to course total"];
     setColumns(
@@ -49,6 +59,18 @@ const StudentGradeTable = memo(({ courseId }: Props) => {
     );
     fetchData(courseId);
   }, [courseId]);
+
+  useEffect(() => {
+    if (data?.length && scoreIdOpen) {
+
+      const scoreOpen = data?.find((item: any) => +item.id === +scoreIdOpen);
+      if (scoreOpen) {
+        router.replace(pathname)
+        setRequestScore(scoreOpen)
+      }
+    }
+  }, [scoreIdOpen, data])
+
 
   const onCloseRequesModal = () => {
     setRequestScore(null);

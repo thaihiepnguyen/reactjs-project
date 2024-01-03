@@ -147,7 +147,6 @@ export class NotificationService {
       `;
     const rawData = await this.connection.query(sql, [id]);
     const room = `room-${id}`;
-
     const notiValues = rawData.map((item) => {
       return {
         title: title,
@@ -173,7 +172,7 @@ export class NotificationService {
     this.gatewayService.pushNotification(room, payload, MESSAGE_TYPE.COURSES);
   }
 
-  async pushScores(id: number, gradeIds: number[], title: string) {
+  async pushScores(id: number, gradeIds: number[], title: string, url = null) {
     if (!gradeIds || !gradeIds.length) {
       return;
     }
@@ -201,7 +200,7 @@ export class NotificationService {
       const message = `Điểm ${item.gradeName} của bạn là: ${item.score}`;
       return {
         title: title,
-        content: `<h5>Thông báo từ lớp học ${item.courseName} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${item.teacherName}</h5>`,
+        content: `<h5>Thông báo từ lớp học ${item.courseName} </h5> <p>${message}</p> <p>Xem chi tiết điểm <a href=${process.env.CLIENT_URL}/course/6?tab=score>tại đây</a></p> <h5>Trân trọng, </h5> <h5>${item.teacherName}</h5>`,
         from: item.teacherId,
         to: item.studentId,
       };
@@ -218,7 +217,7 @@ export class NotificationService {
       const item = {
         avatarUrl: cur.teacherAvatar,
         userName: cur.teacherName,
-        message: `<h5>Thông báo từ lớp học ${cur.courseName} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${cur.teacherName}</h5>`,
+        message: `<h5>Thông báo từ lớp học ${cur.courseName} </h5> <p>${message}</p> <p>Xem chi tiết điểm <a href=${process.env.CLIENT_URL}/course/6?tab=score>tại đây</a></p> <h5>Trân trọng, </h5> <h5>${cur.teacherName}</h5>`,
         title: title,
         time: 0,
       };
@@ -289,9 +288,9 @@ export class NotificationService {
 
     const payload = {
       [data.studentId]: {
-        avatarUrl: data.teacherAvatar,
+        avatarUrl: data.teacherAvatar, 
         userName: data.teacherName,
-        message: `<h5>Thông báo từ lớp học ${data.title} </h5> <p>${messageRes}</p> <h5>Trân trọng, </h5> <h5>${data.teacherName}</h5>`,
+        message: `<h5>Thông báo từ lớp học ${data.title} </h5> <p>${messageRes}</p> <p>Xem chi tiết yêu cầu phúc khảo <a href=${process.env.CLIENT_URL}/course/6?tab=score&scoreId=${scoreId}>tại đây</a></p> <h5>Trân trọng, </h5> <h5>${data.teacherName}</h5>`,
         title: `Thông báo phúc khảo ${data.gradeName}`,
         time: 0,
       },
@@ -304,7 +303,7 @@ export class NotificationService {
       .values([
         {
           title: `Thông báo phúc khảo ${data.gradeName}`,
-          content: `<h5>Thông báo từ lớp học ${data.title} </h5> <p>${messageRes}</p> <h5>Trân trọng, </h5> <h5>${data.teacherName}</h5>`,
+          content: `<h5>Thông báo từ lớp học ${data.title} </h5> <p>${messageRes}</p> <p>Xem chi tiết yêu cầu phúc khảo <a href=${process.env.CLIENT_URL}/course/6?tab=score&scoreId=${scoreId}>tại đây</a></p> <h5>Trân trọng, </h5> <h5>${data.teacherName}</h5>`,
           from: data.teacherId,
           to: data.studentId,
         },
@@ -351,11 +350,11 @@ export class NotificationService {
       [teacherIds]: {
         avatarUrl: data.studentAvatar,
         userName: data.studentName,
-        message: `<h5>Thông báo xin được phúc khảo điểm ở lớp ${data.title} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${data.studentName}</h5>`,
+        message: `<h5>Thông báo xin được phúc khảo điểm ở lớp ${data.title} </h5> <p>${message}</p> <p>Xem chi tiết yêu cầu phúc khảo <a href=${process.env.CLIENT_URL}/course/6?tab=request-review&scoreId=${scoreId}>tại đây</a></p> <h5>Trân trọng, </h5> <h5>${data.studentName}</h5>`,
         title: `Thông báo xin được phúc khảo ${data.gradeName}`,
         time: 0,
       },
-    };
+    }; 
     await this.connection
       .getRepository(Notifications)
       .createQueryBuilder()
@@ -363,7 +362,7 @@ export class NotificationService {
       .values([
         {
           title: `Thông báo xin được phúc khảo ${data.gradeName}`,
-          content: `<h5>Thông báo xin được phúc khảo điểm ở lớp ${data.title} </h5> <p>${message}</p> <h5>Trân trọng, </h5> <h5>${data.studentName}</h5>`,
+          content: `<h5>Thông báo xin được phúc khảo điểm ở lớp ${data.title} </h5> <p>${message}</p> <p>Xem chi tiết yêu cầu phúc khảo <a href=${process.env.CLIENT_URL}/course/6?tab=request-review&scoreId=${scoreId}>tại đây</a></p> <h5>Trân trọng, </h5> <h5>${data.studentName}</h5>`,
           from: data.studentId,
           to: data.teacherId,
         },

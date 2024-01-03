@@ -27,6 +27,7 @@ interface Props {
   onCancel: () => void;
   score: any;
   onSendRequest: () => void;
+  courseId: string | number;
 }
 
 interface DataForm {
@@ -129,7 +130,7 @@ const PopupReviewScore = memo((props: Props) => {
           Grade name: <b>{score?.score?.grade?.name}</b>
         </Heading4>
         <Heading4 sx={{ mt: "8px !important" }}>
-          Score before review: <b>{score?.score?.score}</b>
+          Current Score: <b>{score?.score?.score}</b>
         </Heading4>
         <Grid
           noValidate
@@ -148,7 +149,7 @@ const PopupReviewScore = memo((props: Props) => {
                 placeholder={"New score"}
                 type={"number"}
                 inputRef={register('score')}
-                disabled={score.isFinal || score.acceptNewRequest}
+                disabled={!!score.isFinal || !!score.acceptNewRequest}
                 inputProps={{
                   min: 0,
                   max: 10,
@@ -160,7 +161,7 @@ const PopupReviewScore = memo((props: Props) => {
             <InputSearch
               multiline={true}
               placeholder="Feedback"
-              disabled={score.isFinal || score.acceptNewRequest}
+              disabled={!!score.isFinal || !!score.acceptNewRequest}
               width="100%"
               className={classes.searchInput}
               sx={{ padding: "8px 16px !important" }}
@@ -176,7 +177,7 @@ const PopupReviewScore = memo((props: Props) => {
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <Stack direction={"row"} spacing={0.5} alignItems={"center"} sx={{ mt: "8px !important" }} justifyContent={"right"}>
                   <ParagraphSmall>Mark as final</ParagraphSmall>
-                  <Switch onChange={onChange} onBlur={onBlur} value={value} disabled={score.isFinal || score.acceptNewRequest} color="primary" />
+                  <Switch onChange={onChange} onBlur={onBlur} value={value} disabled={!!score.isFinal || !!score.acceptNewRequest} color="primary" />
                 </Stack>
               )}
             />
