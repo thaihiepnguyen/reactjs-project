@@ -66,6 +66,7 @@ export class CourseListService {
         teacherIds: true,
         classCode: true,
         isValid: true,
+        isActive: true
       },
     });
 
@@ -90,6 +91,7 @@ export class CourseListService {
         description: item.description,
         classCode: item.classCode,
         isValid: item.isValid,
+        isActive: item.isActive,
         teachers: ids,
       };
     });
