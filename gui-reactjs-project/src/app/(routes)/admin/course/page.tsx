@@ -61,6 +61,9 @@ const List = memo(() => {
   const [itemAction, setItemAction] = useState<User>();
   const [actionAnchor, setActionAnchor] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [isDescending, setIsDescending] = useState<boolean>(false);
+
 
   const fetchData = (page: number) => {
     dispatch(setLoading(true));
@@ -78,10 +81,10 @@ const List = memo(() => {
     fetchData(page);
   }, [page]);
 
-  const handleAction = (event: React.MouseEvent<HTMLButtonElement>, item: User) => {
-    setItemAction(item);
-    setActionAnchor(event.currentTarget);
-  };
+  // const handleAction = (event: React.MouseEvent<HTMLButtonElement>, item: User) => {
+  //   setItemAction(item);
+  //   setActionAnchor(event.currentTarget);
+  // };
 
   const onCloseActionMenu = () => {
     setItemAction(undefined);
@@ -130,11 +133,12 @@ const List = memo(() => {
     AdminService.putActive(course.id, !course.isActive);
   };
 
+  // SEARCH COURSE
   const handleOnChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const debouncedSearchTerm = useDebounce(searchTerm, 800);
+  const debouncedSearchTerm = useDebounce(searchTerm, 900);
 
   useEffect(() => {
     dispatch(setLoading(true));
@@ -147,6 +151,43 @@ const List = memo(() => {
     })
     .finally(() => dispatch(setLoading(false)));
   }, [debouncedSearchTerm]);
+
+  // FILTER COURSE
+  const handleSort = (name: string) => {
+    let sortedResult: Course[] = [...data?.list || []];
+    console.log(name);
+    if (sortField === name) {
+      setIsDescending(!isDescending);
+      sortedResult.reverse();
+    } else {
+      setSortField(name);
+      setIsDescending(false);
+  
+      switch (name) {
+        case 'id':
+          sortedResult.sort((a, b) => a.id - b.id);
+          break;
+        case 'class_code':
+          sortedResult.sort((a, b) => a.classCode.localeCompare(b.classCode));
+          break;
+        case 'title':
+          sortedResult.sort((a, b) => a.title.localeCompare(b.title));
+          break;
+        case 'description':
+          sortedResult.sort((a, b) => a.description.localeCompare(b.description));
+          break;
+        // Add more cases for other sortable headers as needed
+        default:
+          break;
+      } 
+    }
+  
+    setData((prevData) => ({
+      ...prevData,
+      list: sortedResult,
+    }));
+  };
+  
 
   return (
     <div className={classes.container}>
@@ -174,7 +215,11 @@ const List = memo(() => {
               </Button>
             </Box>
             <Table>
-              <TableHeader headers={tableHeaders} />
+              <TableHeader 
+                headers={tableHeaders} 
+                sort={{ sortedField: sortField, isDescending: isDescending }}
+                onChangeSort={(name: string) => handleSort(name)}
+              />
               <TableBody>
                 {data?.list?.map((course, courseIndex) => {
                   return (
