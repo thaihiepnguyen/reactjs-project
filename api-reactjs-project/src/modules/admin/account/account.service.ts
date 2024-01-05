@@ -123,7 +123,7 @@ export class AccountService {
       avatar_url as avatarUrl,
       role_id as roleId,
       is_valid as isValid,
-      studentId
+      student_id
     FROM users 
     WHERE MATCH(fullname) AGAINST (?)
     LIMIT ?
