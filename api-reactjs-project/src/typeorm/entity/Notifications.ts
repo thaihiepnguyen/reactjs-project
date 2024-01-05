@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { EntityBase } from '../EntityBase';
 
-@Entity('notifications', { schema: 'QLHSSV_DB' })
+@Entity('notifications', { schema: 'WEBNC_APP' })
 export class Notifications extends EntityBase {
   @Column('tinyint', {
     name: 'is_valid',

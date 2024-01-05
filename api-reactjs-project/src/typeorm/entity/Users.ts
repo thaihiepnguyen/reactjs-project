@@ -2,7 +2,7 @@ import { Column, Entity, OneToOne, JoinColumn } from 'typeorm';
 import { EntityBase } from '../EntityBase';
 import { Roles } from './Roles';
 
-@Entity('users', { schema: 'QLHSSV_DB' })
+@Entity('users', { schema: 'WEBNC_APP' })
 export class Users extends EntityBase {
   @Column('tinyint', {
     name: 'is_valid',

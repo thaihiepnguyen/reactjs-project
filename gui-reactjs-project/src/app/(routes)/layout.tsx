@@ -33,9 +33,20 @@ export default function SidebarLayout({children}: {
     if (user?.role?.name === "teacher") {
       getMyCourses();
     }
-    return () => {
+    const handleTabClose = (event: { preventDefault: () => void; returnValue: string; }) => {
+      event.preventDefault();
+
       socketService.close();
-    }
+
+      return (event.returnValue =
+        'Are you sure you want to exit?');
+    };
+
+    window.addEventListener('beforeunload', handleTabClose);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleTabClose);
+    };
   }, []);
   return <div className={classes.sidebarLayout}>
     <Sidebar></Sidebar>

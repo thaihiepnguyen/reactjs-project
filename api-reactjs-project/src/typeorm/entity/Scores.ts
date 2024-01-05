@@ -3,7 +3,7 @@ import { EntityBase } from '../EntityBase';
 import { GradeCompositions } from './GradeCompositions';
 import { Users } from './Users';
 
-@Entity('scores', { schema: 'QLHSSV_DB' })
+@Entity('scores', { schema: 'WEBNC_APP' })
 export class Scores extends EntityBase {
   @Column('int', {
     name: 'grade_id',

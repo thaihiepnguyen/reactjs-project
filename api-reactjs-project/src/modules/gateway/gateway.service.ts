@@ -26,6 +26,9 @@ export class GatewayService implements OnModuleInit {
   onModuleInit(): any {
     this.server.on('connection', (socket) => {
       console.log('Client: ' + socket.id + ' joined');
+      socket.on('disconnect', () => {
+        console.log(socket.id + ' disconnected')
+      })
     });
   }
   @SubscribeMessage('subscribeCourses')
@@ -39,6 +42,7 @@ export class GatewayService implements OnModuleInit {
       client.join(room);
       console.log(client.id + ' joined ' + room);
     });
+
     return;
   }
 

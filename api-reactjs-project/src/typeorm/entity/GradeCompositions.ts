@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { EntityBase } from '../EntityBase';
 
-@Entity('grade_compositions', { schema: 'QLHSSV_DB' })
+@Entity('grade_compositions', { schema: 'WEBNC_APP' })
 export class GradeCompositions extends EntityBase {
   @Column('int', {
     name: 'course_id',
