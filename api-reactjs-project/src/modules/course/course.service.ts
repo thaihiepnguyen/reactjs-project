@@ -357,75 +357,86 @@ export class CourseService {
 
   async getMyCourseDetail(id: number, userId: number): Promise<TBaseDto<any>> {
     // the userId is a teacher's id
-    const course = await this.connection.getRepository(Courses).findOne({
-      where: {
-        id,
-      },
-    });
-    if (!course) {
-      throw new ForbiddenException({
-        message: 'This course not found!',
+    const runner = this.connection.createQueryRunner();
+    try {
+      const course = await runner.manager.getRepository(Courses).findOne({
+        where: {
+          id,
+        },
       });
+      if (!course) {
+        throw new ForbiddenException({
+          message: 'This course not found!',
+        });
+      }
+
+      const participants = await runner.manager
+        .getRepository(Participants)
+        .find({
+          where: {
+            courseId: course.id,
+          },
+          select: {
+            studentId: true,
+          },
+        });
+
+      const studentIds = participants.map((item) => item.studentId);
+      const teacherIds = course.teacherIds?.split(', ')?.map((idStr) => +idStr);
+
+      if (!teacherIds.includes(userId) && !studentIds.includes(userId)) {
+        throw new ForbiddenException({
+          message: 'Maybe you have not joined this course!',
+        });
+      }
+
+      if (!course.isActive) {
+        throw new ForbiddenException({
+          message: 'This course is blocked by admin!',
+        });
+      }
+
+      // if (!course.teacherIds.includes('' + userId)) {
+      //   throw new ForbiddenException("Maybe you aren't a teacher of this course!");
+      // }
+
+      const [teacherList, studentList, absentStudentList] = await Promise.all([
+        runner.manager.getRepository(Users).find({
+          where: {
+            id: In(teacherIds),
+          },
+        }),
+        runner.manager.getRepository(Users).find({
+          where: {
+            id: In(studentIds),
+          },
+        }),
+        runner.manager.getRepository(AbsentPariticipants).find({
+          where: {
+            courseId: course.id,
+          },
+        }),
+      ]);
+      return {
+        message: 'success',
+        statusCode: 200,
+        data: {
+          ...course,
+          teacherList: teacherList,
+          studentList: studentList,
+          absentStudentList: absentStudentList,
+        },
+      };
+    } catch (e) {
+      console.log(e);
+      return {
+        message: e.message,
+        statusCode: 400,
+        data: null,
+      };
+    } finally {
+      await runner.release();
     }
-
-    const participants = await this.connection
-      .getRepository(Participants)
-      .find({
-        where: {
-          courseId: course.id,
-        },
-        select: {
-          studentId: true,
-        },
-      });
-
-    const studentIds = participants.map((item) => item.studentId);
-    const teacherIds = course.teacherIds?.split(', ')?.map((idStr) => +idStr);
-
-    if (!teacherIds.includes(userId) && !studentIds.includes(userId)) {
-      throw new ForbiddenException({
-        message: 'Maybe you have not joined this course!',
-      });
-    }
-
-    if (!course.isActive) {
-      throw new ForbiddenException({
-        message: 'This course is blocked by admin!',
-      });
-    }
-
-    // if (!course.teacherIds.includes('' + userId)) {
-    //   throw new ForbiddenException("Maybe you aren't a teacher of this course!");
-    // }
-
-    const [teacherList, studentList, absentStudentList] = await Promise.all([
-      this.connection.getRepository(Users).find({
-        where: {
-          id: In(teacherIds),
-        },
-      }),
-      this.connection.getRepository(Users).find({
-        where: {
-          id: In(studentIds),
-        },
-      }),
-      this.connection.getRepository(AbsentPariticipants).find({
-        where: {
-          courseId: course.id,
-        },
-      }),
-    ]);
-
-    return {
-      message: 'success',
-      statusCode: 200,
-      data: {
-        ...course,
-        teacherList: teacherList,
-        studentList: studentList,
-        absentStudentList: absentStudentList,
-      },
-    };
   }
 
   public async isCourseExist(id: number): Promise<boolean> {
@@ -497,7 +508,7 @@ export class CourseService {
   public async inviteToCourse(emails: string[], courseId: string) {
     const runner = this.connection.createQueryRunner();
 
-    const course = await runner.connection.getRepository(Courses).findOne({
+    const course = await runner.manager.getRepository(Courses).findOne({
       where: {
         id: +courseId,
       },
@@ -507,7 +518,7 @@ export class CourseService {
       throw new NotFoundException('Course not found');
     }
 
-    const rawData = await runner.connection.query(
+    const rawData = await runner.manager.query(
       `SELECT * FROM email_templates WHERE id = 3`,
     );
     const content = rawData[0].content;

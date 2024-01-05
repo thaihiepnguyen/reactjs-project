@@ -13,7 +13,9 @@ export default class SocketService {
   private _socket: Socket
 
   private constructor() {
-    this._socket = io(process.env.API_URL).connect()
+    this._socket = io(process.env.API_URL, {
+      transports: ['websocket'],
+    }).connect()
   }
 
   public static instance() {
