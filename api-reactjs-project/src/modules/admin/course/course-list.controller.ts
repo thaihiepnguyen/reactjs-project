@@ -45,10 +45,10 @@ export class CourseListController {
     return this.courseListSerivce.putActive(courseId, isActive);
   }
 
-  @Post('/create') 
-  async createCourse(
-    @Body() formData: FormData,
-  ): Promise<TBaseDto<any>> {
-    return this.courseListSerivce.createCourse(formData);
-  }
+  // @Post('/create')
+  // async createCourse(
+  //   @Body() formData: FormData,
+  // ): Promise<TBaseDto<any>> {
+  //   return this.courseListSerivce.createCourse(formData);
+  // }
 }

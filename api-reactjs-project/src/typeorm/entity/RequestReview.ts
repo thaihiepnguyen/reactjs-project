@@ -3,7 +3,7 @@ import { EntityBase } from '../EntityBase';
 import { RequestMessage } from './RequestMessage';
 import { Scores } from './Scores';
 
-@Entity('request_review', { schema: 'QLHSSV_DB' })
+@Entity('request_review', { schema: 'WEBNC_APP' })
 export class RequestReview extends EntityBase {
   @Column('int', {
     name: 'score_id',

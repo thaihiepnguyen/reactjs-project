@@ -12,9 +12,9 @@ import { join } from 'path';
 import { getEntities } from './typeorm';
 config();
 
-function getFiles(type, prefix) {
+function getFiles(type: string, prefix: string) {
   const result = [];
-  function innerRecursion(type, prefix) {
+  function innerRecursion(type: string, prefix: string) {
     const __dirname = fs.realpathSync('.');
     const files = fs.readdirSync(__dirname + '/src/' + prefix);
 
@@ -30,7 +30,7 @@ function getFiles(type, prefix) {
   return result;
 }
 
-async function dynamicImport(prefix) {
+async function dynamicImport(prefix: string) {
   const moduleFiles = getFiles('module', prefix);
   const modules = await Promise.all(
     moduleFiles.map((file) => {
