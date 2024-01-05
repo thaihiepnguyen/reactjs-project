@@ -1,4 +1,3 @@
--- Host: bck3mm97awdhhrgcudor-mysql.services.clever-cloud.com:21385
 -- Generation Time: Jan 05, 2024 at 08:08 AM
 -- Server version: 8.0.33-25
 -- PHP Version: 8.2.11
@@ -8,10 +7,10 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 --
--- Database: `bck3mm97awdhhrgcudor`
+-- Database: `WEBNC_APP`
 --
-CREATE DATABASE IF NOT EXISTS `bck3mm97awdhhrgcudor` DEFAULT CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci;
-USE `bck3mm97awdhhrgcudor`;
+CREATE DATABASE IF NOT EXISTS `WEBNC_APP` DEFAULT CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci;
+USE `WEBNC_APP`;
 
 -- --------------------------------------------------------
 
