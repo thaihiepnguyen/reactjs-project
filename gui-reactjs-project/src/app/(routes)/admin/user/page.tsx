@@ -31,6 +31,7 @@ import { setLoading } from "@/redux/reducers/loading";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import WarningModal from "@/app/components/WarningModal";
+import useDebounce from "../../../../lib/useDebounce"; 
 
 const tableHeaders: TableHeaderLabel[] = [
   { name: "id", label: "Id", sortable: true },
@@ -59,6 +60,9 @@ const List = memo(() => {
   const [page, setPage] = useState<number>(1);
   const [itemAction, setItemAction] = useState<User>();
   const [actionAnchor, setActionAnchor] = useState<null | HTMLElement>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [isDescending, setIsDescending] = useState<boolean>(false);
 
   const fetchData = (page: number) => {
     dispatch(setLoading(true));
@@ -115,6 +119,63 @@ const List = memo(() => {
     setItemDelete(itemAction);
   };
 
+  // SEARCH USER
+  const handleOnChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 900);
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    AdminService.searchUsers(1, debouncedSearchTerm)
+    .then((data) => {
+    setData(data?.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => dispatch(setLoading(false)));
+  }, [debouncedSearchTerm]);
+
+  // // FILTER USER
+  const handleSort = (name: string) => {
+    let sortedResult: User[] = [...data?.list || []];
+    // console.log(name);
+    if (sortField === name) {
+      setIsDescending(!isDescending);
+      sortedResult.reverse();
+    } else {
+      setSortField(name);
+      setIsDescending(false);
+  
+      switch (name) {
+        case 'id':
+        case 'studentId':
+          sortedResult.sort((a, b) => (isDescending ? b[name] - a[name] : a[name] - b[name]));
+          break;
+        case 'fullname':
+        case 'email':
+          sortedResult.sort((a, b) => a[name].localeCompare(b[name]));
+          break;
+        // case 'isValid':
+        //   sortedResult.sort((a, b) => {
+        //     if (a[name] && !b[name]) return isDescending ? -1 : 1;
+        //     if (!a[name] && b[name]) return isDescending ? 1 : -1;
+        //     return 0;
+        //   });
+        //   break;
+        default:
+          break;
+      } 
+    }
+  
+    setData((prevData) => ({
+      ...prevData,
+      list: sortedResult,
+    }));
+  };
+
   return (
     <div className={classes.container}>
       <Grid container alignItems="center" justifyContent="space-between">
@@ -135,13 +196,17 @@ const List = memo(() => {
         <Grid item xs={12}>
           <TableContainer component={Paper} sx={{ marginTop: "2rem" }}>
             <Box display="flex" alignItems="center" justifyContent="space-between" m={3}>
-              <InputSearch placeholder="Search ..." />
+              <InputSearch placeholder="Search ..." onChange={handleOnChange}/>
               <Button variant="contained" color="primary" startIcon={<FilterAlt />}>
                 Filter
               </Button>
             </Box>
             <Table>
-              <TableHeader headers={tableHeaders} />
+              <TableHeader 
+                headers={tableHeaders} 
+                sort={{ sortedField: sortField, isDescending: isDescending }}
+                onChangeSort={(name: string) => handleSort(name)} 
+              />
               <TableBody>
                 {data?.list?.map((user, userIndex) => {
                   return (
