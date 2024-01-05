@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Post,
   Put,
   Query,
 } from '@nestjs/common';
@@ -42,5 +43,12 @@ export class CourseListController {
     @Param('courseId', ParseIntPipe) courseId: number,
   ): Promise<TBaseDto<null>> {
     return this.courseListSerivce.putActive(courseId, isActive);
+  }
+
+  @Post('/create') 
+  async createCourse(
+    @Body() formData: FormData,
+  ): Promise<TBaseDto<any>> {
+    return this.courseListSerivce.createCourse(formData);
   }
 }

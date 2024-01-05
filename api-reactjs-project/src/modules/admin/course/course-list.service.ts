@@ -119,6 +119,29 @@ export class CourseListService {
       .replace('Đ', 'D');
   }
 
+  async createCourse(
+    formData: FormData
+  ) {
+    try {
+      // const { name, description, class_code } = formData;
+
+      // Call the service method to create a course
+      // const newCourse = await this.courseListSerivce.createCourse({ name, description, class_code });
+      console.log(formData);
+      return {
+        statusCode: 201, 
+        // data: newCourse, 
+        message: 'Course created successfully!',
+      };
+    } catch (error) {
+      return {
+        statusCode: 500,
+        data: null,
+        message: 'Failed to create course.',
+      };
+    }
+  }
+
   async putActive(
     courseId: number,
     isActive: boolean,
