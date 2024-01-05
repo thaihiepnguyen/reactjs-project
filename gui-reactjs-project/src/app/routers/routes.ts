@@ -8,6 +8,7 @@ export const routes = {
   enrolledCourses: "/user/enrolled-courses",
   notifications: "/user/notifications",
   admin_user: "/admin/user",
+  admin_course: "/admin/course",
   admin_mapping: "/admin/mapping",
   courseDetail: "/course/"
 };

@@ -17,6 +17,11 @@ const getTranslatedAdminSidebarItems = (t: any) => [
     icon: <AccountCircleOutlined />,
   },
   {
+    name: t("Courses"),
+    href: routes.admin_course,
+    icon: <SchoolOutlined />,
+  },
+  {
     name: t("Student Ids Mapping"),
     href: routes.admin_mapping,
     icon: <SettingsOutlined />,

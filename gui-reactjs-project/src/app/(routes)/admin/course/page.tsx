@@ -32,6 +32,9 @@ import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import WarningModal from "@/app/components/WarningModal";
 import { Course } from "@/models/course";
+import useDebounce from "../../../../lib/useDebounce"; 
+import axiosInstance from "@/app/routers/axios";
+import Swal from "sweetalert2";
 
 const tableHeaders: TableHeaderLabel[] = [
   { name: "id", label: "Id", sortable: true },
@@ -57,6 +60,7 @@ const List = memo(() => {
   const [page, setPage] = useState<number>(1);
   const [itemAction, setItemAction] = useState<User>();
   const [actionAnchor, setActionAnchor] = useState<null | HTMLElement>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchData = (page: number) => {
     dispatch(setLoading(true));
@@ -126,6 +130,24 @@ const List = memo(() => {
     AdminService.putActive(course.id, !course.isActive);
   };
 
+  const handleOnChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 800);
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    AdminService.searchCourses(1, debouncedSearchTerm)
+    .then((data) => {
+    setData(data?.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => dispatch(setLoading(false)));
+  }, [debouncedSearchTerm]);
+
   return (
     <div className={classes.container}>
       <Grid container alignItems="center" justifyContent="space-between">
@@ -146,7 +168,7 @@ const List = memo(() => {
         <Grid item xs={12}>
           <TableContainer component={Paper} sx={{ marginTop: "2rem" }}>
             <Box display="flex" alignItems="center" justifyContent="space-between" m={3}>
-              <InputSearch placeholder="Search ..." />
+              <InputSearch placeholder="Search ..." onChange={handleOnChange} />
               <Button variant="contained" color="primary" startIcon={<FilterAlt />}>
                 Filter
               </Button>
