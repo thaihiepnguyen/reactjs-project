@@ -155,7 +155,7 @@ const List = memo(() => {
   // FILTER COURSE
   const handleSort = (name: string) => {
     let sortedResult: Course[] = [...data?.list || []];
-    console.log(name);
+    // console.log(name);
     if (sortField === name) {
       setIsDescending(!isDescending);
       sortedResult.reverse();
@@ -199,7 +199,7 @@ const List = memo(() => {
         </Grid>
         <Grid item xs={6}>
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-            <Button variant="contained" color="primary" startIcon={<Add />} onClick={() => router.push("/admin/user/create")}>
+            <Button variant="contained" color="primary" startIcon={<Add />} onClick={() => router.push("/admin/course/create")}>
               Create
             </Button>
           </Box>

@@ -23,6 +23,16 @@ export default class AdminService {
     })
   };
 
+  static async createCourse(data: FormData) {
+    return await axiosInstance.post(`/admin/course/create`, data
+    )
+    .then((res) => {
+      return Promise.resolve(res.data);
+    }).catch((e) => {
+      return Promise.reject(e?.response?.data);
+    })
+  };
+
   static async toggleBlockUser(id: number) {
     return await axiosInstance.delete(`/admin/account/${id}`)
     .then((res) => {
