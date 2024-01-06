@@ -91,25 +91,33 @@ export class AccountService {
   }
 
   async mapping(items: { studentId: string; email: string }[]) {
-    for (const item of items) {
-      const { studentId, email } = item;
+    const runner = this.connection.createQueryRunner();
+    try {
+      for (const item of items) {
+        const { studentId, email } = item;
 
-      // Check if the email exists in the database
-      const existingUser = await this.connection
-        .getRepository(Users)
-        .findOne({ where: { email } });
+        // Check if the email exists in the database
+        const [existedUser, isStudentIdExisted] = await Promise.all([
+          await runner.manager
+            .getRepository(Users)
+            .findOne({ where: { email } }),
+          await runner.manager.getRepository(Users).exist({
+            where: {
+              studentId: studentId,
+            },
+          }),
+        ]);
 
-      if (existingUser) {
-        await this.connection
-          .getRepository(Users)
-          .update((await existingUser).id, {
+        if (existedUser && isStudentIdExisted) {
+          await runner.manager.getRepository(Users).update(existedUser.id, {
             studentId: studentId,
           });
-      } else {
-        // Handle scenario where the email doesn't exist in the database
-        // You might want to log this or handle it as per your application's logic
-        console.log(`Email ${email} not found in the database.`);
+        }
       }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      await runner.release();
     }
   }
 
