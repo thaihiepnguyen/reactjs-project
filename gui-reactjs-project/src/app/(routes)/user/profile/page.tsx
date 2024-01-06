@@ -42,7 +42,7 @@ export default function Profile() {
   return (
     <>
       <Grid className={classes.main}>
-        <div className={classes.menuList}>{links}</div>
+        {/* <div className={classes.menuList}>{links}</div> */}
         <div className={classes.content}>
           <EditProfile/>
         </div>

@@ -1,16 +1,26 @@
-import {DynamicModule, MiddlewareConsumer, Module, NestModule} from '@nestjs/common';
-import {TypeOrmModule} from "@nestjs/typeorm";
-import entities from "./typeorm";
-import {AuthMiddleware} from "./modules/auth/auth.middleware";
-import {MailerModule} from "@nestjs-modules/mailer";
-import {ConfigModule} from "@nestjs/config";
-import * as process from "process";
+import {
+  DynamicModule,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthMiddleware } from './modules/auth/auth.middleware';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { ConfigModule } from '@nestjs/config';
+import * as process from 'process';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CourseController } from './modules/course/course.controller';
+import { ScoreController } from './modules/score/score.controller';
+import { AccountController } from './modules/admin/account/account.controller';
+import { CourseListController } from './modules/admin/course/course-list.controller';
+import { UserController } from './modules/user/user.controller';
+import { NotificationController } from './modules/notification/notification.controller';
 
 @Module({})
 export class AppModule implements NestModule {
-  static forRoot(modules): DynamicModule {
+  static forRoot({ modules, entities }): DynamicModule {
     return {
       module: AppModule,
       imports: [
@@ -28,26 +38,31 @@ export class AppModule implements NestModule {
             host: process.env.HOST_NODEMAILER,
             auth: {
               user: process.env.USER_NODEMAILER,
-              pass: process.env.PASS_NODEMAILER
-            }
-          }
+              pass: process.env.PASS_NODEMAILER,
+            },
+          },
         }),
         ConfigModule.forRoot({
           isGlobal: true,
         }),
         ServeStaticModule.forRoot({
           rootPath: join(__dirname, '..', 'uploads'),
-          serveRoot: '/uploads/'
+          serveRoot: '/uploads/',
         }),
-        ...modules
-      ]
-    }
+        ...modules,
+      ],
+    };
   }
   configure(consumer: MiddlewareConsumer): any {
     consumer
       .apply(AuthMiddleware)
       .forRoutes(
-        'user/profile'
-      )
+        UserController,
+        CourseController,
+        ScoreController,
+        NotificationController,
+        AccountController,
+        CourseListController,
+      );
   }
 }

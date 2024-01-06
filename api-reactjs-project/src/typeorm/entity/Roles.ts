@@ -1,11 +1,11 @@
-import {Column, Entity} from "typeorm";
-import {EntityBase} from "./EntityBase";
+import { Column, Entity } from 'typeorm';
+import { EntityBase } from '../EntityBase';
 
-@Entity('roles', {schema: 'QLHSSV_DB'})
-export class Roles extends EntityBase{
-  @Column("varchar", {
+@Entity('roles', { schema: 'WEBNC_APP' })
+export class Roles extends EntityBase {
+  @Column('varchar', {
     length: 255,
-    name: "name"
+    name: 'name',
   })
   name: string;
 }

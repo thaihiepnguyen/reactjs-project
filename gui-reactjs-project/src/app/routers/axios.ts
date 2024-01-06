@@ -11,14 +11,14 @@ axiosInstance.interceptors.request.use(
   (config) => {
 
     let tokenStr =  getCookie('token')?.toString();
-    let token = {
-      accessToken: ""
-    };
+    let token = null;
+    
     if (tokenStr) {
       token = JSON.parse(tokenStr);
     }
     const userId = getCookie('userId');
     const userName = getCookie('userName');
+    const role = getCookie('role');
 
     if (token) {
       config.headers['Authorization'] = `Bearer ${token.accessToken}`;
@@ -30,6 +30,9 @@ axiosInstance.interceptors.request.use(
 
     if (userName) {
       config.headers['X-User-Name'] = encodeURI(userName);
+    }
+    if (role) {
+      config.headers['X-Role'] = role;
     }
 
     return config;
@@ -45,10 +48,19 @@ axiosInstance.interceptors.response.use(
       setCookie('token', JSON.stringify(response.data.data.token))
       setCookie('userId', response.data.data.user.id)
       setCookie('userName', response.data.data.user.fullname)
+      setCookie('role', response.data.data.user.role)
     }
     return response;
   },
   (error) => {
+    if (error?.response?.status === 401) {
+      if (getCookie('token')) {
+        deleteCookie('token');
+        deleteCookie('userId');
+        deleteCookie('userName');
+        deleteCookie('role');
+      }
+    }
     return Promise.reject(error);
   }
 );

@@ -1,0 +1,19 @@
+.title {
+  font-weight: 500;
+}
+.buttonCancel {
+  margin-right: 5px;
+}
+.buttonConfirm {
+  background-color: #af1c10;
+  color: 'white';
+  font-weight: 'bold';
+  &:hover {
+    background-color: #af1c10;
+  }
+}
+.icon {
+  font-size: 3rem;
+  color: #af1c10;
+  margin-right: 5px;
+}

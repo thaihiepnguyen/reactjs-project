@@ -1,0 +1,25 @@
+
+.iconMore {
+  color: #767676;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  border-radius: 50%;
+  position: 'absolute'
+}
+.iconMore:hover {
+  border: 1px solid #f4f4f4;
+  background: #f4f4f4;
+}
+
+.more {
+  position: relative;
+  bottom: -2rem;
+  right: 2rem;
+  padding: 0 16px;
+}

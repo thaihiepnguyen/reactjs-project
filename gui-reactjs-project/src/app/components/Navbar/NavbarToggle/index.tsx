@@ -9,35 +9,45 @@ import Logout from '@mui/icons-material/Logout';
 import { useState } from "react";
 import { useAppDispatch } from "@/redux/hook";
 import { setUser } from "@/redux/reducers/user";
-import { getCookies, setCookie, deleteCookie, getCookie } from 'cookies-next';
+import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation'
 import { signOut } from "next-auth/react"
 import Link from "next/link";
+import { useTranslation , appWithTranslation } from 'next-i18next';
+import SocketService from "@/services/socketService";
 
-export default function NavbarToggle({avatar, userName }) {
+interface NavbarToggleProps {
+  avatar: string;
+  userName: string;
+}
+export default function NavbarToggle({avatar, userName }: NavbarToggleProps) {
+  const socketService = SocketService.instance()
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const handleClick = (event: MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
 
   };
-  const handleClose = (e:MouseEvent<HTMLElement>) => {
+  const handleClose = (e:React.MouseEvent<HTMLElement>) => {
     setAnchorEl(null);
   };
 
   const logout = () => {
+    socketService.close()
     signOut();
     deleteCookie('token');
     deleteCookie('userId');
     deleteCookie('userName');
+    deleteCookie('role');
     dispatch(setUser(null));
     router.replace('/');
   }
 
   return (
     <div className={classes.navbarToggle}>
-      <span>Hi, {userName}</span>
+      <span>{t('welcome')}, {userName}</span>
       <div style={{ marginLeft: 10 }} onClick={handleClick}>
         {!avatar ? (
           <Avatar>H</Avatar>
@@ -87,7 +97,7 @@ export default function NavbarToggle({avatar, userName }) {
               <ListItemIcon>
                 <Person fontSize="small" />
               </ListItemIcon>
-              Profile
+              {t('profile')}
             </MenuItem>
 
           </Link>
@@ -98,7 +108,7 @@ export default function NavbarToggle({avatar, userName }) {
             <ListItemIcon>
               <Logout fontSize="small" />
             </ListItemIcon>
-            Logout
+            {t('logout')}
           </MenuItem>
         </Menu>
     </div>

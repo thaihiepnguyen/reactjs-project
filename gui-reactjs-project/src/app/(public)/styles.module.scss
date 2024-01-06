@@ -1,0 +1,12 @@
+.sidebarLayout {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+.content {
+  width: 100%;
+  display: flex;
+  justify-content: left;
+  margin: 20px;
+}

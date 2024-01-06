@@ -6,6 +6,7 @@ import AuthProvider from "./components/AuthProvider";
 import Navbar from "@/app/components/Navbar";
 import CircularProgress from "@/app/components/CircularProgress";
 import StyledComponentsRegistry from "@/lib/registry";
+import ReduxLayer from "./components/ReduxLayer";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -20,11 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={montserrat.className}>
         <Providers>
           <AuthProvider>
-            <StyledComponentsRegistry>
-              <CircularProgress />
-              <Navbar></Navbar>
-              {children}
-            </StyledComponentsRegistry>
+            <ReduxLayer>
+              <StyledComponentsRegistry>
+                <CircularProgress />
+                <Navbar></Navbar>
+                {children}
+              </StyledComponentsRegistry>
+            </ReduxLayer>
           </AuthProvider>
         </Providers>
       </body>

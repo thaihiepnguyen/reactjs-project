@@ -1,37 +1,40 @@
-import {NextFunction} from "express";
-import {Injectable, NestMiddleware} from "@nestjs/common";
-import { Response, Request } from "express";
-import {JwtService} from "@nestjs/jwt";
+import { NextFunction } from 'express';
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Response, Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
   constructor(private jwtService: JwtService) {}
   use(req: Request, res: Response, next: NextFunction) {
+    const cookies = req.cookies;
     const authorizationHeader = req.headers.authorization;
-    if (!authorizationHeader) {
-      return res.status(401).json({
-        statusCode: 401,
-        message: 'Unauthorized'
-      })
-    }
-    const [, accessToken] = authorizationHeader.split(' ');
 
-    if (!accessToken) {
+    if (!cookies && !authorizationHeader) {
       return res.status(401).json({
         statusCode: 401,
-        message: 'Unauthorized'
-      })
+        message: 'Unauthorized',
+      });
     }
 
     let isTokenValid = true;
     try {
+      const accessToken =
+        JSON.parse(cookies['token'])?.accessToken ||
+        authorizationHeader.split(' ')[1];
+      if (!accessToken) {
+        return res.status(401).json({
+          statusCode: 401,
+          message: 'Unauthorized',
+        });
+      }
       this.jwtService.verify(accessToken);
     } catch (e) {
       isTokenValid = false;
       return res.status(401).json({
         statusCode: 401,
-        message: 'Unauthorized'
-      })
+        message: 'Unauthorized',
+      });
     } finally {
       if (isTokenValid) next();
     }

@@ -9,8 +9,9 @@
   line-height: 60px;
   padding: 0 20px;
   width: 100%;
-  margin-bottom: 30px;
+  // margin-bottom: 30px;
   .home {
+    margin-left: 10px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -21,9 +22,11 @@
   .loginContainer {
     align-self: center;
     height: 40px;
-    width: 200px;
+    width: auto;
     display: flex;
+    gap: 0.5rem;
     justify-content: space-around;
+    align-items: center;
   }
   .link {
     text-decoration: none;

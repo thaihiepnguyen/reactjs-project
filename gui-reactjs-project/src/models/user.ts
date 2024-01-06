@@ -1,6 +1,23 @@
 export interface User {
-  fullname: string,
-  email: string,
-  avatarUrl: string,
-  phone: string
+  id: number;
+  studentId: string;
+  fullname: string;
+  email: string;
+  password: string;
+  avatarUrl: string;
+  phone: string;
+  role: Role;
+  roleId: number;
+  isValid: boolean;
+  isActive: boolean;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+}
+
+export interface Role {
+  id: number,
+  name: string,
 }
