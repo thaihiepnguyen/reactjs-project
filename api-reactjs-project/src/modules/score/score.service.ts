@@ -890,19 +890,20 @@ export class ScoreService {
       .createQueryBuilder('scores')
       .where(
         'scores.grade_id IN (:...gradeIds) and scores.student_id = :studentId',
-        { gradeIds, studentId: user.studentId },
+        { gradeIds, studentId: user.studentId }, 
       )
       .leftJoinAndSelect(
         GradeCompositions,
-        'grade',
+        'grade', 
         'grade.id = scores.grade_id',
       )
       .leftJoinAndSelect(Users, 'users', 'users.id = scores.teacher_id')
       .leftJoinAndSelect(
         RequestReview,
-        'requestReview',
+        'requestReview', 
         'requestReview.score_id = scores.id',
       )
+      .orderBy('grade.order', "ASC")
       .execute();
 
     let avg = 0;

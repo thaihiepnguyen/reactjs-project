@@ -13,6 +13,9 @@ import ParagraphSmall from "../text/ParagraphSmall";
 import Button, { BtnType } from "../buttons/Button";
 import ErrorMessage from "../text/ErrorMessage";
 import axiosInstance from "@/app/routers/axios";
+import { useAppDispatch } from "@/redux/hook";
+import { setLoading } from "@/redux/reducers/loading";
+import Swal from "sweetalert2";
 
 interface Props {
   isOpen: boolean;
@@ -27,7 +30,7 @@ interface DataForm {
 
 const PopupInviteCourse = memo((props: Props) => {
   const { isOpen, onCancel, courseId } = props;
-
+  const dispatch = useAppDispatch();
   const schema = useMemo(() => {
     return yup.object().shape({
       email: yup.string().notRequired(),
@@ -51,19 +54,30 @@ const PopupInviteCourse = memo((props: Props) => {
   });
 
   const onSubmit = (data: DataForm) => {
-    const listEmail = [...data.emails];
+    let listEmail: string[] = [];
+    if (data?.emails?.length) {
+      listEmail = [...data?.emails]
+    }
     if (data.email) listEmail.push(data.email);
+    dispatch(setLoading(true));
     axiosInstance
       .post("/courses/invite", {
         emails: listEmail,
         courseId: courseId
       })
       .then((res) => {
-        console.log(res);
+        Swal.fire({
+          title: "Success",
+          text: "Send invitation email successfully!",
+          icon: "success",
+        })
+        onCancel();
       })
       .catch((err) => {
         console.log(err);
       });
+    dispatch(setLoading(false));
+    
   };
 
   return (

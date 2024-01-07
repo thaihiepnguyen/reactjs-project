@@ -230,10 +230,10 @@ export class CourseService {
       });
 
       if (!user || !user.studentId) {
-        return {
+        return { 
           status: false,
           msg: 'You must add student id at your profile',
-          data: course.id,
+          data: null,
         };
       }
 
@@ -242,7 +242,7 @@ export class CourseService {
         if (!course.teacherIds.includes(`${userId}`)) {
           const newIds = course.teacherIds + `, ${userId}`;
           await runner.manager.getRepository(Courses).update(
-            {
+            { 
               id: course.id,
             },
             {
@@ -520,13 +520,14 @@ export class CourseService {
 
     const rawData = await runner.manager.query(
       `SELECT * FROM email_templates WHERE id = 3`,
-    );
+    ); 
     const content = rawData[0].content;
 
     if (!content) {
       throw new NotFoundException('Email template not found');
     }
     const html = content
+      .replace('$user_name$', '')
       .replace('$courseName$', course.title)
       .replace('$url$', process.env.CLIENT_URL)
       .replace('classCode', course.classCode);

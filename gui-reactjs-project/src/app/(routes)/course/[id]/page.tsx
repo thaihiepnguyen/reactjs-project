@@ -103,6 +103,10 @@ export default function Page({ params }: { params: { id: string } }) {
     axiosInstance
       .get(`/courses/user/my-courses/detail/${id}`)
       .then((response) => {
+        if (!response.data.data) {
+          return router.push('/home');
+        }
+
         setCourse(response.data.data);
       })
       .catch((err) => {
