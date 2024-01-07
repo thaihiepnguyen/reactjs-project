@@ -108,7 +108,7 @@ export class AccountService {
           }),
         ]);
 
-        if (existedUser && isStudentIdExisted) {
+        if (existedUser && !isStudentIdExisted) {
           await runner.manager.getRepository(Users).update(existedUser.id, {
             studentId: studentId,
           });
