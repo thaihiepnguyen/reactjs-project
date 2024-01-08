@@ -76,13 +76,18 @@ export default class AdminService {
 
   static async searchUsers(page: number, query: string) {
     try {
-      const response = await axiosInstance.get('/admin/account/search', {
-        params: {
-          page: page,
-          q: query,
-        },
-      });
-      return Promise.resolve(response.data);
+      if (query === "") {
+        return this.getAllUser(page);
+      }
+      else {
+        const response = await axiosInstance.get('/admin/account/search', {
+          params: {
+            page: page,
+            q: query,
+          },
+        });
+        return Promise.resolve(response.data);
+      }
     } catch (error) {
       return Promise.reject(error?.response?.data);
     }
