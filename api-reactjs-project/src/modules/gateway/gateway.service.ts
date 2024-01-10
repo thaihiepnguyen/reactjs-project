@@ -27,8 +27,8 @@ export class GatewayService implements OnModuleInit {
     this.server.on('connection', (socket) => {
       console.log('Client: ' + socket.id + ' joined');
       socket.on('disconnect', () => {
-        console.log(socket.id + ' disconnected')
-      })
+        console.log(socket.id + ' disconnected');
+      });
     });
   }
   @SubscribeMessage('subscribeCourses')

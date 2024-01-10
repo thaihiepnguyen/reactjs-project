@@ -71,7 +71,11 @@ export default function MenuCourses({id}) {
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option} selected={option === 'Pyxis'} onClick={UnenrollCourse}>
+          <MenuItem key={option} selected={option === 'Pyxis'} onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            UnenrollCourse();
+          }}>
             {option}
           </MenuItem>
         ))}
