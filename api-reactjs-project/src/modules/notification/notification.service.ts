@@ -106,7 +106,7 @@ export class NotificationService {
   }
 
   private _getMinutes(from) {
-    const sentTime = moment(from).add(7, 'hours');
+    const sentTime = moment(from);
     const now = moment();
     const diffMinutes = now.diff(sentTime, 'minutes');
     if (diffMinutes <= 60) {
